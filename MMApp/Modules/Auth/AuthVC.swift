@@ -13,6 +13,7 @@ import WebKit
 class AuthVC: UIViewController, SubscriptionStore {
     // MARK: Private Property
     private var isLogined = false
+    private(set) var viewModel = AuthViewModel()
     
     
     // MARK: Live cicle
@@ -68,10 +69,15 @@ class AuthVC: UIViewController, SubscriptionStore {
         $0.textAlignment = .center
     }
     
-    private let webView = WKWebView().apply {
-        $0.alpha = 0
-    }
+    private let webView: WKWebView = {
+        let config = WKWebViewConfiguration()
+        config.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
+        let webView = WKWebView(frame: .zero, configuration: config)
+        webView.alpha = 0
+        return webView
+    }()
     
+    // MARK: - Private Methods
     private func bind() {
         telegramStack.publisher
             .handleEvents(
@@ -124,7 +130,14 @@ class AuthVC: UIViewController, SubscriptionStore {
     
     
     private func openWebView() {
-        let request = URLRequest(url: URL(string: "https://oauth.telegram.org/auth?bot_id=7585753405&origin=http%3A%2F%2F194.87.93.98&embed=1&return_to=http%3A%2F%2F194.87.93.98%2Fauth%2Fauthentication")!)
+        // TODO: Убрать - чистку кешей веб вью при открытии webview
+        clearWebViewCache()
+        // END: -
+        
+        guard viewModel.chekSavedKey() else {
+            return
+        }
+        let request = URLRequest(url: URL(string: Constants.tgBotdev)!)
         webView.load(request)
         
         contentView.snp.remakeConstraints({ make in
@@ -182,128 +195,15 @@ class AuthVC: UIViewController, SubscriptionStore {
             make.edges.equalToSuperview()
         }
     }
-    
-    private func validateWebRequest(url: URL?, httpBody: Data?) {
-        print("Neshko WEb URL: \(url)")
-        print("Neshko WEb httpBody: \(httpBody)")
-        guard
-            let urlComponents = url?.absoluteString.components(
-                separatedBy: Constants.tgAuthResult
-            ),
-            let tgKey = urlComponents[safe: 1],
-            !tgKey.isEmpty
-        else {
-            return
-        }
-        print("Neshko weEnd \(tgKey)")
-        webView.alpha = 0
-    }
 }
-
-extension AuthVC: WKNavigationDelegate {
-    func webView(
-        _ webView: WKWebView,
-        decidePolicyFor navigationAction: WKNavigationAction,
-        decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
-    ) {
-        guard let url = webView.url else { return }
-        decisionHandler(.allow)
-        validateWebRequest(
-            url: url,
-            httpBody: navigationAction.request.httpBody
-        )
-        let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: true)?.queryItems
-        print("---------- Neshko Hui: ---- \(url) ----")
-        
-        
-        if url.absoluteString.contains("") {
-            
-        }
-    }
-
-    
-    
-    func webView(
-        _ webView: WKWebView,
-        didFinish navigation: WKNavigation!
-    ) {
-        print("Neshko web didFinish \(navigation)")
-    }
-
-    func webView(
-        _ webView: WKWebView,
-        didFail navigation: WKNavigation!,
-        withError error: Error
-    ) {
-        print("Neshko web didFail1 \(error)")
-    }
-    
-    
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: any Error) {
-        print(" +++ Neshko web didFail2 \(error)")
-        guard let userInfo = (error as? NSError)?.userInfo["NSErrorFailingURLKey"]
-        else { return }
-        
-        let urlComponents = (userInfo as? URL)?.absoluteString.components(
-            separatedBy: Constants.tgAuthResult
-        )
-        
-        guard
-            let urlComponents,
-            let tgKey = urlComponents[safe: 1]
-        else {
-            print(" === Neshko Error")
-            return
-        }
-        
-        let base64String = Data(tgKey.utf8).base64EncodedString()
-        
-        guard let decodedData = Data(base64Encoded: base64String),
-              let decodedString = String(data: decodedData, encoding: .utf8)
-        else {
-                  print("Не удалось декодировать строку из Base64")
-            return
-        }
-        
-        let decodedString2 = decodeBase64(tgKey)
-        
-        guard
-            let jsonData = decodedString.data(using: .utf8),
-            let jsonObject = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any]
-        else {
-            print("Не удалось декодировать строку в jsonData")
-            return
-        }
-        
-        print(jsonObject)
-
-        
-        
-        
-        
-        
-
-    }
-    
-    
-    
-    func decodeBase64(_ input: String) -> String? {
-        // Проверяем, является ли входящая строка корректной Base64 строкой
-        guard let decodedData = Data(base64Encoded: input) else {
-            return nil
-        }
-        
-        // Преобразуем полученные данные обратно в строку
-        return String(data: decodedData, encoding: .utf8)
-    }
-}
-
 
 
 extension AuthVC {
     enum Constants {
         static let queryParamQuestion = "#"
         static let tgAuthResult = "tgAuthResult="
+        static let tgBotdev = "https://oauth.telegram.org/auth?bot_id=7585753405&origin=http%3A%2F%2F194.87.93.98&embed=1&return_to=http%3A%2F%2F194.87.93.98%2Fauth%2Fauthentication"
+        static let tgBotLocalHost = "https://oauth.telegram.org/auth?bot_id=7621034824&origin=http%3A%2F%2F127.0.0.1&embed=1&return_to=http%3A%2F%2F127.0.0.1%2Fauth%2Fauthentication"
     }
 }
 

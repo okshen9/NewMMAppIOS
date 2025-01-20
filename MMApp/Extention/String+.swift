@@ -5,6 +5,8 @@
 //  Created by artem on 18.12.2024.
 //
 
+import Foundation
+
 /// Небольшое расширение для проверки строки на пригодность к обработке.
 extension String {
     /// Удобное расширение для пустой строки, котрой нет в STL Swift.
@@ -24,3 +26,26 @@ extension String {
     var toFloat: Float? { Float(self) }
 }
 
+
+extension String {
+    /// Дополняет данные из присланные телегой до корректного формата base64 и возвращает словарь данных разшифрованных из base64
+    /// - Returns: Словарь данных из данных телеграмма
+    func dicFromData64() -> Dictionary<String, Any>? {
+        var paddedString = self
+        while paddedString.count % 4 != 0 {
+            paddedString += "="
+        }
+        
+        guard
+            let data = Data(base64Encoded: paddedString),
+            let dataStr = String(data: data, encoding: .utf8),
+            let jsonData = dataStr.data(using: .utf8),
+            let jsonObject = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any]
+        
+        else {
+            print("❌ Ошибка: Некорректная Base64 строка")
+            return nil
+        }
+        return jsonObject
+    }
+}

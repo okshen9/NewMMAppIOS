@@ -124,8 +124,8 @@ class UserInfoViewController: UIViewController {
     
     // MARK: - Actions
     @objc private func doneButtonTapped() {
-        let profileVC = ProfileVC()
-        navigationController?.pushViewController(profileVC, animated: true)
+//        let profileVC = ProfileVC()
+//        navigationController?.pushViewController(profileVC, animated: true)
     }
 }
 
