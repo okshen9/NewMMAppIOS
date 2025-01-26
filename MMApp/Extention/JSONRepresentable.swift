@@ -7,7 +7,7 @@
 
 import Foundation
 
-// Если запрос требует наличие message body с SnakeCase кодировкой contractID -> contract_id
+// Если запрос требует наличие message body с CamalCase кодировкой contractID -> contractId
 public protocol JSONRepresentable: Codable {
     func toData() -> Data?
 }
@@ -15,7 +15,7 @@ public protocol JSONRepresentable: Codable {
 public extension JSONRepresentable {
     func toData() -> Data? {
         let encoder = JSONEncoder()
-        encoder.keyEncodingStrategy = .convertToSnakeCase
+        encoder.keyEncodingStrategy = .useDefaultKeys
         return try? encoder.encode(self)
     }
 }

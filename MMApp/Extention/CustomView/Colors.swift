@@ -61,6 +61,17 @@ extension UIColor {
     static let layerThird = UIColor(hex: "303030")!
     /// #F6F6F6
     static let layerInverted = UIColor(hex: "F6F6F6")!
+    
+    ///  #FF4646
+    static let mainRed = UIColor(hex: "FF4646")
+    /// #E2EBEE
+    static let secondbackGraund = UIColor(hex: "E2EBEE")
+    /// #000000 0.87
+    static let headerText = UIColor(hex: "00000", alpha: 0.87)
+    /// #000000 0.54
+    static let subtitleText = UIColor(hex: "00000", alpha: 0.54)
+    /// #F2F4F4
+    static let textFieldBack = UIColor(hex: "F2F4F4")
 }
 
 extension UIColor {

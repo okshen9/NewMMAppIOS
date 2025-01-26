@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -16,7 +17,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
-        window?.rootViewController = AuthVC()
+        if let _ = KeyChainStorage.jwtToken.getData() {
+            window?.rootViewController = AuthVC()
+        } else {
+            window?.rootViewController = AuthVC()
+        }
         window?.makeKeyAndVisible()
     }
 
@@ -49,5 +54,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
 
+}
+
+extension UIWindow {
+    open override func motionBegan(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        if motion == .motionShake {
+            
+            let debugMenu = TestScreenVC()
+            let hostingController = UIHostingController(rootView: debugMenu)
+            UIApplication.shared.topmostViewController?.present(hostingController, animated: true)
+        }
+    }
 }
 
