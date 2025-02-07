@@ -6,7 +6,7 @@ struct ProfileView: View {
     let index: Int
 //    var user: AuthUserDtoResult
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 16) {
             KFImage(Constants.imageUrl)
                 .resizable()
                 .placeholder { Color.gray }
@@ -17,17 +17,69 @@ struct ProfileView: View {
                 .downsampling(size: CGSize(width: 88, height: 88))
                 .clipShape(Circle())
                 .frame(width: 88, height: 88)
-            Text("Артем")
-                .foregroundColor(.headerText)
-            Text("Нешко")
-                .foregroundColor(.headerText)
-            Text("Продаю на Wb")
-                .foregroundColor(.headerText)
-            Button("Update") {
-                viewModel.updateTitle()
+            
+            HStack {
+                Text("Имя ")
+                    .foregroundColor(.subtitleText)
+                Text("Артем")
+                    .foregroundColor(.headerText)
             }
-            .foregroundColor(.green)
+            .padding(8)
+            .background(Color.secondbackGraund)
+            .cornerRadius(8)
+            
+            HStack {
+                Text("Фамилия ")
+                    .foregroundColor(.subtitleText)
+                Text("Нешко")
+                    .foregroundColor(.headerText)
+            }
+            .padding(8)
+            .background(Color.secondbackGraund)
+            .cornerRadius(8)
+            
+            HStack {
+                Text("Телеграмм: ")
+                    .foregroundColor(.subtitleText)
+                Text("@okshen9")
+                    .foregroundColor(.headerText)
+            }
+            .padding(8)
+            .background(Color.secondbackGraund)
+            .cornerRadius(8)
+
+            HStack {
+                Text("Род деятельности: ")
+                    .foregroundColor(.subtitleText)
+                Text("Продаю на Wb")
+                    .foregroundColor(.headerText)
+            }
+            .padding(8)
+            .background(Color.secondbackGraund)
+            .cornerRadius(8)
+            
+            HStack {
+                Text("Учавствовал в: ")
+                    .foregroundColor(.subtitleText)
+                Text("7 поток")
+                    .foregroundColor(.headerText)
+            }
+            .padding(8)
+            .background(Color.secondbackGraund)
+            .cornerRadius(8)
+            
+            HStack {
+                Text("Стутус завершения ")
+                    .foregroundColor(.subtitleText)
+                Text("Закончил")
+                    .foregroundColor(.headerText)
+            }
+            .padding(8)
+            .background(Color.secondbackGraund)
+            .cornerRadius(8)
+            Spacer()
         }
+        .padding(.top, 16)
         
     }
 }

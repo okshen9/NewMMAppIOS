@@ -14,6 +14,7 @@ struct FeedView: View {
             .padding(.horizontal)
             
         }
+        .padding(.top, 24)
         .frame(alignment: .leading)
         .background(Color.secondbackGraund)
         .cornerRadius(16)
@@ -27,7 +28,8 @@ struct FeedView: View {
                     .frame(width: 44, height: 44)
                     .foregroundColor(Color.mainRed)
                 Text("24\ndec")
-                    .frame(alignment: .center)
+                    
+                    .multilineTextAlignment(.center)
                     .font(.caption)
                     .foregroundColor(.white)
             }

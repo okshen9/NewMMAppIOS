@@ -35,7 +35,7 @@ enum AuthRequestHelper {
         case .sendTGToken:
             return RequestUrls.tgCallBack
         case .getMe:
-            return RequestUrls.getProfile
+            return RequestUrls.userProfileMe
         case .createProfile:
             return RequestUrls.userProfile
         }

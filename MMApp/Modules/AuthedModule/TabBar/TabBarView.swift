@@ -28,12 +28,12 @@ struct TabBarView: View {
                 }
                 .tag(1)
             
-            EmptyView()
+            TargetsView()
                 .tabItem {
                     Image(.star)
                         .renderingMode(.template)
                         .foregroundColor(selectedTab == 2 ? Color.mainRed : Color.tabbarSecond)
-                    Text("Главная")
+                    Text("Цели")
                         .foregroundColor(selectedTab == 2 ? Color.mainRed : Color.orange)
                 }
                 .tag(2)
@@ -43,7 +43,7 @@ struct TabBarView: View {
                     Image(.pay)
                         .renderingMode(.template)
                         .foregroundColor(selectedTab == 3 ? Color.mainRed : Color.orange)
-                    Text("Главная")
+                    Text("Оплата")
                         .foregroundColor(selectedTab == 3 ? Color.mainRed : Color.orange)
                 }
                 .tag(3)
@@ -54,7 +54,7 @@ struct TabBarView: View {
                         Image(.profile)
                             .renderingMode(.template)
                             .foregroundColor(selectedTab == 4 ? Color.green : Color.orange)
-                        Text("Главная")
+                        Text("Провиль")
                             .foregroundColor(selectedTab == 4 ? Color.mainRed : Color.orange)
                     }
                 }

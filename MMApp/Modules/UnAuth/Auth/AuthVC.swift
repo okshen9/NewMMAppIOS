@@ -215,6 +215,17 @@ class AuthVC: UIViewController, SubscriptionStore {
         UIView.animate(withDuration: 0.5, animations: {[weak self] in
             self?.webView.alpha = 1
             self?.view.layoutIfNeeded()
+            
+            [self?.headerLabel,
+            self?.telegramStack,
+             self?.linkLabel].forEach({
+                $0?.alpha = 0
+            })
+            
+            
+            
+            
+            
         })
     }
     

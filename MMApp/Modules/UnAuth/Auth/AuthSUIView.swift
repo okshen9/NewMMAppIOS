@@ -61,7 +61,7 @@ struct CollapsingView: View {
                             Text("Развернуть")
                                 .font(.headline)
                                 .padding()
-                                .background(Color.blue)
+                                .background(Color.mainRed)
                                 .foregroundColor(.white)
                                 .cornerRadius(10)
                         }
