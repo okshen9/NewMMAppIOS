@@ -8,7 +8,7 @@
 import Foundation
 
 extension TargetsView {
-    func loadTargets() {
+    @discardableResult func loadTargets() -> [UserTarget] {
         let dateFormatter = ISO8601DateFormatter()
         let currentDate = Date()
 
@@ -281,5 +281,8 @@ extension TargetsView {
                 category: .health
             )
         ]
+        return targets
     }
+    
+    
 }

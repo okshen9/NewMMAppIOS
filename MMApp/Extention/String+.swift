@@ -49,3 +49,18 @@ extension String {
         return jsonObject
     }
 }
+
+extension String {
+    /// Форматирует дробное число в строку для оторажения отбрасывая 0, если число является целым
+    /// - Parameters:
+    ///   - value: форматируемое значение
+    ///   - maximumFractionDigits: максимально количство знаков после зяпятой
+    /// - Returns: Форматированную строку из числа
+    static func doubleFormat(_ value: Double, maximumFractionDigits: Int = 1) -> String {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.minimumFractionDigits = 0 // Минимальное количество знаков после запятой
+        numberFormatter.maximumFractionDigits = maximumFractionDigits // Максимальное количество знаков после запятой
+        
+        return numberFormatter.string(from: NSNumber(value: value)) ?? .empty
+    }
+}

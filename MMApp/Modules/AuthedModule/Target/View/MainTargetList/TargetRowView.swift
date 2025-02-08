@@ -23,6 +23,7 @@ struct TargetRowView: View {
                         .font(.subheadline)
                         .foregroundColor(.gray)
                     ProgressView(value: target.percentage, total: 100)
+                        .tint(.mainRed)
                 }
                 Spacer()
                 Button(action: { isEditing = true }) {

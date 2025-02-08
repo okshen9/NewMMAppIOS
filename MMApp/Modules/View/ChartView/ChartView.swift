@@ -8,13 +8,19 @@
 import SwiftUI
 
 struct PiaView: View {
-    
+    @Binding var selectedFract: PiaViewFractionModel?
     @State private var totalPortfolioPrice: Double = 0
     
     let values: [Double]
     var colors: [Color]
+    var names: [String]
     
+    //TODO: передалать
+    private var fractals = [PiaViewFractionModel]()
+    
+    /// процент ширины занимаемый кругом от супер вью
     var widthFraction: CGFloat
+    /// размер внутреннего круга, дробная часть от общего круга
     var innerRadiusFraction: CGFloat
     
     @State private var activeIndex: Int = -1
@@ -26,19 +32,61 @@ struct PiaView: View {
     /// - Parameters:
     ///    - values: значения
     ///    - colors:цвета для каждого значения
-    ///    - widthFraction: процент ширины занимаемый круком
+    ///    - widthFraction: процент ширины занимаемый кругом от супер вью
     ///    - innerRadiusFraction: размер внутреннего круга, дробная часть от общего круга
     init(
         values:[Double],
         colors: [Color] = [Color.blue, Color.green, Color.purple, Color.orange, Color.yellow, Color.blue, Color.red],
-        widthFraction: CGFloat = 1,
-        innerRadiusFraction: CGFloat = 0.6)
+        names: [String] = [],
+        widthFraction: CGFloat = 0.1,
+        innerRadiusFraction: CGFloat = 0.6,
+        selectedFract:  Binding<PiaViewFractionModel?>)
     {
         self.values = values
-        
         self.colors = colors
+        self.names = names
         self.widthFraction = widthFraction
         self.innerRadiusFraction = innerRadiusFraction
+        self._selectedFract = selectedFract
+    }
+    
+//    let color: Color
+//    let allStats: Double
+//    let currnetValue: Double
+//    let name: String?
+    
+    init(
+        piaMdels: [PiaViewFractionModel],
+        widthFraction: CGFloat = 0.9,
+        innerRadiusFraction: CGFloat = 0.6,
+        selectedFract:  Binding<PiaViewFractionModel?>
+    ) {
+        var values = [Double]()
+        var colors = [Color]()
+        var names = [String]()
+        piaMdels.forEach({ model in
+            values.append(model.currnetValue)
+            colors.append(model.color)
+            names.append(model.name ?? .empty)
+            
+            if let allStats = model.allStats {
+                
+                let delta = allStats > model.currnetValue ? allStats - model.currnetValue : 0
+                values.append(delta)
+                colors.append(model.color.opacity(0.3))
+                names.append(model.name ?? .empty)
+            }
+        })
+        
+        self.init(
+            values: values,
+            colors: colors,
+            names: names,
+            widthFraction: widthFraction,
+            innerRadiusFraction: innerRadiusFraction,
+            selectedFract: selectedFract
+        )
+        self.fractals = piaMdels
     }
     
     var body: some View {
@@ -79,7 +127,9 @@ struct PiaView: View {
             .gesture(
                 DragGesture(minimumDistance: 0)
                     .onChanged { value in
+                        // находим радиус круга
                         let radius = 0.5 * widthFraction * geometry.size.width
+                        
                         let diff = CGPoint(x: value.location.x - radius, y: radius - value.location.y)
                         let dist = pow(pow(diff.x, 2.0) + pow(diff.y, 2.0), 0.5)
                         if (dist > radius || dist < radius * innerRadiusFraction) {
@@ -94,6 +144,11 @@ struct PiaView: View {
                         for (i, slice) in slices.enumerated() {
                             if (radians < slice.endAngle.radians) {
                                 self.activeIndex = i
+                                
+                                let currentFract = fractals
+                                    .filter({$0.name == names[self.activeIndex]})
+                                    .first
+                                selectedFract = currentFract
                                 break
                             }
                         }
@@ -109,16 +164,85 @@ struct PiaView: View {
                 .gesture(
                     DragGesture(minimumDistance: 0)
                         .onChanged { value in
+                            print("По всем категориям")
                             self.activeIndex = -1
+                            self.selectedFract = nil
                         }
                     )
+            if names.contains(where: {!$0.isEmpty}) {
+                
+                if self.activeIndex != -1 {
+                    let nameFract = names[self.activeIndex]
+                    let currentFract = fractals
+                        .filter({$0.name == nameFract})
+                        .first
+                    
+                    
+                    let isCurrent = if values[self.activeIndex] == currentFract?.currnetValue {
+                        true
+                    } else {
+                        false
+                    }
+                    let status = isCurrent ? "выполнено" : "осталось"
+                    
+                    let all = String.doubleFormat((currentFract?.allStats ?? currentFract?.allStats) ?? 0)
+                    
+                    
+                    
+                    
+                    let val1 = (currentFract?.currnetValue ?? 0)
+                    let val2 = ((currentFract?.allStats ?? currentFract?.currnetValue) ?? 0) - (currentFract?
+                        .currnetValue ?? 0)
+                    let currentVal: Double =
+                    isCurrent ?
+                    val1 : val2
+                    
+                    let current =
+                    String.doubleFormat(currentVal)
+                    
+                    VStack {
+                        Text(nameFract)
+                            .font(.headline)
+                            .foregroundColor(.headerText)
+                        Text("\(status) \(current) / \(all)")
+                            .font(.subheadline)
+                            .foregroundColor(.subtitleText)
+                    }
+                } else {
+                    let all =
+                    String.doubleFormat(fractals
+                        .map({$0.allStats ?? $0.currnetValue})
+                        .reduce(0, +)
+                    )
+                    let current =
+                    String.doubleFormat(fractals
+                        .map({$0.currnetValue})
+                        .reduce(0, +)
+                    )
+                    VStack {
+                        Text("По всем категориям")
+                            .font(.headline)
+                            .foregroundColor(.headerText)
+                        Text("выполнено \(current) / \(all)")
+                            .font(.subheadline)
+                            .foregroundColor(.subtitleText)
+                    }
+                }
+            }
         }
     }
 }
 
 struct PiaView_Previews: PreviewProvider {
     static var previews: some View {
-        PiaView(values: [1300, 500, 300, 600, 500])
+        let slis = [
+            PiaViewFractionModel(color: .mainRed, allStats: 2, currnetValue: 1.5, name: "Семья"),
+            PiaViewFractionModel(color: .green, allStats: 4, currnetValue: 1.5, name: "Здоровье"),
+            PiaViewFractionModel(color: .blue, allStats: 3, currnetValue: 0.9, name: "Личное"),
+            PiaViewFractionModel(color: .yellow, allStats: 7, currnetValue: 4, name: "Бизнес"),
+        ]
+//        PiaView(values: [1300, 500, 300, 600, 500])
+        PiaView(piaMdels: slis, selectedFract: Binding<PiaViewFractionModel?>.constant(nil))
     }
 }
 

@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct PiaViewFractionModel {
+struct PiaViewFractionModel: Equatable {
     let color: Color
     let allStats: Double?
     let currnetValue: Double

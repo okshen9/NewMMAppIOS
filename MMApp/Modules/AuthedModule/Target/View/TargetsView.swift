@@ -22,7 +22,7 @@ struct TargetsView: View {
                     Text("Статистика").tag(1)
                 }
                 .pickerStyle(.segmented)
-                .padding()
+                .padding(.horizontal, 16)
                 if selectedTab == 0 {
                     ScrollView {
                         LazyVStack {
@@ -55,9 +55,7 @@ struct TargetsView: View {
                         loadTargets()
                     }
                 } else {
-                    Text("DGFD")
-                        .foregroundColor(.mainRed)
-                    Spacer()
+                    StatisticTargetScreen()
                 }
             }
             .navigationTitle("Цели")

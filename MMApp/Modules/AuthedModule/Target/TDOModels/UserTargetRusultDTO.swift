@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUICore
 
 struct UserTarget: Identifiable, Codable {
     var id: Int
@@ -34,6 +35,21 @@ struct UserTarget: Identifiable, Codable {
             let container = try decoder.singleValueContainer()
             let rawValue = try container.decode(String.self)
             self = Category(rawValue: rawValue) ?? .unknown
+        }
+        
+        var color: Color {
+            switch self {
+            case .money:
+                    .yellow
+            case .personal:
+                    .blue
+            case .family:
+                    .mainRed
+            case .health:
+                    .green
+            case .unknown:
+                    .purple
+            }
         }
     }
 }
