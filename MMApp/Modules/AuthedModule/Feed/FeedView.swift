@@ -10,6 +10,7 @@ struct FeedView: View {
             List {
                 getCell(title: "Витяля закрыл цель", subtitle: "Полетел на самолете")
             }
+            .cornerRadius(16)
             .background(Color.clear)
             .padding(.horizontal)
             

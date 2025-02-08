@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct UpdateUserProfileResultDto: Codable {
+struct UserProfileResultDto: Codable {
     let id: Int?
     let externalId: Int?
     let username: String?

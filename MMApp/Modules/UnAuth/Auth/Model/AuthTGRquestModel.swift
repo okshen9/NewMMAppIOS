@@ -9,8 +9,9 @@ import Foundation
 
 struct AuthTGRequestModel: Codable {
     let jwt: String
+    let refreshToken: String?
     let authUserDto: AuthUserDtoResult?
-    
+    let status: String?
 //    enum CodingKeys: String, CodingKey {
 //        case jwt
 //        case authUserDto = "authUserDto"

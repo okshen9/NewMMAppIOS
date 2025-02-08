@@ -59,7 +59,7 @@ extension APIURLRequestsBuilder {
     // Create URL query. JSON params added to body
     public func buildJSONParamsRequest(
         url: URL,
-        model: JSONRepresentable,
+        bodyModel: JSONRepresentable,
         query: QueryItemsRepresentable? = nil,
         method: HTTPMethod,
         tokenNeccessity: TokenNecessity = .mandatory
@@ -72,7 +72,7 @@ extension APIURLRequestsBuilder {
         
         var request = URLRequest(url: completedURL)
         request.httpMethod = method.rawValue
-        request.httpBody = model.toData()
+        request.httpBody = bodyModel.toData()
         
         request.httpShouldHandleCookies = false
 

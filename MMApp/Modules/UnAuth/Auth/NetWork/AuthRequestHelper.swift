@@ -12,19 +12,24 @@ enum AuthRequestHelper {
     case sendTGToken(AuthQueryModel)
     
     /// user/authuser/me
-    case getMe
+    case getUserMe
     
     /// user-profile/me
     case createProfile
+    
+    /// /auth/refresh/
+    case authuserRefreshJWT
 
     /// Массив параметров
     var query: QueryItemsRepresentable? {
         switch self {
         case .sendTGToken(let model):
             return model
-        case .getMe:
+        case .getUserMe:
             return nil
         case let .createProfile:
+            return nil
+        case .authuserRefreshJWT:
             return nil
         }
     }
@@ -34,19 +39,21 @@ enum AuthRequestHelper {
         switch self {
         case .sendTGToken:
             return RequestUrls.tgCallBack
-        case .getMe:
+        case .getUserMe:
             return RequestUrls.userProfileMe
         case .createProfile:
             return RequestUrls.userProfile
+        case .authuserRefreshJWT:
+            return RequestUrls.authuserRefresh
         }
     }
 
     /// Метод
     var method: HTTPMethod {
         switch self {
-        case .sendTGToken, .getMe:
+        case .sendTGToken, .getUserMe:
             return .get
-        case .createProfile:
+        case .createProfile, .authuserRefreshJWT:
             return .post
         }
     }

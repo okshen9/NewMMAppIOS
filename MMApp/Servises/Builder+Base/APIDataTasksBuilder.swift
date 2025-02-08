@@ -41,6 +41,14 @@ public class APIDataTasksBuilder {
         
         let httpStatusCode = httpResponse.statusCode
         
+        switch httpStatusCode {
+        case 200..<300:
+            break
+        case 401:
+            throw APIError.failedToken
+        default:
+            break
+        }
         
         if data.isEmpty {
             if isEmptyResponseAllowed {

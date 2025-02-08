@@ -12,7 +12,7 @@ struct TargetsView: View {
     @State var targets: [UserTarget] = [] // Состояние для всех целей
     @State private var isEditingCategory: Bool = false
     @State private var selectedCategory: UserTarget.Category? = nil
-    @State private var selectedTab = 1
+    @State private var selectedTab = 0
 
     var body: some View {
         NavigationView {

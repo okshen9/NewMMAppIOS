@@ -36,20 +36,4 @@ struct CreateUserProfileBodyModel: JSONRepresentable {
     
     /// "Номер тел", example = "88005553535")
     var phoneNumber: String
-    
-    
-    
-    func queryItems() -> [URLQueryItem] {
-        var items = [URLQueryItem]()
-        items.append(URLQueryItem(name: "externalId", value: String(externalId)))
-        items.append(URLQueryItem(name: "username", value: username))
-        items.append(URLQueryItem(name: "fullName", value: fullName))
-        items.append(URLQueryItem(name: "userProfileStatus", value: userProfileStatus))
-        items.append(URLQueryItem(name: "userPaymentStatus", value: userPaymentStatus))
-        items.append(URLQueryItem(name: "comment", value: comment))
-        items.append(URLQueryItem(name: "photoUrl", value: photoUrl))
-        items.append(URLQueryItem(name: "location", value: location))
-        items.append(URLQueryItem(name: "phoneNumber", value: phoneNumber))
-        return items
-    }
 }

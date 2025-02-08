@@ -12,6 +12,7 @@ public enum APIError: Error {
     case isEmptyResponseAllowed
     case responseObject
     case cannotBeFormed
+    case failedToken
 }
 
 public enum URLError: Error {

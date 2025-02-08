@@ -14,6 +14,7 @@ extension APIFactory {
 //        return URLRequest(url: URL("http://194.87.93.98:8080/user/auth/telegram/callback?id=165600121&first_name=Vitaliy&last_name=Baker&username=laggard_nc")!)
 //    }
     
+    /// /user/auth/telegram/callback
     func sendTGToken(authQueryModel: AuthQueryModel) async -> AuthTGRequestModel? {
         do {
             let helper = AuthRequestHelper.sendTGToken(authQueryModel)
@@ -41,16 +42,30 @@ extension APIFactory {
         }
     }
     
-    func getMe() async -> AuthUserDtoResult? {
-        do {
-            let helper = AuthRequestHelper.getMe
+    /// user-profile/me
+    func getProfileMe() async throws -> UserProfileResultDto? {
+            let helper = AuthRequestHelper.getUserMe
             let url = try urlBuilder.buildURL(path: helper.path)
             let urlRequest = try requestBuilder.buildURLRequest(
                 url: url,
                 query: helper.query,
                 method: helper.method,
                 tokenNeccessity: .mandatory)
-            let tempResult: AuthUserDtoResult = try await dataTaskBuilder.buildDataTask(urlRequest).response
+            let tempResult: UserProfileResultDto = try await dataTaskBuilder.buildDataTask(urlRequest).response
+            return tempResult
+    }
+    
+    /// user-profile/me
+    func refreshJWT(refreshModel: RefreshBodyModel) async -> AuthTGRequestModel? {
+        do {
+            let helper = AuthRequestHelper.getUserMe
+            let url = try urlBuilder.buildURL(path: helper.path)
+            let urlRequest = try requestBuilder.buildJSONParamsRequest(
+                url: url,
+                bodyModel: refreshModel,
+                method: helper.method,
+                tokenNeccessity: .refreshToken)
+            let tempResult: AuthTGRequestModel = try await dataTaskBuilder.buildDataTask(urlRequest).response
             return tempResult
         }
         catch {
@@ -59,17 +74,17 @@ extension APIFactory {
         }
     }
     
-    func createProfile(profileData: CreateUserProfileBodyModel) async -> UpdateUserProfileResultDto? {
+    func createProfile(profileData: CreateUserProfileBodyModel) async -> UserProfileResultDto? {
         do {
             let helper = AuthRequestHelper.createProfile
             let url = try urlBuilder.buildURL(path: helper.path)
             let urlRequest = try requestBuilder.buildJSONParamsRequest(
                 url: url,
-                model: profileData,
+                bodyModel: profileData,
                 query: helper.query,
                 method: helper.method,
                 tokenNeccessity: .mandatory)
-            let tempResult: UpdateUserProfileResultDto = try await dataTaskBuilder.buildDataTask(urlRequest).response
+            let tempResult: UserProfileResultDto = try await dataTaskBuilder.buildDataTask(urlRequest).response
             return tempResult
         }
         catch {

@@ -49,8 +49,13 @@ struct TestScreenVC: View {
     }
     
     func testReq() async {
-        let me = await APIFactory.global.getMe()
-        print("Это я = \(me)")
+        do {
+            let me = try await APIFactory.global.getProfileMe()
+            print("Это я = \(me)")
+        }
+        catch {
+            print("Ошибка testReq: \(error)")
+        }
     }
     
     

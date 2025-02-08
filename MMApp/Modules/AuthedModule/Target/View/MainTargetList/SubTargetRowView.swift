@@ -20,7 +20,12 @@ struct SubTargetRowView: View {
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle())
             } else {
-                Button(action: { showConfirmationDialog = true }) {
+                Button(action: {
+                    isLoading = true
+                    
+                    completeSubTarget()
+                    
+                }) {
                     Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
                         .foregroundColor(isCompleted ? .green : .gray)
                 }
@@ -58,4 +63,8 @@ struct SubTargetRowView: View {
             isCompleted = true
         }
     }
+}
+
+#Preview {
+    SubTargetRowView(subTarget: UserSubTarget.init(id: 0, title: "ssf", description: "sfsdf", subTargetPercentage: 13, targetStatus: "sdfsdf", rootTargetId: 12312, isDeleted: false, creationDateTime: Date.now, lastUpdatingDateTime: Date.now, deadLineDateTime: Date.now))
 }

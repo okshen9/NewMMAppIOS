@@ -63,6 +63,7 @@ class AuthViewModel {
             let result = await self?.getProfile(authQueryModel: AuthQueryModel(tgData: tgKey))
             guard
                 let jwt = result?.jwt,
+                let refreshToken = result?.jwt,
                 var user = result?.authUserDto,
                 let vc = self?.viewController
                   
@@ -70,9 +71,11 @@ class AuthViewModel {
                 return
             }
             KeyChainStorage.jwtToken.save(value: jwt)
+            KeyChainStorage.refreshToken.save(value: refreshToken)
             user.photoUrl = authQueryModel.getTgCallBackModelDTO().photoUrl
             // TODO: Вернуть нормальную логику
-            var defRole = UserDefaultsStorege.role.getData()
+            var defRole = result?.authUserDto?.roles?.first?.rawValue ?? UserDefaultsStorege.role.getData()
+            
             switch defRole {
             case "ROLE_ADMIN":
                 await self?.navigateToMain(vc, user: user)
@@ -86,16 +89,21 @@ class AuthViewModel {
             }
             
             defRole = UserDefaultsStorege.role.getData()
-                
             
-//            print("Neshko jwt \(jwt)")
-//            if user.roles?.first != .draft {
-//                user.photoUrl = authQueryModel.getTgCallBackModelDTO().photoUrl
-//                await self?.navigateToUserForm(vc, user: user)
-//            } else {
-//                await self?.navigateToMain(vc)
-//            }
+            if let result {
+                UserRepository.shared.saveUserAuthDTO(result)
+            }
             
+            await self?.getUser()
+        }
+    }
+    
+    private func getUser() async {
+        do {
+            guard let userProfile = try await apiFactory.getProfileMe() else { return }
+            UserRepository.shared.saveUserProfileDTO(userProfile)
+        } catch {
+            print(error)
         }
     }
     

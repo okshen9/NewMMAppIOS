@@ -19,6 +19,7 @@ struct TargetRowView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(target.title)
                         .font(.headline)
+                        .foregroundColor(.headerText)
                     Text("Дедлайн: \(target.deadLineDateTime.formatted(date: .abbreviated, time: .shortened))")
                         .font(.subheadline)
                         .foregroundColor(.gray)

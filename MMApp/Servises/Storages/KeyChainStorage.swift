@@ -12,7 +12,9 @@ import Foundation
 enum KeyChainStorage: String {
     case tgData = "tgData"
     case jwtToken = "jwtToken"
+    case refreshToken = "refreshToken"
     
+    @discardableResult
     func save(value: String) -> Bool {
         KeyChainStorage.saveToKeychain(key: self.rawValue, value: value)
     }
@@ -21,6 +23,7 @@ enum KeyChainStorage: String {
         KeyChainStorage.getFromKeychain(key: self.rawValue)
     }
     
+    @discardableResult
     static func saveToKeychain(key: String, value: String) -> Bool {
         guard let data = value.data(using: .utf8) else { return false }
 
@@ -44,6 +47,7 @@ enum KeyChainStorage: String {
         return SecItemAdd(query as CFDictionary, nil) == errSecSuccess
     }
 
+    
     static func getFromKeychain(key: String) -> String? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
@@ -62,6 +66,7 @@ enum KeyChainStorage: String {
 
         return nil
     }
+    
     
     func clearKeychain() {
         let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword]
