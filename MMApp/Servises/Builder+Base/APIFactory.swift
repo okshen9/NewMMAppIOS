@@ -7,9 +7,11 @@
 
 import Foundation
 
-public struct APIFactory {
+public struct APIFactory  {
     public var urlBuilder: URLBuilding = APIURLBuilder()
     public var requestBuilder: APIURLRequestsBuilder = APIURLRequestsBuilder(requestDecorators: [])
+    
+    // requered - нужно удалить
     public var dataTaskBuilder: APIDataTasksBuilder = APIDataTasksBuilder()
 
     

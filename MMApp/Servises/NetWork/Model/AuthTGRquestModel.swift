@@ -70,7 +70,7 @@ enum AuthStatus: String, Codable {
     }
 }
 
-enum Roles: String, Codable {
+enum Roles: String, Codable, UnknownCasedEnum {
     case user = "ROLE_USER"
     case admin = "ROLE_ADMIN"
     case unknown = "UNKNOWN"

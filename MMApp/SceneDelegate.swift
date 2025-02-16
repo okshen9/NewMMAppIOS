@@ -58,8 +58,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 extension UIWindow {
     open override func motionBegan(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        ///  Вызов дебаг панели при тряске
         if motion == .motionShake {
-            
             let debugMenu = TestScreenVC()
             let hostingController = UIHostingController(rootView: debugMenu)
             UIApplication.shared.topmostViewController?.present(hostingController, animated: true)

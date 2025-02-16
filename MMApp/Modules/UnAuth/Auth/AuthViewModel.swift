@@ -11,6 +11,7 @@ import SwiftUI
 
 class AuthViewModel {
     private(set) weak var viewController: UIViewController?
+//    private let apiFactory = ServiceBuilder()
     private let apiFactory = APIFactory.global
     
     init(_ vc: UIViewController) {

@@ -9,7 +9,8 @@ import Foundation
 import SwiftUI
 
 struct TargetsView: View {
-    @State var targets: [UserTarget] = [] // Состояние для всех целей
+    private let viewModel = TargetsViewModel()
+//    @State var targets: [UserTarget] = [] // Состояние для всех целей
     @State private var isEditingCategory: Bool = false
     @State private var selectedCategory: UserTarget.Category? = nil
     @State private var selectedTab = 0
@@ -17,6 +18,18 @@ struct TargetsView: View {
     var body: some View {
         NavigationView {
             VStack(alignment: .leading, spacing: 8) {
+                
+//                Button(action: {
+//                    viewModel.networkService.
+//                }, label: <#T##() -> View#>())
+//                
+                
+                
+                
+                
+                
+                
+                
                 Picker("Key", selection: $selectedTab) {
                     Text("Список").tag(0)
                     Text("Статистика").tag(1)
@@ -27,7 +40,7 @@ struct TargetsView: View {
                     ScrollView {
                         LazyVStack {
                             ForEach(UserTarget.Category.allCases, id: \.self) { category in
-                                let filteredTargets = targets.filter { $0.category == category }
+                                let filteredTargets = viewModel.targets.filter { $0.category == category }
                                 if !filteredTargets.isEmpty {
                                     CategorySectionView(
                                         category: category,
@@ -46,13 +59,13 @@ struct TargetsView: View {
                         if let category = selectedCategory {
                             CategoryEditView(
                                 category: category,
-                                targets: $targets, // Передаем Binding к списку целей
+                                targets: viewModel.$targets, // Передаем Binding к списку целей
                                 isPresented: $isEditingCategory
                             )
                         }
                     }
                     .onAppear {
-                        loadTargets()
+                        viewModel.loadTargets()
                     }
                 } else {
                     StatisticTargetScreen()

@@ -5,4 +5,5 @@ use_frameworks!
 target 'MMApp' do
   pod 'SnapKit'
   pod 'Kingfisher'
+  pod 'Swinject'
 end

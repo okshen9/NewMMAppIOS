@@ -8,6 +8,11 @@
 import Foundation
 
 final class UserRepository {
+    
+    var isLoggedIn: Bool {
+        userAuthDTO != nil
+    }
+    
     private(set) var userProfileDTO: UserProfileResultDto?
     private(set) var userAuthDTO: AuthTGRequestModel?
     

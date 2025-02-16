@@ -12,13 +12,44 @@ struct EmptyResponse: Codable {}
 
 public class APIDataTasksBuilder {
     
-    private let decoder: JSONDecoder = .init()
+    private let apiFactory: APIFactory
+//    private let authService: AuthServiceProtocol
+    private var decoder: JSONDecoder = .init()
     private var session: URLSession {
         let config = URLSessionConfiguration.default
         config.waitsForConnectivity = true
         config.timeoutIntervalForRequest = 5
         return URLSession(configuration: config)
     }
+    private typealias tokenStorage = KeyChainStorage
+    
+
+//    private lazy var refreshManager: RefreshTokenManager = {
+//        RefreshTokenManager(serverApiUrlString: serverApiUrlString)
+//    }()
+    
+    public init(
+        apiFactory: APIFactory = APIFactory.global
+//        authService: AuthServiceProtocol,
+//        decoder: JSONDecoder,
+//        session: URLSession,
+//        serverApiUrlString: String
+    ) {
+        self.apiFactory = apiFactory
+//        self.authService = authService
+//        self.decoder = decoder
+//        self.session = session
+//        self.serverApiUrlString = serverApiUrlString
+    }
+
+//    private func setTokensToRequest(_ request: inout URLRequest, authTokens: AuthTokens) -> URLRequest {
+//        request.setValue("token \(authTokens.accessToken)", forHTTPHeaderField: HTTPHeader.authorization)
+//        
+//        return request
+//    }
+}
+
+extension APIDataTasksBuilder {
     
     func buildDataTask<T: Decodable>(
         _ request: URLRequest,
@@ -46,6 +77,17 @@ public class APIDataTasksBuilder {
             break
         case 401:
             throw APIError.failedToken
+//            if allowRetry {
+//                do {
+//                    let authTokens = try await refreshManager.checkRefreshToken()
+//                    var request = request
+//                    let newRequest = setTokensToRequest(&request, authTokens: authTokens)
+//                    return try await buildDataTask(request: newRequest, allowRetry: false)
+//
+//                } catch {
+//                    throw ResponseError.invalidToken
+//                }
+//            }
         default:
             break
         }
