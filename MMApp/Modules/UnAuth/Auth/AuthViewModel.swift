@@ -11,8 +11,8 @@ import SwiftUI
 
 class AuthViewModel {
     private(set) weak var viewController: UIViewController?
-//    private let apiFactory = ServiceBuilder()
-    private let apiFactory = APIFactory.global
+    private let apiFactory = ServiceBuilder()
+//    private let apiFactory = APIFactory.global
     
     init(_ vc: UIViewController) {
         self.viewController = vc
@@ -118,8 +118,12 @@ class AuthViewModel {
     }
     
     func getProfile(authQueryModel: AuthQueryModel) async -> AuthTGRequestModel? {
-        
-        return await apiFactory.sendTGToken(authQueryModel: authQueryModel)
+        do {
+            return await try apiFactory.sendTGToken(model: authQueryModel)
+        } catch {
+            print("neshko error \(error)")
+            return nil
+        }
     }
     
 }

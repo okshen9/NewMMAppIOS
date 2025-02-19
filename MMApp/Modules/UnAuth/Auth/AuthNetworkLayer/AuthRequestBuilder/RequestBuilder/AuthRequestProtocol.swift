@@ -1,0 +1,22 @@
+//
+//  AuthRequestProtocol.swift
+//  MMApp
+//
+//  Created by artem on 18.02.2025.
+//
+
+import Foundation
+
+protocol AuthRequestProtocol {
+    /// /user/auth/telegram/callback
+    func sendTGTokenRequest(model: AuthQueryModel) throws -> URLRequest
+    
+    /// user-profile/me
+    func getProfileMeRequest() throws -> URLRequest
+    
+    /// user-profile/me
+    func refreshJWTRequest(refreshModel: RefreshBodyModel) throws -> URLRequest
+    
+    /// /user-profile
+    func createProfileRequest(profileData: CreateUserProfileBodyModel) throws -> URLRequest
+}

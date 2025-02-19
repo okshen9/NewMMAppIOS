@@ -6,13 +6,18 @@
 //
 
 import SwiftUI
+import Combine
 
 struct SubTargetRowView: View {
+    
+    
+    @Binding var clusedSubTarget: UserSubTargetDtoModel?
+    
     @State private var showConfirmationDialog = false
     @State private var isLoading = false
     @State private var isCompleted = false
     
-    let subTarget: UserSubTarget
+    let subTarget: UserSubTargetDtoModel
     
     var body: some View {
         HStack {
@@ -21,9 +26,17 @@ struct SubTargetRowView: View {
                     .progressViewStyle(CircularProgressViewStyle())
             } else {
                 Button(action: {
-                    isLoading = true
+                    if subTarget.targetStatus != .done {
+                        isLoading = true
+                        clusedSubTarget = subTarget
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                            isLoading = false
+                        }
+                    }
                     
-                    completeSubTarget()
+//                    isLoading = true
+//                    
+//                    completeSubTarget()
                     
                 }) {
                     Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
@@ -45,9 +58,9 @@ struct SubTargetRowView: View {
             }
             
             VStack(alignment: .leading, spacing: 4) {
-                Text(subTarget.title)
+                Text(subTarget.title.orEmpty)
                     .font(.subheadline)
-                Text("Дедлайн: \(subTarget.deadLineDateTime.formatted(date: .abbreviated, time: .shortened))")
+                Text("Срок выполнения: \((subTarget.deadLineDateTime?.dateFromString ?? Date.now).formatted(date: .abbreviated, time: .shortened))")
                     .font(.caption)
                     .foregroundColor(.gray)
             }
@@ -65,6 +78,6 @@ struct SubTargetRowView: View {
     }
 }
 
-#Preview {
-    SubTargetRowView(subTarget: UserSubTarget.init(id: 0, title: "ssf", description: "sfsdf", subTargetPercentage: 13, targetStatus: "sdfsdf", rootTargetId: 12312, isDeleted: false, creationDateTime: Date.now, lastUpdatingDateTime: Date.now, deadLineDateTime: Date.now))
-}
+//#Preview {
+//    SubTargetRowView(subTarget: UserSubTarget.init(id: 0, title: "ssf", description: "sfsdf", subTargetPercentage: 13, targetStatus: "sdfsdf", rootTargetId: 12312, isDeleted: false, creationDateTime: Date.now, lastUpdatingDateTime: Date.now, deadLineDateTime: Date.now))
+//}

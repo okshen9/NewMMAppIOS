@@ -9,8 +9,8 @@ import Foundation
 import SwiftUI
 
 struct AddTargetView: View {
-    let category: UserTarget.Category // Категория, переданная из CategoryEditView
-    var onSave: (UserTarget) -> Void // Замыкание для сохранения новой цели
+    let category: TargetCategory // Категория, переданная из CategoryEditView
+    var onSave: (UserTargetDtoModel) -> Void // Замыкание для сохранения новой цели
     @Environment(\.dismiss) private var dismiss
     
     // Состояние для основной цели
@@ -19,41 +19,45 @@ struct AddTargetView: View {
     @State private var deadLineDateTime: Date = Date()
     
     // Состояние для подцелей
-    @State private var subTargets: [UserSubTarget] = []
+    @State private var subTargets: [UserSubTargetDtoModel] = []
     @State private var newSubTargetTitle: String = ""
     @State private var newSubTargetDescription: String = ""
     @State private var newSubTargetDeadline: Date = Date()
     
     var body: some View {
+        // Neshkotodo
+//        Text("sdsds")
         NavigationView {
             Form {
                 // Секция для основной цели
                 Section(header: Text("Основная цель")) {
                     TextField("Название цели", text: $title)
                     TextField("Описание цели", text: $description)
-                    DatePicker("Дедлайн", selection: $deadLineDateTime, displayedComponents: [.date, .hourAndMinute])
+                    DatePicker("Срок выполнения", selection: $deadLineDateTime, displayedComponents: [.date, .hourAndMinute])
                 }
                 
                 // Секция для добавления подцелей
                 Section(header: Text("Подцели")) {
-                    ForEach(subTargets) { subTarget in
+                    ForEach($subTargets.indices, id: \.self) { index in
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(subTarget.title)
+                            Text($subTargets[index].title.wrappedValue.orEmpty)
                                 .font(.headline)
-                            Text(subTarget.description)
+                            Text($subTargets[index].description.wrappedValue.orEmpty)
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
-                            Text("Дедлайн: \(subTarget.deadLineDateTime.formatted(date: .abbreviated, time: .shortened))")
+                            let date = $subTargets[index].deadLineDateTime.wrappedValue?.dateFromString ?? Date.now
+                            let text = "Дедлайн: \((date).formatted(date: .abbreviated, time: .shortened))"
+                            Text(text) // Используем wrappedValue
                                 .font(.caption)
                                 .foregroundColor(.gray)
                         }
                     }
                     
-                    // Форма для добавления новой подцели
+//                    // Форма для добавления новой подцели
                     Group {
                         TextField("Название подцели", text: $newSubTargetTitle)
                         TextField("Описание подцели", text: $newSubTargetDescription)
-                        DatePicker("Дедлайн подцели", selection: $newSubTargetDeadline, displayedComponents: [.date, .hourAndMinute])
+                        DatePicker("Срок выполнения подцели", selection: $newSubTargetDeadline, displayedComponents: [.date, .hourAndMinute])
                         
                         Button(action: addSubTarget) {
                             Text("Добавить подцель")
@@ -83,17 +87,17 @@ struct AddTargetView: View {
     
     // Добавление подцели
     private func addSubTarget() {
-        let newSubTarget = UserSubTarget(
+        let newSubTarget = UserSubTargetDtoModel(
             id: subTargets.count + 1, // Временный ID (в реальном приложении это должно генерироваться на сервере)
             title: newSubTargetTitle,
             description: newSubTargetDescription,
             subTargetPercentage: 0, // Начальный прогресс
-            targetStatus: "active", // Статус по умолчанию
+            targetStatus: .draft, // Статус по умолчанию
             rootTargetId: 0, // Временное значение (будет обновлено после сохранения основной цели)
             isDeleted: false,
-            creationDateTime: Date(),
-            lastUpdatingDateTime: Date(),
-            deadLineDateTime: newSubTargetDeadline
+            creationDateTime: Date().toApiString,
+            lastUpdatingDateTime: Date().toApiString,
+            deadLineDateTime: newSubTargetDeadline.toApiString
         )
         subTargets.append(newSubTarget)
         
@@ -105,26 +109,26 @@ struct AddTargetView: View {
     
     // Сохранение основной цели
     private func saveTarget() {
-        let newTarget = UserTarget(
+        let newTarget = UserTargetDtoModel(
             id: 0, // Временный ID (в реальном приложении это должно генерироваться на сервере)
             title: title,
             description: description,
             userExternalId: 1, // Временное значение (должно быть передано из контекста пользователя)
             percentage: 0, // Начальный прогресс
-            deadLineDateTime: deadLineDateTime,
+            deadLineDateTime: deadLineDateTime.toApiString,
             streamId: 1, // Временное значение (должно быть передано из контекста)
-            targetStatus: "active", // Статус по умолчанию
+            targetStatus: .draft, // Статус по умолчанию
             subTargets: subTargets,
             isDeleted: false,
-            creationDateTime: Date(),
-            lastUpdatingDateTime: Date(),
+            creationDateTime: Date().toApiString,
+            lastUpdatingDateTime: Date().toApiString,
             category: category
         )
         onSave(newTarget)
     }
 }
 
-#Preview {
-    AddTargetView(category: .family, onSave: {_ in })
-}
+//#Preview {
+//    AddTargetView(category: .family, onSave: {_ in })
+//}
 

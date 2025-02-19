@@ -8,7 +8,10 @@
 import SwiftUI
 
 struct TargetRowView: View {
-    let target: UserTarget
+    @Binding var clusedSubTarget: UserSubTargetDtoModel?
+    
+    
+    let target: UserTargetDtoModel
     @State private var isExpanded: Bool = false
     @State private var isEditing: Bool = false
     
@@ -17,10 +20,10 @@ struct TargetRowView: View {
             // Заголовок, дата, прогресс-бар
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(target.title)
+                    Text(target.title.orEmpty)
                         .font(.headline)
                         .foregroundColor(.headerText)
-                    Text("Дедлайн: \(target.deadLineDateTime.formatted(date: .abbreviated, time: .shortened))")
+                    Text("Срок выполнения: \((target.deadLineDateTime?.dateFromString ?? Date.now).formatted(date: .abbreviated, time: .shortened))")
                         .font(.subheadline)
                         .foregroundColor(.gray)
                     ProgressView(value: target.percentage, total: 100)
@@ -40,8 +43,8 @@ struct TargetRowView: View {
             
             // Подцели
             if isExpanded {
-                ForEach(target.subTargets) { subTarget in
-                    SubTargetRowView(subTarget: subTarget)
+                ForEach(target.subTargets ?? []) { subTarget in
+                    SubTargetRowView(clusedSubTarget: $clusedSubTarget, subTarget: subTarget)
                 }
             }
             

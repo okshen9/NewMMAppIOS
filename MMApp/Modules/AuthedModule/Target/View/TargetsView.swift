@@ -9,27 +9,14 @@ import Foundation
 import SwiftUI
 
 struct TargetsView: View {
-    private let viewModel = TargetsViewModel()
-//    @State var targets: [UserTarget] = [] // Состояние для всех целей
+    @StateObject private var viewModel = TargetsViewModel()
     @State private var isEditingCategory: Bool = false
-    @State private var selectedCategory: UserTarget.Category? = nil
+    @State private var selectedCategory: TargetCategory? = nil
     @State private var selectedTab = 0
-
+    
     var body: some View {
         NavigationView {
             VStack(alignment: .leading, spacing: 8) {
-                
-//                Button(action: {
-//                    viewModel.networkService.
-//                }, label: <#T##() -> View#>())
-//                
-                
-                
-                
-                
-                
-                
-                
                 Picker("Key", selection: $selectedTab) {
                     Text("Список").tag(0)
                     Text("Статистика").tag(1)
@@ -39,18 +26,8 @@ struct TargetsView: View {
                 if selectedTab == 0 {
                     ScrollView {
                         LazyVStack {
-                            ForEach(UserTarget.Category.allCases, id: \.self) { category in
-                                let filteredTargets = viewModel.targets.filter { $0.category == category }
-                                if !filteredTargets.isEmpty {
-                                    CategorySectionView(
-                                        category: category,
-                                        targets: filteredTargets,
-                                        onEdit: {
-                                            selectedCategory = category
-                                            isEditingCategory = true
-                                        }
-                                    )
-                                }
+                            ForEach(TargetCategory.allCases, id: \.self) { category in
+                                categorySectionView(for: category)
                             }
                         }
                         .padding()
@@ -59,7 +36,8 @@ struct TargetsView: View {
                         if let category = selectedCategory {
                             CategoryEditView(
                                 category: category,
-                                targets: viewModel.$targets, // Передаем Binding к списку целей
+                                clusedSubTarget: $viewModel.clusedSubTarget,
+                                targets: $viewModel.targets, // Передаем Binding к списку целей
                                 isPresented: $isEditingCategory
                             )
                         }
@@ -68,10 +46,33 @@ struct TargetsView: View {
                         viewModel.loadTargets()
                     }
                 } else {
-                    StatisticTargetScreen()
+                    StatisticTargetScreen(viewModel: viewModel)
                 }
             }
             .navigationTitle("Цели")
+        }
+    }
+    
+    @ViewBuilder
+    private func categorySectionView(for category: TargetCategory) -> some View {
+        let targets = filteredTargets(for: category) // Используем вынесенный метод
+        
+        if !targets.isEmpty {
+            CategorySectionView(
+                clusedSubTarget: $viewModel.clusedSubTarget,
+                category: category,
+                targets: targets.map({$0.wrappedValue}),
+                onEdit: {
+                    selectedCategory = category
+                    isEditingCategory = true
+                }
+            )
+        }
+    }
+    
+    private func filteredTargets(for category: TargetCategory) -> [Binding<UserTargetDtoModel>] {
+        viewModel.targets.indices.compactMap { index -> Binding<UserTargetDtoModel>? in
+            viewModel.targets[index].category == category ? $viewModel.targets[index] : nil
         }
     }
 }

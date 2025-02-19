@@ -12,7 +12,7 @@ public struct APIFactory  {
     public var requestBuilder: APIURLRequestsBuilder = APIURLRequestsBuilder(requestDecorators: [])
     
     // requered - нужно удалить
-    public var dataTaskBuilder: APIDataTasksBuilder = APIDataTasksBuilder()
+//    public var dataTaskBuilder: APIDataTasksBuilder = APIDataTasksBuilder()
 
     
     static let global = APIFactory()

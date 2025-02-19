@@ -18,3 +18,11 @@ public enum APIError: Error {
 public enum URLError: Error {
     case cannotBeFormed
 }
+
+
+// Ошибки сети
+enum NetworkError: Error {
+    case invalidURL
+    case noData
+    case decodingFailed
+}

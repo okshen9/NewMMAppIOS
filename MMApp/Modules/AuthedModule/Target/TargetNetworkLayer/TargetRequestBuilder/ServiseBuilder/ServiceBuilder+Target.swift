@@ -14,9 +14,39 @@ extension ServiceBuilder: TargetServiceProtocol {
     ///   - model: модель получения истории пользователя
     ///   - id: id пользователя
     /// - Returns: модель пользователя
-    func getData(model: TargetBodyModel, id: Int) async throws -> TargetResultModel {
+    func createUserTarget(model: CreateUserTargetBodyModel) async throws -> UserTargetDtoModel {
         try await performRequest {
-            try apiFactory.getDataRequest(model: model, id: id)
+            try apiFactory.createUserTarget(model: model)
+        }
+    }
+    
+    ///Получение цели id цели
+    /// - Parameters:
+    ///   - id: id цели
+    /// - Returns: подготовленный запрос
+    func getTarget(targetId: Int) async throws -> UserTargetDtoModel {
+        try await performRequest {
+            try apiFactory.getTarget(targetId: targetId)
+        }
+    }
+    
+    /// получение всех целей пользователя по externalId пользователя
+    /// - Parameters:
+    ///   - id: id пользователя
+    /// - Returns: подготовленный запрос
+    func getUserTargets(externalId: Int) async throws -> UserTargetsList {
+        try await performRequest {
+            try apiFactory.getUserTargets(externalId: externalId)
+        }
+    }
+    
+    /// Обновление цели и подцели
+    /// - Parameters:
+    ///   - model: моделоь
+    /// - Returns: подготовленный запрос
+    func updateTargetAll(model: UserTargetDtoModel) async throws -> UserTargetDtoModel {
+        try await performRequest {
+            try apiFactory.updateTargetAll(model: model)
         }
     }
 }

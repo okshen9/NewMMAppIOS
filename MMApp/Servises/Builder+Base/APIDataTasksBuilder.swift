@@ -29,13 +29,13 @@ public class APIDataTasksBuilder {
 //    }()
     
     public init(
-        apiFactory: APIFactory = APIFactory.global
+        apiFactory: APIFactory? = nil
 //        authService: AuthServiceProtocol,
 //        decoder: JSONDecoder,
 //        session: URLSession,
 //        serverApiUrlString: String
     ) {
-        self.apiFactory = apiFactory
+        self.apiFactory = apiFactory ?? APIFactory.global
 //        self.authService = authService
 //        self.decoder = decoder
 //        self.session = session
@@ -115,7 +115,7 @@ extension APIDataTasksBuilder {
             let responseObject = try decoder.decode(T.self, from: data)
             return (responseObject, httpResponse.allHeaderFields)
         } catch {
-            print("Neshko responseObject Error")
+            print("Neshko responseObject Error: \(error)")
             throw APIError.responseObject
             //            let mapError = ResponseError.mapping(
             //                response: httpResponse,

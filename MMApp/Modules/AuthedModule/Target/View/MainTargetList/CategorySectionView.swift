@@ -8,8 +8,11 @@
 import SwiftUI
 
 struct CategorySectionView: View {
-    let category: UserTarget.Category
-    let targets: [UserTarget] // Список целей для выбранной категории
+    @Binding var clusedSubTarget: UserSubTargetDtoModel?
+    
+    
+    let category: TargetCategory
+    let targets: [UserTargetDtoModel] // Список целей для выбранной категории
     var onEdit: () -> Void // Замыкание для редактирования категории
 
     var body: some View {
@@ -27,7 +30,7 @@ struct CategorySectionView: View {
             }
         ) {
             ForEach(targets) { target in
-                TargetRowView(target: target)
+                TargetRowView(clusedSubTarget: $clusedSubTarget, target: target)
             }
         }
     }

@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct CategoryEditView: View {
-    let category: UserTarget.Category
-    @Binding var targets: [UserTarget] // Binding к списку целей
+    let category: TargetCategory
+    @Binding var clusedSubTarget: UserSubTargetDtoModel?
+    @Binding var targets: [UserTargetDtoModel] // Binding к списку целей
     @Binding var isPresented: Bool
     
     @State private var isAddingNewTarget: Bool = false
@@ -18,7 +19,7 @@ struct CategoryEditView: View {
         NavigationView {
             List {
                 ForEach(targets.filter { $0.category == category }) { target in
-                    TargetRowView(target: target)
+                    TargetRowView(clusedSubTarget: $clusedSubTarget, target: target)
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {
                                 deleteTarget(target)
@@ -47,7 +48,7 @@ struct CategoryEditView: View {
     }
     
     // Удаление цели
-    private func deleteTarget(_ target: UserTarget) {
+    private func deleteTarget(_ target: UserTargetDtoModel) {
         targets.removeAll { $0.id == target.id }
     }
 }

@@ -1,11 +1,9 @@
 //
-//  RequestBulder.swift
+//  AuthRequestHelper.swift
 //  MMApp
 //
-//  Created by artem on 05.01.2025.
+//  Created by artem on 18.02.2025.
 //
-
-import Foundation
 
 enum AuthRequestHelper {
     /// user/auth/telegram/callback

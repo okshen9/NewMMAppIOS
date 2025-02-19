@@ -25,7 +25,7 @@ class UserInfoViewModel {
     // MARK: - Output
     @Published private(set) var isFormValid: Bool = false
     
-    private let apiFactory = APIFactory.global
+    private let apiFactory = ServiceBuilder()
     private var cancellables = Set<AnyCancellable>()
     
     init(userModel: AuthUserDtoResult) {
@@ -41,25 +41,33 @@ class UserInfoViewModel {
     }
     
     func createProfile() async {
-        let finalUser = await apiFactory.createProfile(profileData: CreateUserProfileBodyModel(
-            externalId: userModel.id ?? 0,
-            username: userModel.username ?? userName,
-            fullName: firstName,
-            userProfileStatus: "DRAFT",
-            userPaymentStatus: "DRAFT",
-            comment: occupation,
-            photoUrl: userModel.photoUrl.orEmpty,
-            location: city,
-            phoneNumber: phoneNumber)
-        )
-        
-        // TODO: Вернуться насчет авторизации
-        UserDefaultsStorege.role.save(value: ("ROLE_ADMIN"))
-        guard let viewController else { return }
-        Task {
-            await navigateToMain(viewController)
+        do {
+            let finalUser = try await apiFactory.createProfile(profileData: CreateUserProfileBodyModel(
+                externalId: userModel.id ?? 0,
+                username: userModel.username ?? userName,
+                fullName: firstName,
+                userProfileStatus: "DRAFT",
+                userPaymentStatus: "DRAFT",
+                comment: occupation,
+                photoUrl: userModel.photoUrl.orEmpty,
+                location: city,
+                phoneNumber: phoneNumber)
+            )
+            
+            // TODO: Вернуться насчет авторизации
+            UserDefaultsStorege.role.save(value: ("ROLE_ADMIN"))
+            guard let viewController else { return }
+            Task {
+                await navigateToMain(viewController)
+            }
+            print(finalUser)
         }
-        print(finalUser)
+        catch {
+            print(error)
+            return
+        }
+        
+
     }
     
     

@@ -50,7 +50,7 @@ struct TestScreenVC: View {
     
     func testReq() async {
         do {
-            let me = try await APIFactory.global.getProfileMe()
+            let me = try await ServiceBuilder().getProfileMe()
             print("Это я = \(me)")
         }
         catch {

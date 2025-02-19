@@ -13,6 +13,12 @@ class UserInfoViewController: UIViewController {
     private let apiFactory = APIFactory.global
     
     // MARK: - UI Elements
+    private let scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.keyboardDismissMode = .interactive
+        scrollView.showsVerticalScrollIndicator = false
+        return scrollView
+    }()
     
     private let contentView = UIView().apply {
         $0.backgroundColor = .secondbackGraund
@@ -96,7 +102,8 @@ class UserInfoViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = .white
         
-        view.addSubview(contentView)
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
         contentView.addSubview(stackView)
         
         
@@ -113,11 +120,16 @@ class UserInfoViewController: UIViewController {
         
         doneButton.addSubview(activity)
         
-        contentView.snp.makeConstraints { make in
+        scrollView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
             make.left.right.equalToSuperview()
             make.bottom.equalToSuperview().inset(-40)
         }
+        
+        contentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
         
         stackView.snp.makeConstraints { make in
             make.top.equalToSuperview().inset(16)

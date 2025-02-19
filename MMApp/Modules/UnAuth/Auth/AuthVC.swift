@@ -118,7 +118,7 @@ class AuthVC: UIViewController, SubscriptionStore {
         label.isUserInteractionEnabled = true // Включение взаимодействия
         
         // Добавление жеста для обработки касаний
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTapOnLabel(_:)))
+        let tapGesture = UITapGestureRecognizer(target: AuthVC.self, action: #selector(handleTapOnLabel(_:)))
         label.addGestureRecognizer(tapGesture)
         
         return label
