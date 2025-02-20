@@ -15,7 +15,6 @@ struct SubTargetRowView: View {
     
     @State private var showConfirmationDialog = false
     @State private var isLoading = false
-    @State private var isCompleted = false
     
     let subTarget: UserSubTargetDtoModel
     
@@ -29,9 +28,6 @@ struct SubTargetRowView: View {
                     if subTarget.targetStatus != .done {
                         isLoading = true
                         clusedSubTarget = subTarget
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                            isLoading = false
-                        }
                     }
                     
 //                    isLoading = true
@@ -39,8 +35,8 @@ struct SubTargetRowView: View {
 //                    completeSubTarget()
                     
                 }) {
-                    Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
-                        .foregroundColor(isCompleted ? .green : .gray)
+                    Image(systemName: subTarget.targetStatus == .done ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(subTarget.targetStatus == .done ? .green : .gray)
                 }
                 .buttonStyle(.plain)
                 .background(
@@ -73,7 +69,6 @@ struct SubTargetRowView: View {
     private func completeSubTarget() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             isLoading = false
-            isCompleted = true
         }
     }
 }
