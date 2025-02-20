@@ -11,7 +11,7 @@ import SwiftUICore
 /// Категории задач
 enum TargetCategory: String, UnknownCasedEnum, JSONRepresentable, CaseIterable {
     case money = "Бизнес"
-    case personal = "Личная"
+    case personal = "Личное"
     case family = "Семья"
     case health = "Здоровье"
     case other = "Свободная тема"
@@ -59,6 +59,9 @@ enum TargetStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable {
     /// Цель просрочена.
     case expired = "EXPIRED"
     
+    /// Подцель не выполнена
+    case notDone = "NOT_DONE"
+    
     
     var title: String {
         switch self {
@@ -78,6 +81,8 @@ enum TargetStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable {
             return "Провалена"
         case .expired:
             return "Просрочена"
+        case .notDone:
+            return "Не завершена"
         }
     }
 }

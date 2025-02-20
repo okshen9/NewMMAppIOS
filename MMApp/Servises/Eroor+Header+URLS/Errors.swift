@@ -13,6 +13,7 @@ public enum APIError: Error {
     case responseObject
     case cannotBeFormed
     case failedToken
+    case failedRefreshToken
 }
 
 public enum URLError: Error {

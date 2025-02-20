@@ -188,45 +188,31 @@ class AuthVC: UIViewController, SubscriptionStore {
         // TODO: Убрать - чистку кешей веб вью при открытии webview
         //        clearWebViewCache()
         // END: -
-        
-        guard viewModel.chekSavedKey() else {
-            if let role = UserDefaultsStorege.role.getData(),
-               !role.isEmpty,
-               role != "ROLE_DRAFT",
-               role != "UNKNOWN"{
-                
-                
-                viewModel.telegramCallBack()
-            } else {
-                viewModel.telegramCallBack()
+        Task {
+            if let tgData = await viewModel.chekSavedTGData() {
+                viewModel.telegramCallBack(tgKey: tgData)
+                return
             }
+            let request = URLRequest(url: URL(string: Constants.tgBotdev)!)
+            webView.load(request)
             
-            return
-        }
-        let request = URLRequest(url: URL(string: Constants.tgBotdev)!)
-        webView.load(request)
-        
-        contentView.snp.remakeConstraints({ make in
-            make.leading.trailing.equalToSuperview()
-            make.bottom.equalToSuperview()
-            make.top.equalToSuperview { $0.safeAreaLayoutGuide }.inset(8)
-        })
-        
-        UIView.animate(withDuration: 0.5, animations: {[weak self] in
-            self?.webView.alpha = 1
-            self?.view.layoutIfNeeded()
-            
-            [self?.headerLabel,
-            self?.telegramStack,
-             self?.linkLabel].forEach({
-                $0?.alpha = 0
+            contentView.snp.remakeConstraints({ make in
+                make.leading.trailing.equalToSuperview()
+                make.bottom.equalToSuperview()
+                make.top.equalToSuperview { $0.safeAreaLayoutGuide }.inset(8)
             })
             
-            
-            
-            
-            
-        })
+            UIView.animate(withDuration: 0.5, animations: {[weak self] in
+                self?.webView.alpha = 1
+                self?.view.layoutIfNeeded()
+                
+                [self?.headerLabel,
+                 self?.telegramStack,
+                 self?.linkLabel].forEach({
+                    $0?.alpha = 0
+                })
+            })
+        }
     }
     
     

@@ -3,6 +3,11 @@ import Combine
 
 // MARK: - ViewModel
 class TabBarViewModel: ObservableObject {
+    private let service = ServiceBuilder()
+    private let userRepository = UserRepository.shared
+    
+    @Published var user: UserProfileResultDto?
+    
     struct Input {
         @State var title: String = Constants.title
     }
@@ -15,8 +20,14 @@ class TabBarViewModel: ObservableObject {
     @Published private(set) var input = Input()
 
     // MARK: - Public Methods
-    func updateTitle() {
-        input.title = "Updated Title"
+    func fetchUserProfile() {
+        Task {[weak self] in
+            guard let userProfile = try? await self?.service.getProfileMe() else {
+                return print("Error fetching user profile Neshko")
+            }
+            self?.userRepository.setUserProfile(userProfile)
+            self?.user = userProfile
+        }
     }
 
     // MARK: - Private Methods

@@ -9,25 +9,9 @@ import Foundation
 
 struct AuthTGRequestModel: Codable {
     let jwt: String
-    let refreshToken: String?
+    let refreshToken: String
     let authUserDto: AuthUserDtoResult?
-    let status: String?
-//    enum CodingKeys: String, CodingKey {
-//        case jwt
-//        case authUserDto = "authUserDto"
-//    }
-//    
-//    init(from decoder: Decoder) throws {
-//        let container = try decoder.container(keyedBy: CodingKeys.self)
-//        self.jwt = try container.decodeIfPresent(String.self, forKey: .jwt)
-//        self.authUserDto = try container.decodeIfPresent(AuthUserDtoResult.self, forKey: .authUserDto)
-//    }
-//    
-//    func encode(to encoder: Encoder) throws {
-//        var container = encoder.container(keyedBy: CodingKeys.self)
-//        try container.encodeIfPresent(jwt, forKey: .jwt)
-//        try container.encodeIfPresent(authUserDto, forKey: .authUserDto)
-//    }
+    let status: AuthStatus?
 }
 
 struct AuthUserDtoResult: Codable, JSONRepresentable {
@@ -73,8 +57,8 @@ enum AuthStatus: String, Codable {
 enum Roles: String, Codable, UnknownCasedEnum {
     case user = "ROLE_USER"
     case admin = "ROLE_ADMIN"
-    case unknown = "UNKNOWN"
     case draft = "ROLE_DRAFT"
+    case unknown = "UNKNOWN"
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -85,7 +69,7 @@ enum Roles: String, Codable, UnknownCasedEnum {
             self = .user
         case Roles.admin.rawValue:
             self = .admin
-        case Roles.admin.rawValue:
+        case Roles.draft.rawValue:
             self = .draft
         default:
             self = .unknown

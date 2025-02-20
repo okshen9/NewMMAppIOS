@@ -27,9 +27,11 @@ extension ServiceBuilder: AuthServiceProtocol {
     
     /// user-profile/me
     func refreshJWT(refreshModel: RefreshBodyModel) async throws -> AuthTGRequestModel? {
-        try await performRequest {
-            try apiFactory.refreshJWTRequest(refreshModel: refreshModel)
-        }
+        try await performRequest(
+            makeRequest: {
+                try apiFactory.refreshJWTRequest(refreshModel: refreshModel)
+            },
+            allowRetry: false)
     }
     
     /// /user-profile

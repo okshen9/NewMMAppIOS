@@ -17,8 +17,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
-        if let _ = KeyChainStorage.jwtToken.getData() {
-            window?.rootViewController = AuthVC()
+        if let _ = UserRepository.shared.jwt {
+            window?.rootViewController = UIHostingController(rootView: TabBarView())
         } else {
             window?.rootViewController = AuthVC()
         }

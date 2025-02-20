@@ -60,14 +60,12 @@ struct TestScreenVC: View {
     
     
     func deletChashJWT() {
-        KeyChainStorage.jwtToken.clearKeychain()
-        UserDefaultsStorege.role.clearDefaults()
+        UserRepository.shared.clearAuth()
     }
     
     func deletChashTg() {
+        UserRepository.shared.clearAll()
         clearWebViewCache()
-        KeyChainStorage.tgData.clearKeychain()
-        UserDefaultsStorege.role.clearDefaults()
     }
     
     func clearWebViewCache() {

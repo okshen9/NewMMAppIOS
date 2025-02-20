@@ -55,7 +55,7 @@ class UserInfoViewModel {
             )
             
             // TODO: Вернуться насчет авторизации
-            UserDefaultsStorege.role.save(value: ("ROLE_ADMIN"))
+            UserRepository.shared.setRoles([(finalUser?.userProfileStatus).orEmpty])
             guard let viewController else { return }
             Task {
                 await navigateToMain(viewController)
@@ -73,7 +73,7 @@ class UserInfoViewModel {
     
     @MainActor
     func navigateToMain(_ from: UIViewController) {
-        let nextVC = TabBarView(user: userModel)//UserInfoViewController() // Создаем экземпляр SwiftUI экрана
+        let nextVC = TabBarView()//UserInfoViewController() // Создаем экземпляр SwiftUI экрана
         let hostingController = UIHostingController(rootView: nextVC)
 //        TabBarView
         // Переход на новый экран

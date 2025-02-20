@@ -18,17 +18,18 @@ extension AuthVC: WKNavigationDelegate {
         decidePolicyFor navigationAction: WKNavigationAction,
         decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
     ) {
-        print("neshko web \(webView.url) nav: \(navigationAction.request)")
         guard let url = webView.url else { return }
         decisionHandler(.allow)
         
-        let tgKey = viewModel.validateWebRequest(
-            url: navigationAction.request.url,
-            httpBody: navigationAction.request.httpBody
-        )
-        webView.isHidden = !tgKey.isNil
-        
-        if let tgKey {
+        guard let tgKey = viewModel.validateWebRequest(url: navigationAction.request.url,
+                                                       httpBody: navigationAction.request.httpBody),
+              !tgKey.isEmpty
+        else {
+            return
+        }
+        // если tgData имеется
+        webView.isHidden = true
+        Task {
             viewModel.telegramCallBack(tgKey: tgKey)
         }
     }
@@ -70,7 +71,7 @@ extension AuthVC: WKNavigationDelegate {
             print(" === Neshko Error")
             return
         }
-        let user = await viewModel.getProfile(authQueryModel: AuthQueryModel(tgData: tgKey))
+        let user = await viewModel.getAuthProfile(authQueryModel: AuthQueryModel(tgData: tgKey))
         print("BackView \(user)")
     }
     

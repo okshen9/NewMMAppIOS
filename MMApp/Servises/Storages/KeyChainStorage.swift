@@ -6,10 +6,9 @@
 //
 
 import Foundation
+import Security
 
-
-
-enum KeyChainStorage: String {
+enum KeyChainStorage: String, CaseIterable {
     case tgData = "tgData"
     case jwtToken = "jwtToken"
     case refreshToken = "refreshToken"
@@ -67,16 +66,31 @@ enum KeyChainStorage: String {
         return nil
     }
     
-    
-    func clearKeychain() {
-        let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword]
+    // MARK: Удаление ключей
+    func deleteKeychainItem() {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: self.rawValue
+        ]
         
         let status = SecItemDelete(query as CFDictionary)
+        
         if status == errSecSuccess {
-            print("Ключи успешно очищены")
+            print("Успешно удалено из Keychain")
+        } else if status == errSecItemNotFound {
+            print("Элемент не найден в Keychain")
         } else {
-            print("Ошибка удаления ключей из Keychain: \(status)")
+            print("Ошибка при удалении из Keychain: \(status)")
         }
+    }
+    
+    static func deleteAllJWTKeychain() {
+        KeyChainStorage.jwtToken.deleteKeychainItem()
+        KeyChainStorage.refreshToken.deleteKeychainItem()
+    }
+    
+    static func deleteAllKeychain() {
+        KeyChainStorage.allCases.forEach({ $0.deleteKeychainItem() })
     }
 }
 

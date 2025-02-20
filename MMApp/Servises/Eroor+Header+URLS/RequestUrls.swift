@@ -18,7 +18,7 @@ enum RequestUrls {
     /// Получение профиля Регистарции
     static let authuserMe = "/user/authuser/me"
     /// Запрос на рерфреш , обновление refreshToken, accessToken
-    static let authuserRefresh = "/auth/refresh"
+    static let authuserRefresh = "/user/auth/refresh"
     
     /// Создание профиля пользователя
     static let userProfile = "/user-profile"

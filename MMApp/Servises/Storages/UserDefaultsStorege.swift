@@ -9,25 +9,38 @@
 import Foundation
 
 enum UserDefaultsStorege: String {
-    case role = "userRole"
+    /// String
+    case roles = "userRoles"
+    /// Id
+    case externalId = "externalId"
 
     @discardableResult
-    func save(value: String) -> Bool {
+    func save<T: Codable>(value: T) -> Bool {
         UserDefaultsStorege.saveToDefaults(key: self.rawValue, value: value)
     }
-    
-    func getData() -> String? {
-        UserDefaultsStorege.getFromDefaults(key: self.rawValue)
+
+    func getData<T: Codable>(_: T.Type = String.self) -> T? {
+        UserDefaultsStorege.getFromDefaults(key: self.rawValue, T.self)
     }
-    
+
     @discardableResult
-    static func saveToDefaults(key: String, value: String) -> Bool {
+    static func saveToDefaults<T: Codable>(key: String, value: T) -> Bool {
         UserDefaults.standard.set(value, forKey: key)
         return UserDefaults.standard.synchronize()
     }
 
-    static func getFromDefaults(key: String) -> String? {
-        return UserDefaults.standard.string(forKey: key)
+    static func getFromDefaults<T: Codable>(key: String, _: T.Type = String.self) -> T? {
+        let defaults = UserDefaults.standard
+        switch T.self {
+        case is String.Type: return defaults.string(forKey: key) as? T
+        case is Int.Type: return defaults.integer(forKey: key) as? T
+        case is Bool.Type: return defaults.bool(forKey: key) as? T
+        case is Double.Type: return defaults.double(forKey: key) as? T
+        case is Data.Type: return defaults.data(forKey: key) as? T
+        default:
+            precondition(false, "Unsupported type \(T.self) for UserDefaults")
+            return nil
+        }
     }
 
     func clearDefaults() {
@@ -35,3 +48,4 @@ enum UserDefaultsStorege: String {
         UserDefaults.standard.synchronize()
     }
 }
+

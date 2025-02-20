@@ -11,7 +11,6 @@ import Foundation
 struct StatisticTargetScreen: View {
     @ObservedObject var viewModel: TargetsViewModel
     // TODO: Убрать TargetsView
-    @State var targets: [UserTargetDtoModel] = []
     @State var category: String = "Все категории"
     @State var selectedFractal: PiaViewFractionModel? = nil
     
@@ -22,18 +21,17 @@ struct StatisticTargetScreen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-//                PiaView(piaMdels: mapTargetsToFractal(targets),
-//                        selectedFract: $selectedFractal)
-//                .frame(width: UIScreen.main.bounds.width - 32,
-//                       height: UIScreen.main.bounds.width - 32
-//                )
+                PiaView(piaMdels: mapTargetsToFractal(viewModel.targets),
+                        selectedFract: $selectedFractal)
+                .frame(width: UIScreen.main.bounds.width - 32,
+                       height: UIScreen.main.bounds.width - 32
+                )
                 LazyVStack {
-                    let categorys = TargetCategory.allCases//selectedCategory.isNil ? TargetCategory.allCases : [selectedCategory!]
+                    let categorys = selectedCategory.isNil ? TargetCategory.allCases : [selectedCategory!]
                     ForEach(categorys, id: \.self) { category in
-                        let filteredTargets = targets
-//                            .filter {
-//                            $0.category == category
-//                        }
+                        let filteredTargets = viewModel.targets.filter {
+                            $0.category == category
+                        }
                         if !filteredTargets.isEmpty {
                             CategorySectionView(
                                 clusedSubTarget: $viewModel.clusedSubTarget,

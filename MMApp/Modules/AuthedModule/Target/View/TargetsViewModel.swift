@@ -49,8 +49,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore {
         errorMessage = nil
         Task { [weak self] in
             do {
-                
-                let targets = try await self? .networkService.getUserTargets(externalId: (UserRepository.shared.userProfileDTO?.externalId) ?? 0).userTargets
+                let targets = try await self?.networkService.getUserTargets(externalId: (UserRepository.shared.userProfile?.externalId) ?? 0).userTargets
                 guard let self, !targets.isNil else { return }
                 self.targets = targets ?? []
                 self.isLoading = false

@@ -11,7 +11,7 @@ import SwiftUI
 
 class AuthViewModel {
     private(set) weak var viewController: UIViewController?
-    private let apiFactory = ServiceBuilder()
+    private let service = ServiceBuilder()
 //    private let apiFactory = APIFactory.global
     
     init(_ vc: UIViewController) {
@@ -32,100 +32,95 @@ class AuthViewModel {
     
     @MainActor
     func navigateToMain(_ from: UIViewController, user: AuthUserDtoResult) {
-        let nextVC = TabBarView(user: user)//UserInfoViewController() // Создаем экземпляр SwiftUI экрана
+        let nextVC = TabBarView()
         let hostingController = UIHostingController(rootView: nextVC)
-//        TabBarView
         // Переход на новый экран
         hostingController.modalPresentationStyle = .fullScreen
         viewController?.present(hostingController, animated: true, completion: nil)
     }
     
     /// MARK: - Validaite
+    /// Провереяет url на наличе tgData
+    /// - Parameters:
+    ///   - url: проверяемый url
+    ///   - httpBody: боди запроса
+    /// - Returns: строку tgKey или nil, если не нашел
     func validateWebRequest(url: URL?, httpBody: Data?) -> String? {
         print("Neshko VAlWEb URL: \(url)")
         print("Neshko VAlWEb httpBody: \(httpBody)")
         guard
-            let urlComponents = url?.absoluteString.components(
-                separatedBy: Constants.tgAuthResult
-            ),
+            let urlComponents = url?.absoluteString.components(separatedBy: Constants.tgAuthResult),
             let tgKey = urlComponents[safe: 1],
             !tgKey.isEmpty
         else {
             return nil
         }
         print("Neshko profile \(tgKey)")
-        KeyChainStorage.tgData.save(value: tgKey)
         return tgKey
     }
     
-    func telegramCallBack(tgKey: String = KeyChainStorage.tgData.getData().orEmpty) {
-        Task {[weak self] in
+    func saveTGData(tgKey: String) async {
+        /*await*/ UserRepository.shared.setTGData(tgKey)
+    }
+    
+    /// Кол бек с телеграм даты - авторизация и навигация
+    func telegramCallBack(tgKey: String) {
+        Task { [weak self] in
             let authQueryModel = AuthQueryModel(tgData: tgKey)
-            let result = await self?.getProfile(authQueryModel: AuthQueryModel(tgData: tgKey))
+            let resultAuth = await self?.getAuthProfile(authQueryModel: authQueryModel)
             guard
-                let jwt = result?.jwt,
-                let refreshToken = result?.jwt,
-                var user = result?.authUserDto,
+                let jwt = resultAuth?.jwt,
+                let refreshToken = resultAuth?.jwt,
+                var authUser = resultAuth?.authUserDto,
                 let vc = self?.viewController
                   
             else {
                 return
             }
-            KeyChainStorage.jwtToken.save(value: jwt)
-            KeyChainStorage.refreshToken.save(value: refreshToken)
-            user.photoUrl = authQueryModel.getTgCallBackModelDTO().photoUrl
+            /*await*/ UserRepository.shared.setAuthUser(resultAuth)
+            authUser.photoUrl = authQueryModel.getTgCallBackModelDTO().photoUrl
             // TODO: Вернуть нормальную логику
-            var defRole = result?.authUserDto?.roles?.first?.rawValue ?? UserDefaultsStorege.role.getData()
             
-            switch defRole {
-            case "ROLE_ADMIN":
-                await self?.navigateToMain(vc, user: user)
-            case "ROLE_DRAFT":
-                user.photoUrl = authQueryModel.getTgCallBackModelDTO().photoUrl
-                await self?.navigateToUserForm(vc, user: user)
-            default:
-                UserDefaultsStorege.role.save(value: ("ROLE_DRAFT"))
-                user.photoUrl = authQueryModel.getTgCallBackModelDTO().photoUrl
-                await self?.navigateToUserForm(vc, user: user)
+            let role = (resultAuth?.authUserDto?.roles ?? [.draft]).contains(.draft) ? Roles.draft : Roles.admin
+            
+            switch role {
+            case .admin, .user:
+                await self?.navigateToMain(vc, user: authUser)
+            case .draft, .unknown:
+                await self?.navigateToUserForm(vc, user: authUser)
             }
-            
-            defRole = UserDefaultsStorege.role.getData()
-            
-            if let result {
-                UserRepository.shared.saveUserAuthDTO(result)
-            }
-            
-            await self?.getUser()
         }
     }
     
-    private func getUser() async {
+    private func fetchUser() async {
         do {
-            guard let userProfile = try await apiFactory.getProfileMe() else { return }
-            UserRepository.shared.saveUserProfileDTO(userProfile)
+            guard let userProfile = try await service.getProfileMe() else { return }
+            /*await*/ UserRepository.shared.setUserProfile(userProfile)
         } catch {
             print(error)
         }
     }
     
     /// Return: true - грузим новые данные, false - данные имеются
-    func chekSavedKey() -> Bool {
-        guard let tgData = KeyChainStorage.tgData.getData() else {
-            return true
-        }
-        
-        return false
+    func chekSavedTGData() async -> String? {
+        /*await*/ UserRepository.shared.tgData
     }
     
-    func getProfile(authQueryModel: AuthQueryModel) async -> AuthTGRequestModel? {
+    func currentUserIsDraft() async -> Bool {
+        return (/*await*/ UserRepository.shared.roles ?? [])
+            .map{Roles(rawValue: $0)}
+            .contains(where: {$0 == .draft || $0 == .unknown})
+    }
+    
+    /// Запрашиваем authUser
+    func getAuthProfile(authQueryModel: AuthQueryModel) async -> AuthTGRequestModel? {
         do {
-            return await try apiFactory.sendTGToken(model: authQueryModel)
+            return await try service.sendTGToken(model: authQueryModel)
         } catch {
             print("neshko error \(error)")
             return nil
         }
     }
-    
 }
 
 extension AuthViewModel {

@@ -15,7 +15,7 @@ enum AuthRequestHelper {
     /// user-profile/me
     case createProfile
     
-    /// /auth/refresh/
+    /// /user/auth/refresh
     case authuserRefreshJWT
 
     /// Массив параметров
@@ -36,6 +36,7 @@ enum AuthRequestHelper {
     var path: String {
         switch self {
         case .sendTGToken:
+            print("Neshko - sendTGToken")
             return RequestUrls.tgCallBack
         case .getUserMe:
             return RequestUrls.userProfileMe

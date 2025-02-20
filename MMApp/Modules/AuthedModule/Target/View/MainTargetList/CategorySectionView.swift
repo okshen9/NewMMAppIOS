@@ -11,9 +11,9 @@ struct CategorySectionView: View {
     @Binding var clusedSubTarget: UserSubTargetDtoModel?
     
     
-    let category: TargetCategory
-    let targets: [UserTargetDtoModel] // Список целей для выбранной категории
-    var onEdit: () -> Void // Замыкание для редактирования категории
+    @State var category: TargetCategory
+    @State var targets: [UserTargetDtoModel] // Список целей для выбранной категории
+    @State var onEdit: () -> Void // Замыкание для редактирования категории
 
     var body: some View {
         Section(header:

@@ -38,7 +38,7 @@ extension APIFactory: AuthRequestProtocol {
     
     /// user-profile/me
     func refreshJWTRequest(refreshModel: RefreshBodyModel) throws -> URLRequest {
-        let helper = AuthRequestHelper.getUserMe
+        let helper = AuthRequestHelper.authuserRefreshJWT
         let url = try urlBuilder.buildURL(path: helper.path)
         let urlRequest = try requestBuilder.buildJSONParamsRequest(
             url: url,

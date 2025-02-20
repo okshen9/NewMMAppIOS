@@ -15,7 +15,8 @@ open class AbstractService {
     }
     
     public func performRequest<Response: Decodable>(
-        makeRequest: () throws -> URLRequest
+        makeRequest: () throws -> URLRequest,
+        allowRetry: Bool = true
     ) async throws -> Response {
         let request: URLRequest
         do {
@@ -24,7 +25,7 @@ open class AbstractService {
             throw ResponseError.noConnection
         }
 
-        return try await self.dataTaskBuilder.buildDataTask(request).response
+        return try await self.dataTaskBuilder.buildDataTask(request, allowRetry: allowRetry).response
     }
     
     public func performEmptyRequest(
@@ -40,7 +41,8 @@ open class AbstractService {
     }
 
     public func performRequestWithHeaders<Response: Decodable> (
-        makeRequest: () throws -> URLRequest
+        makeRequest: () throws -> URLRequest,
+        allowRetry: Bool = true
     ) async throws -> (response: Response, headers: [AnyHashable : Any]) {
         let request: URLRequest
         do {
@@ -49,7 +51,7 @@ open class AbstractService {
             throw ResponseError.noConnection
         }
 
-        return try await self.dataTaskBuilder.buildDataTask(request)
+        return try await self.dataTaskBuilder.buildDataTask(request, allowRetry: allowRetry)
     }
 
     public func performRawRequest(

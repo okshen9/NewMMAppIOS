@@ -65,7 +65,7 @@ extension APIFactory: TargetRequestProtocol {
     ///   - model: моделоь
     /// - Returns: подготовленный запрос
     func updateTargetAll(model: UserTargetDtoModel) throws -> URLRequest {
-        let helper = TargetRequestHelper.createUserTarget
+        let helper = TargetRequestHelper.updateTargetAll
         let url = try urlBuilder.buildURL(path: helper.path)
 
         let urlRequest = try requestBuilder.buildJSONParamsRequest(

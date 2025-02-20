@@ -21,12 +21,9 @@ public class APIDataTasksBuilder {
         config.timeoutIntervalForRequest = 5
         return URLSession(configuration: config)
     }
-    private typealias tokenStorage = KeyChainStorage
     
 
-//    private lazy var refreshManager: RefreshTokenManager = {
-//        RefreshTokenManager(serverApiUrlString: serverApiUrlString)
-//    }()
+    private var refreshManager = UserRepository.shared
     
     public init(
         apiFactory: APIFactory? = nil
@@ -42,18 +39,19 @@ public class APIDataTasksBuilder {
 //        self.serverApiUrlString = serverApiUrlString
     }
 
-//    private func setTokensToRequest(_ request: inout URLRequest, authTokens: AuthTokens) -> URLRequest {
-//        request.setValue("token \(authTokens.accessToken)", forHTTPHeaderField: HTTPHeader.authorization)
-//        
-//        return request
-//    }
+    private func setTokensToRequest(_ request: inout URLRequest, authTokens: String) -> URLRequest {
+        request.setValue("Bearer \(authTokens)", forHTTPHeaderField: HTTPHeader.authorization)
+        
+        return request
+    }
 }
 
 extension APIDataTasksBuilder {
     
     func buildDataTask<T: Decodable>(
         _ request: URLRequest,
-        tokenNecessity: TokenNecessity = .mandatory
+        tokenNecessity: TokenNecessity = .mandatory,
+        allowRetry: Bool
     ) async throws -> (response: T, headers: [AnyHashable : Any])
     {
         
@@ -76,18 +74,20 @@ extension APIDataTasksBuilder {
         case 200..<300:
             break
         case 401:
-            throw APIError.failedToken
-//            if allowRetry {
-//                do {
-//                    let authTokens = try await refreshManager.checkRefreshToken()
-//                    var request = request
-//                    let newRequest = setTokensToRequest(&request, authTokens: authTokens)
-//                    return try await buildDataTask(request: newRequest, allowRetry: false)
-//
-//                } catch {
-//                    throw ResponseError.invalidToken
-//                }
-//            }
+            if allowRetry {
+                do {
+//                    guard let refreshManager else {
+//                        throw ResponseError.invalidToken
+//                    }
+                    let newToken = try await refreshManager.makeRefreshToken()
+                    var request = request
+                    let newRequest = setTokensToRequest(&request, authTokens: newToken)
+                    return try await buildDataTask(newRequest, allowRetry: false)
+
+                } catch {
+                    throw ResponseError.invalidToken
+                }
+            }
         default:
             break
         }
@@ -135,7 +135,7 @@ extension APIDataTasksBuilder {
     public func buildEmptyDataTask(request: URLRequest, allowRetry: Bool) async throws {
         let _: (
             response: EmptyResponse, headers: [AnyHashable : Any]
-        ) = try await self.buildDataTask(request)
+        ) = try await self.buildDataTask(request, allowRetry: allowRetry)
     }
 
     /// Запрос в сеть, возвращает Data
@@ -145,7 +145,7 @@ extension APIDataTasksBuilder {
     public func buildRawDataTask(request: URLRequest, allowRetry: Bool) async throws -> (Data, headers: [AnyHashable : Any]) {
         let result: (
             response: Data, headers: [AnyHashable : Any]
-        ) = try await self.buildDataTask(request)
+        ) = try await self.buildDataTask(request, allowRetry: allowRetry)
         return result
     }
 }

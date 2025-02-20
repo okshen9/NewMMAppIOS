@@ -20,7 +20,6 @@ public protocol RequestDecorator {
 }
 
 public struct APIURLRequestsBuilder {
-//    private let tokenStorage: KeychainStorageProtocol = KeychainStorage()
     private let requestDecorators: [RequestDecorator]
     
     public init(
@@ -103,7 +102,7 @@ extension APIURLRequestsBuilder {
         case .mandatory:
             
 
-            if let token = KeyChainStorage.jwtToken.getData() {
+            if let token = UserRepository.shared.jwt {
                 
                 request.setValue("Bearer \(token)", forHTTPHeaderField: HTTPHeader.authorization)
             }
