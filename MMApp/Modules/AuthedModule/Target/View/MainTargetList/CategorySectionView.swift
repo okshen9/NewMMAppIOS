@@ -9,10 +9,11 @@ import SwiftUI
 
 struct CategorySectionView: View {
     @Binding var clusedSubTarget: UserSubTargetDtoModel?
+    @Binding var clusedTarget: UserTargetDtoModel?
     
     
     @State var category: TargetCategory
-    @State var targets: [UserTargetDtoModel] // Список целей для выбранной категории
+    @Binding var targets: [UserTargetDtoModel] // Список целей для выбранной категории
     @State var onEdit: () -> Void // Замыкание для редактирования категории
 
     var body: some View {
@@ -29,9 +30,20 @@ struct CategorySectionView: View {
                 }
             }
         ) {
-            ForEach(targets) { target in
-                TargetRowView(clusedSubTarget: $clusedSubTarget, target: target)
+            ForEach($targets) { target in
+                TargetRowView(clusedSubTarget: $clusedSubTarget, clusedTarget: $clusedTarget, target: target)
             }
+            .onChange(of: targets, {
+                print("Изменилась CategorySectionView")
+            })
         }
+
     }
+
 }
+
+//extension Array: Equatable where Element == UserTargetDtoModel {
+//    static func == (lhs: Self, rhs: Self) -> Bool {
+//        
+//    }
+//}

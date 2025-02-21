@@ -92,7 +92,7 @@ struct AddTargetView: View {
             title: newSubTargetTitle,
             description: newSubTargetDescription,
             subTargetPercentage: 0, // Начальный прогресс
-            targetStatus: .draft, // Статус по умолчанию
+            targetSubStatus: .notDone, // Статус по умолчанию
             rootTargetId: 0, // Временное значение (будет обновлено после сохранения основной цели)
             isDeleted: false,
             creationDateTime: Date().toApiString,

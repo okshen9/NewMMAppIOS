@@ -8,6 +8,12 @@
 import SwiftUI
 import Combine
 
+//if subTarget.targetStatus != .done {
+//    isLoading = true
+//    clusedSubTarget = subTarget
+//}
+
+
 struct SubTargetRowView: View {
     
     
@@ -16,7 +22,7 @@ struct SubTargetRowView: View {
     @State private var showConfirmationDialog = false
     @State private var isLoading = false
     
-    let subTarget: UserSubTargetDtoModel
+    @Binding var subTarget: UserSubTargetDtoModel
     
     var body: some View {
         HStack {
@@ -24,38 +30,13 @@ struct SubTargetRowView: View {
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle())
             } else {
-                Button(action: {
-                    if subTarget.targetStatus != .done {
-                        isLoading = true
-                        clusedSubTarget = subTarget
-                    }
-                    
-//                    isLoading = true
-//                    
-//                    completeSubTarget()
-                    
-                }) {
-                    Image(systemName: subTarget.targetStatus == .done ? "checkmark.circle.fill" : "circle")
-                        .foregroundColor(subTarget.targetStatus == .done ? .green : .gray)
-                }
-                .buttonStyle(.plain)
-                .background(
-                    ConfirmationDialog(
-                        message: "Вы закрыли эту подцель?",
-                        onConfirm: {
-                            isLoading = true
-                            showConfirmationDialog = false
-                            completeSubTarget()
-                        },
-                        onCancel: { showConfirmationDialog = false }
-                    )
-                    .opacity(showConfirmationDialog ? 1 : 0) // Показываем/скрываем диалог
-                )
+                closeButton()
             }
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(subTarget.title.orEmpty)
-                    .font(.subheadline)
+                    .font(.headline)
+                    .foregroundColor(.headerText)
                 Text("Срок выполнения: \((subTarget.deadLineDateTime?.dateFromString ?? Date.now).formatted(date: .abbreviated, time: .shortened))")
                     .font(.caption)
                     .foregroundColor(.gray)
@@ -64,12 +45,39 @@ struct SubTargetRowView: View {
             Spacer()
         }
         .padding(.vertical, 4)
+        .onChange(of: subTarget, {
+            print("Изменилась subTarget")
+            isLoading = false
+        })
     }
     
-    private func completeSubTarget() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            isLoading = false
+    @ViewBuilder
+    func closeButton() -> some View {
+        Button(action: {
+                showConfirmationDialog = true
+        }) {
+            Image(systemName: $subTarget.targetStatus.wrappedValue == .done ? "checkmark.circle.fill" : "circle")
+                .foregroundColor($subTarget.targetStatus.wrappedValue == .done ? .green : .gray)
         }
+        .buttonStyle(.plain)
+        .alert(isPresented: $showConfirmationDialog,
+               content: {
+            let title = (subTarget.targetStatus?.isDone) ?? false ? "Вы хотите открыть цель?" : "Вы закрыли цель?"
+            return Alert(title: Text(title),
+                  primaryButton:
+                    .default(Text("Да"), action: {
+                        //                        subTarget.targetStatus = .done
+                        isLoading = true
+                        clusedSubTarget = subTarget
+                        print("Done")
+                    }),
+                  secondaryButton:
+                    .destructive(Text("Нет"), action: {
+                        //                        subTarget.targetStatus = .inProgress
+                        print("Not Done")
+                    })
+            )
+        })
     }
 }
 

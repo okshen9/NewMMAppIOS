@@ -21,6 +21,7 @@
 		AC041CF62D11FB2D003CE128 /* Exceptions for "MMApp" folder in "MMApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Extention/Binding.swift,
 				Info.plist,
 				Servises/CoreDate/CoreDataManagerFetch.swift,
 				Servises/CoreDate/CoreDataManagerSave.swift,
@@ -34,6 +35,7 @@
 			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
 			buildPhase = AC041CE22D11FB2D003CE128 /* Resources */;
 			membershipExceptions = (
+				Extention/Binding.swift,
 				Servises/CoreDate/CoreDataManagerFetch.swift,
 				Servises/CoreDate/CoreDataManagerSave.swift,
 			);

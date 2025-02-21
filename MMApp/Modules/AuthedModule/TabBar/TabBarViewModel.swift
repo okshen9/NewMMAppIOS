@@ -21,12 +21,14 @@ class TabBarViewModel: ObservableObject {
 
     // MARK: - Public Methods
     func fetchUserProfile() {
-        Task {[weak self] in
+        Task { [weak self] in
             guard let userProfile = try? await self?.service.getProfileMe() else {
                 return print("Error fetching user profile Neshko")
             }
             self?.userRepository.setUserProfile(userProfile)
-            self?.user = userProfile
+            DispatchQueue.main.async { [weak self] in
+                self?.user = userProfile
+            }
         }
     }
 

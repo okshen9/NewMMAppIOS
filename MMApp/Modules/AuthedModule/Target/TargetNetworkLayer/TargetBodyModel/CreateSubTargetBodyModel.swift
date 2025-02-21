@@ -11,5 +11,5 @@ struct CreateSubTargetBodyModel: JSONRepresentable {
     let description: String?
     let subTargetPercentage: Double?
     let deadLineDateTime: Date?
-    let targetStatus: TargetStatus?
+    let targetSubStatus: TargetSubStatus?
 }

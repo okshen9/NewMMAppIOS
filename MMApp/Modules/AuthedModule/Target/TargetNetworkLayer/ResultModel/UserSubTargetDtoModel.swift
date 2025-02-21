@@ -7,7 +7,7 @@
 import Foundation
 
 /// Модель результата для UserSubTargetDto
-struct UserSubTargetDtoModel: Codable, JSONRepresentable, Identifiable {
+struct UserSubTargetDtoModel: Codable, JSONRepresentable, Identifiable, Equatable {
     /// Идентификатор подцели
     var id: Int?
     /// Название подцели
@@ -17,7 +17,7 @@ struct UserSubTargetDtoModel: Codable, JSONRepresentable, Identifiable {
     /// Процент выполнения подцели
     var subTargetPercentage: Double?
     /// Статус подцели
-    var targetStatus: TargetStatus?
+    var targetStatus: TargetSubStatus?
     /// Идентификатор родительской цели
     var rootTargetId: Int?
     /// Флаг удаления подцели (true - удалена, false - нет)
@@ -29,12 +29,12 @@ struct UserSubTargetDtoModel: Codable, JSONRepresentable, Identifiable {
     /// Срок выполнения подцели
     var deadLineDateTime: String?
     
-    init(id: Int? = nil, title: String? = nil, description: String? = nil, subTargetPercentage: Double? = nil, targetStatus: TargetStatus? = nil, rootTargetId: Int? = nil, isDeleted: Bool? = nil, creationDateTime: String? = nil, lastUpdatingDateTime: String? = nil, deadLineDateTime: String? = nil) {
+    init(id: Int? = nil, title: String? = nil, description: String? = nil, subTargetPercentage: Double? = nil, targetSubStatus: TargetSubStatus? = nil, rootTargetId: Int? = nil, isDeleted: Bool? = nil, creationDateTime: String? = nil, lastUpdatingDateTime: String? = nil, deadLineDateTime: String? = nil) {
         self.id = id
         self.title = title
         self.description = description
         self.subTargetPercentage = subTargetPercentage
-        self.targetStatus = targetStatus
+        self.targetStatus = targetSubStatus
         self.rootTargetId = rootTargetId
         self.isDeleted = isDeleted
         self.creationDateTime = creationDateTime
@@ -48,7 +48,7 @@ struct UserSubTargetDtoModel: Codable, JSONRepresentable, Identifiable {
         self.title = try container.decodeIfPresent(String.self, forKey: .title)
         self.description = try container.decodeIfPresent(String.self, forKey: .description)
         self.subTargetPercentage = try container.decodeIfPresent(Double.self, forKey: .subTargetPercentage)
-        self.targetStatus = try container.decodeIfPresent(TargetStatus.self, forKey: .targetStatus)
+        self.targetStatus = try container.decodeIfPresent(TargetSubStatus.self, forKey: .targetStatus)
         self.rootTargetId = try container.decodeIfPresent(Int.self, forKey: .rootTargetId)
         self.isDeleted = try container.decodeIfPresent(Bool.self, forKey: .isDeleted)
         self.creationDateTime = try container.decodeIfPresent(String.self, forKey: .creationDateTime)

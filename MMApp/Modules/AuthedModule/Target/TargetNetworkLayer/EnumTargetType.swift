@@ -9,7 +9,7 @@ import Foundation
 import SwiftUICore
 
 /// Категории задач
-enum TargetCategory: String, UnknownCasedEnum, JSONRepresentable, CaseIterable {
+enum TargetCategory: String, UnknownCasedEnum, JSONRepresentable, CaseIterable, Equatable {
     case money = "Бизнес"
     case personal = "Личное"
     case family = "Семья"
@@ -35,7 +35,11 @@ enum TargetCategory: String, UnknownCasedEnum, JSONRepresentable, CaseIterable {
     }
 }
 
-enum TargetStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable {
+enum TargetStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable, Equatable {
+    /// Цель успешно завершена в срок.
+    case done = "DONE"
+    
+    // Другие
     case unknown = "unknown"
     
     /// Только создано и не получен аппрув для цели от админа.
@@ -43,9 +47,6 @@ enum TargetStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable {
     
     /// Цель аппрувнута админом и в прогрессе
     case inProgress = "IN_PROGRESS"
-    
-    /// Цель успешно завершена в срок.
-    case done = "DONE"
     
     /// Успешно завершена цель, но с просрочкой.
     case doneExpired = "DONE_EXPIRED"
@@ -58,10 +59,6 @@ enum TargetStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable {
     
     /// Цель просрочена.
     case expired = "EXPIRED"
-    
-    /// Подцель не выполнена
-    case notDone = "NOT_DONE"
-    
     
     var title: String {
         switch self {
@@ -81,8 +78,64 @@ enum TargetStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable {
             return "Провалена"
         case .expired:
             return "Просрочена"
+        }
+    }
+    
+    mutating func changeSelf() {
+        self = switch self {
+        case .done, .doneExpired:
+            TargetStatus.inProgress
+        case .draft, .expired, .inProgress, .cancelled, .unknown, .failed:
+            TargetStatus.done
+        }
+    }
+    
+    var isDone: Bool {
+        return switch self {
+        case .done, .doneExpired:
+            true
+        case .draft, .expired, .inProgress, .cancelled:
+            false
+        default:
+            false
+        }
+    }
+}
+
+
+enum TargetSubStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable, Equatable {
+    // Для целей и подцелей
+    /// Подцель не выполнена
+    case notDone = "NOT_DONE"
+    /// Цель успешно завершена в срок.
+    case done = "DONE"
+    
+    
+    // Другие
+    case unknown = "unknown"
+    
+
+    var title: String {
+        switch self {
+        case .unknown:
+            return "инзвестно"
+        case .done:
+            return "Завершене"
         case .notDone:
             return "Не завершена"
+        }
+    }
+    
+    mutating func changeSelf() {
+        self = self == .done ? .notDone : .done
+    }
+    
+    var isDone: Bool {
+        return switch self {
+        case .done:
+            true
+        case .notDone, .unknown:
+            false
         }
     }
 }

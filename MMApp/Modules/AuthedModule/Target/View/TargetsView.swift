@@ -37,6 +37,7 @@ struct TargetsView: View {
                             CategoryEditView(
                                 category: category,
                                 clusedSubTarget: $viewModel.clusedSubTarget,
+                                clusedTarget: $viewModel.clusedTarget,
                                 targets: $viewModel.targets, // Передаем Binding к списку целей
                                 isPresented: $isEditingCategory
                             )
@@ -51,29 +52,42 @@ struct TargetsView: View {
             }
             .navigationTitle("Цели")
         }
+        .onChange(of: viewModel.targets, {
+            print("Изменилась target")
+        })
     }
     
     @ViewBuilder
     private func categorySectionView(for category: TargetCategory) -> some View {
-        let targets = filteredTargets(for: category) // Используем вынесенный метод
-        
+        var targets = filteredTargets(for: category) // Используем вынесенный метод
         if !targets.isEmpty {
             CategorySectionView(
                 clusedSubTarget: $viewModel.clusedSubTarget,
+                clusedTarget: $viewModel.clusedTarget,
                 category: category,
-                targets: targets.map({$0.wrappedValue}),
+                targets: targets,
                 onEdit: {
                     selectedCategory = category
                     isEditingCategory = true
                 }
             )
+            .onChange(of: viewModel.targets, {
+                print("Изменилась TargetsView categorySectionView")
+            })
         }
     }
     
-    private func filteredTargets(for category: TargetCategory) -> [Binding<UserTargetDtoModel>] {
-        viewModel.targets.indices.compactMap { index -> Binding<UserTargetDtoModel>? in
-            viewModel.targets[index].category == category ? $viewModel.targets[index] : nil
-        }
+    private func filteredTargets(for category: TargetCategory) -> Binding<[UserTargetDtoModel]> {
+        Binding(
+            get: { viewModel.targets.filter { $0.category == category } },
+            set: { newValue in
+                for target in newValue {
+                    if let index = viewModel.targets.firstIndex(where: { $0.id == target.id }) {
+                        viewModel.targets[index] = target
+                    }
+                }
+            }
+        )
     }
 }
 
