@@ -15,6 +15,7 @@ struct PiaView: View {
     
     @State var values: [Double]
     var colors: [Color]
+    var strongColor: [Color]
     var names: [String]
     
     //TODO: передалать
@@ -42,6 +43,7 @@ struct PiaView: View {
         names: [String] = [],
         widthFraction: CGFloat = 0.1,
         innerRadiusFraction: CGFloat = 0.6,
+        strongColor: [Color] = [Color.blue, Color.green, Color.purple, Color.orange, Color.yellow, Color.blue, Color.red],
         selectedFract:  Binding<PiaViewFractionModel?>)
     {
         self.values = values
@@ -49,6 +51,7 @@ struct PiaView: View {
         self.names = names
         self.widthFraction = widthFraction
         self.innerRadiusFraction = innerRadiusFraction
+        self.strongColor = strongColor
         self._selectedFract = selectedFract
     }
     
@@ -66,16 +69,19 @@ struct PiaView: View {
         var values = [Double]()
         var colors = [Color]()
         var names = [String]()
+        var strongColor = [Color]()
         piaMdels.forEach({ model in
             values.append(model.currnetValue)
             colors.append(model.color)
             names.append(model.name ?? .empty)
+            strongColor.append(model.color)
             
             if let allStats = model.allStats {
                 //TODO: Neshko Прозрачные цевета круга
                 let delta = allStats > model.currnetValue ? allStats - model.currnetValue : 0
                 values.append(delta)
-                colors.append(model.color.opacity(0.3))
+                colors.append(model.color.lighter(by: 0.5))
+                strongColor.append(model.color)
                 names.append(model.name ?? .empty)
             }
         })
@@ -86,6 +92,7 @@ struct PiaView: View {
             names: names,
             widthFraction: widthFraction,
             innerRadiusFraction: innerRadiusFraction,
+            strongColor: strongColor,
             selectedFract: selectedFract
         )
         self.fractals = piaMdels
@@ -120,8 +127,8 @@ struct PiaView: View {
             ForEach(Array(slices.enumerated()), id: \.0) { index, slice in
                 zDictionary[index] = index
                 return PortfolioStatisticSlice(portfolioSliceData: slice)
-                    .shadow(color: self.activeIndex == index ? slice.color.opacity(1.0) : .clear,
-                            radius: self.activeIndex == index ? 10 : 0)
+                    .shadow(color: self.activeIndex == index ? slice.strongColor : .clear,
+                            radius: self.activeIndex == index ? 8 : 0)
                     .scaleEffect(self.activeIndex == index ? 1.05 : 1)
                     .animation(Animation.spring())
                     .zIndex(Double(zDictionary[index] ?? 0))
@@ -278,7 +285,8 @@ extension PiaView {
             tempSlices.append(PortfolioSliceData(
                 startAngle: Angle(degrees: endDeg),
                 endAngle: Angle(degrees: endDeg + degrees),
-                color: colors[i]))
+                color: colors[i],
+                strongColor: strongColor[i]))
             endDeg += degrees
         }
         return tempSlices

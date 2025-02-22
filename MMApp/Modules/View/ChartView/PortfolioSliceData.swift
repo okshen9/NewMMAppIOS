@@ -11,6 +11,7 @@ struct PortfolioSliceData {
     var startAngle: Angle
     var endAngle: Angle
     var color: Color
+    var strongColor: Color
 }
 
 struct PortfolioStatisticSlice: View {
@@ -47,6 +48,6 @@ struct PortfolioStatisticSlice: View {
 
 struct PortfolioStatisticSlice_Previews: PreviewProvider {
     static var previews: some View {
-        PortfolioStatisticSlice(portfolioSliceData: PortfolioSliceData(startAngle: Angle(degrees: 0.0), endAngle: Angle(degrees: 120.0), color: Color.black))
+        PortfolioStatisticSlice(portfolioSliceData: PortfolioSliceData(startAngle: Angle(degrees: 0.0), endAngle: Angle(degrees: 120.0), color: Color.black, strongColor: Color.black))
     }
 }

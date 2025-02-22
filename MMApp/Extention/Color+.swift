@@ -109,3 +109,23 @@ extension Color {
     }
 }
 
+extension Color {
+    /// Возвращает более светлый цвет, увеличивая значения RGB-компонентов.
+    /// - Parameter amount: Коэффициент осветления (от 0 до 1). Значение 0 не изменяет цвет, 1 делает его белым.
+    /// - Returns: Осветленный цвет.
+    func lighter(by amount: Double) -> Color {
+        guard amount >= 0, amount <= 1 else { return self }
+
+        let uiColor = UIColor(self)
+        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+
+        if uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha) {
+            let newRed = min(red + (1 - red) * CGFloat(amount), 1)
+            let newGreen = min(green + (1 - green) * CGFloat(amount), 1)
+            let newBlue = min(blue + (1 - blue) * CGFloat(amount), 1)
+            return Color(red: newRed, green: newGreen, blue: newBlue)
+        }
+        
+        return self
+    }
+}
