@@ -11,7 +11,9 @@ struct PiaView: View {
     @Binding var selectedFract: PiaViewFractionModel?
     @State private var totalPortfolioPrice: Double = 0
     
-    let values: [Double]
+    @State private var zDictionary: [Int: Int] = [:]
+    
+    @State var values: [Double]
     var colors: [Color]
     var names: [String]
     
@@ -70,7 +72,7 @@ struct PiaView: View {
             names.append(model.name ?? .empty)
             
             if let allStats = model.allStats {
-                
+                //TODO: Neshko Прозрачные цевета круга
                 let delta = allStats > model.currnetValue ? allStats - model.currnetValue : 0
                 values.append(delta)
                 colors.append(model.color.opacity(0.3))
@@ -116,9 +118,13 @@ struct PiaView: View {
     private func sliceViews(geometry: GeometryProxy) -> some View {
         ZStack(alignment: .center) {
             ForEach(Array(slices.enumerated()), id: \.0) { index, slice in
-                PortfolioStatisticSlice(portfolioSliceData: slice)
+                zDictionary[index] = index
+                return PortfolioStatisticSlice(portfolioSliceData: slice)
+                    .shadow(color: self.activeIndex == index ? slice.color.opacity(1.0) : .clear,
+                            radius: self.activeIndex == index ? 10 : 0)
                     .scaleEffect(self.activeIndex == index ? 1.05 : 1)
                     .animation(Animation.spring())
+                    .zIndex(Double(zDictionary[index] ?? 0))
             }
             .frame(
                 width: widthFraction * geometry.size.width,
@@ -133,7 +139,8 @@ struct PiaView: View {
                         let diff = CGPoint(x: value.location.x - radius, y: radius - value.location.y)
                         let dist = pow(pow(diff.x, 2.0) + pow(diff.y, 2.0), 0.5)
                         if (dist > radius || dist < radius * innerRadiusFraction) {
-                            self.activeIndex = -1
+//                            self.activeIndex = -1
+                            setActive(index: -1)
                             return
                         }
                         var radians = Double(atan2(diff.x, diff.y))
@@ -143,8 +150,8 @@ struct PiaView: View {
                         
                         for (i, slice) in slices.enumerated() {
                             if (radians < slice.endAngle.radians) {
-                                self.activeIndex = i
-                                
+//                                self.activeIndex = i
+                                setActive(index: i)
                                 let currentFract = fractals
                                     .filter({$0.name == names[self.activeIndex]})
                                     .first
@@ -165,10 +172,12 @@ struct PiaView: View {
                     DragGesture(minimumDistance: 0)
                         .onChanged { value in
                             print("По всем категориям")
-                            self.activeIndex = -1
+//                            self.activeIndex = -1
+                            setActive(index: -1)
                             self.selectedFract = nil
                         }
                     )
+                .zIndex(101.0)
             if names.contains(where: {!$0.isEmpty}) {
                 
                 if self.activeIndex != -1 {
@@ -208,6 +217,7 @@ struct PiaView: View {
                             .font(.subheadline)
                             .foregroundColor(.subtitleText)
                     }
+                    .zIndex(102.0)
                 } else {
                     let all =
                     String.doubleFormat(fractals
@@ -227,8 +237,19 @@ struct PiaView: View {
                             .font(.subheadline)
                             .foregroundColor(.subtitleText)
                     }
+                    .zIndex(102.0)
                 }
             }
+        }
+    }
+    
+    private func setActive(index: Int) {
+        if activeIndex != -1 {
+            zDictionary[activeIndex] = activeIndex
+        }
+        self.activeIndex = index
+        if index != -1 {
+            zDictionary[index] = 100
         }
     }
 }
