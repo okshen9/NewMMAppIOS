@@ -15,6 +15,7 @@ struct CalendarViewUIKit: UIViewRepresentable {
 
     func makeUIView(context: Context) -> UICalendarView {
         let calendarView = UICalendarView()
+        calendarView.locale = Locale(identifier: "ru_RU")
         calendarView.delegate = context.coordinator
         calendarView.selectionBehavior = UICalendarSelectionSingleDate(delegate: context.coordinator)
         return calendarView
@@ -110,6 +111,7 @@ struct CustomCalendarView: View {
     var body: some View {
         VStack {
             CalendarViewUIKit(selectedDate: $selectedDate, events: markedDates)
+                .tint(.mainRed)
                 .frame(height: 400)
             Text("Выбранная дата: \(selectedDate.formatted(.dateTime.day().month().year()))")
         }
