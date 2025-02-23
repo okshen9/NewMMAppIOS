@@ -59,4 +59,15 @@ extension APIFactory: AuthRequestProtocol {
             tokenNeccessity: .mandatory)
         return urlRequest
     }
+    
+    func getUserProfile(externalId: Int) throws -> URLRequest {
+        let helper = AuthRequestHelper.getUserProfile(externalId)
+        let url = try urlBuilder.buildURL(path: helper.path)
+        let urlRequest = try requestBuilder.buildURLRequest(
+            url: url,
+            query: helper.query,
+            method: helper.method,
+            tokenNeccessity: .mandatory)
+        return urlRequest
+    }
 }

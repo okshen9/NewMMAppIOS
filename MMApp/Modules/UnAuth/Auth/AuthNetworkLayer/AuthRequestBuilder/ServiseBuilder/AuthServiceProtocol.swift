@@ -20,4 +20,7 @@ protocol AuthServiceProtocol {
     
     /// /user-profile
     func createProfile(profileData: CreateUserProfileBodyModel) async throws -> UserProfileResultDto?
+    
+    /// GET /userprofile/{extId}
+    func getUserProfile(externalId: Int) async throws -> UserProfileResultDto?
 }

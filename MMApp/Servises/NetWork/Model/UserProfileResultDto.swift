@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct UserProfileResultDto: Codable {
+struct UserProfileResultDto: Codable, Equatable {
     let id: Int?
     let externalId: Int?
     let username: String?
@@ -21,6 +21,12 @@ struct UserProfileResultDto: Codable {
     let location: String?
     let userGroup: UserGroupResultDto?
     let stream: StreamResultDto?
+    let photoUrl: String?
+    let activitySphere: String?
+    
+    static func == (lhs: UserProfileResultDto, rhs: UserProfileResultDto) -> Bool {
+        return lhs.id == rhs.id
+    }
 }
 
 struct UserGroupResultDto: Codable {
@@ -42,4 +48,10 @@ struct StreamResultDto: Codable {
     let isDeleted: Bool?
     let creationDateTime: String?
     let lastUpdatingDateTime: String? // не обновлялось, но при обновлении должно быть аналогично creationDateTime
+    
+    var isActive: Bool {
+        guard let dateToStr = dateTo,
+              let dateTo = dateToStr.dateFromString() else { return false }
+        return Date() < dateTo
+    }
 }

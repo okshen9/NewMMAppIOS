@@ -17,6 +17,8 @@ enum AuthRequestHelper {
     
     /// /user/auth/refresh
     case authuserRefreshJWT
+    
+    case getUserProfile(Int)
 
     /// Массив параметров
     var query: QueryItemsRepresentable? {
@@ -28,6 +30,8 @@ enum AuthRequestHelper {
         case let .createProfile:
             return nil
         case .authuserRefreshJWT:
+            return nil
+        case .getUserProfile(_):
             return nil
         }
     }
@@ -44,13 +48,15 @@ enum AuthRequestHelper {
             return RequestUrls.userProfile
         case .authuserRefreshJWT:
             return RequestUrls.authuserRefresh
+        case .getUserProfile(let externalId):
+            return "\(RequestUrls.userProfile)/\(externalId)"
         }
     }
 
     /// Метод
     var method: HTTPMethod {
         switch self {
-        case .sendTGToken, .getUserMe:
+        case .sendTGToken, .getUserMe, .getUserProfile(_):
             return .get
         case .createProfile, .authuserRefreshJWT:
             return .post

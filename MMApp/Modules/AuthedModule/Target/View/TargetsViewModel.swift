@@ -10,7 +10,7 @@ import Combine
 import SwiftUI
 
 
-final class TargetsViewModel: ObservableObject, Sendable, SubscriptionStore {
+final class TargetsViewModel: ObservableObject, SubscriptionStore {
     
     @Published var targets: [UserTargetDtoModel] = []
     @Published var clusedSubTarget: UserSubTargetDtoModel?

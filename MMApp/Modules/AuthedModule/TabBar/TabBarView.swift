@@ -53,7 +53,7 @@ struct TabBarView: View {
                     }
                     .tag(3)
                 
-                ProfileView(index: selectedTab)
+                ProfileView()
                     .tabItem {
                         VStack {
                             Image(.profile)

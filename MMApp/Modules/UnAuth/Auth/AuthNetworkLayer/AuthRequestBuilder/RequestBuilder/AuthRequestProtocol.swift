@@ -19,4 +19,7 @@ protocol AuthRequestProtocol {
     
     /// /user-profile
     func createProfileRequest(profileData: CreateUserProfileBodyModel) throws -> URLRequest
+    
+    /// GET /userprofile/{extId}
+    func getUserProfile(externalId: Int) throws -> URLRequest
 }

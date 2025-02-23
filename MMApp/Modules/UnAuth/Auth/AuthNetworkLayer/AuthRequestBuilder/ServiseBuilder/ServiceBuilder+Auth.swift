@@ -40,4 +40,10 @@ extension ServiceBuilder: AuthServiceProtocol {
             try apiFactory.createProfileRequest(profileData: profileData)
         }
     }
+    
+    func getUserProfile(externalId: Int) async throws -> UserProfileResultDto? {
+        try await performRequest {
+            try apiFactory.getUserProfile(externalId: externalId)
+        }
+    }
 }
