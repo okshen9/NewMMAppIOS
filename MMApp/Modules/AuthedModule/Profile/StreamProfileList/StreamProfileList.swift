@@ -71,7 +71,8 @@ struct UserRow: View {
     let user: StreamUserProfileShortInfoDto
     
     var body: some View {
-        NavigationLink(destination: ProfileView()) {
+        let viewModel = ProfileViewModel(externalId: user.externalId)
+        NavigationLink(destination: ProfileView(viewModel: viewModel)) {
             HStack {
                 VStack(alignment: .leading) {
                     Text(user.fullName ?? "Неизвестный пользователь")

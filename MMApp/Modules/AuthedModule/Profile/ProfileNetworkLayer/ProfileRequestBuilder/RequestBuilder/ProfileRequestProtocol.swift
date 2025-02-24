@@ -1,0 +1,17 @@
+//
+//  ProfileRequestProtocol.swift
+//  MMApp
+//
+//  Created by artem on 24.02.2025.
+//
+
+import Foundation
+
+protocol ProfileRequestProtocol {
+    /// Получить дату пользователя
+    /// - Parameters:
+    ///   - model: модель получения истории пользователя
+    ///   - id: id пользователя
+    /// - Returns: подготовленный запрос
+    func getDataRequest(model: ProfileBodyModel, id: Int) throws -> URLRequest
+}

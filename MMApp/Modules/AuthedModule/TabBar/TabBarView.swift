@@ -59,7 +59,7 @@ struct TabBarView: View {
                             Image(.profile)
                                 .renderingMode(.template)
                                 .foregroundColor(selectedTab == 4 ? Color.green : Color.orange)
-                            Text("Провиль")
+                            Text("Профиль")
                                 .foregroundColor(selectedTab == 4 ? Color.mainRed : Color.orange)
                         }
                     }

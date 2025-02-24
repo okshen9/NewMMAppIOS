@@ -15,18 +15,19 @@ final class ProfileViewModel: ObservableObject {
     // MARK: - Private properties
     private let serviceNetwork = ServiceBuilder()
     private let userRepository = UserRepository.shared
-    
+    private let externalId: Int?
 
     init(externalId: Int? = nil) {
-        
+        self.externalId = externalId
     }
+    
     // MARK: - Public properties
 //    @Published private(set) var input = Input()
 
     // MARK: - Public Methods
     func onApper() {
         Task {
-            if let profileDto = userRepository.userProfile {
+            if let profileDto = userRepository.userProfile, externalId == nil {
                 await updateUI(profile: profileDto)
             } else {
                 await updateProfile()
@@ -34,11 +35,16 @@ final class ProfileViewModel: ObservableObject {
         }
     }
     
-    func updateProfile() async {
+    func updateProfile(externalId: Int? = nil) async {
         do {
             await setIsLoading(true)
-            guard let updatetedProfile = try await serviceNetwork.getProfileMe() else { return }
-            await updateUI(profile: updatetedProfile)
+            if let externalId = self.externalId {
+                guard let updatetedProfile = try await serviceNetwork.getUserProfile(externalId: externalId) else { return }
+                await updateUI(profile: updatetedProfile)
+            } else {
+                guard let updatetedProfile = try await serviceNetwork.getProfileMe() else { return }
+                await updateUI(profile: updatetedProfile)
+            }
         } catch {
             print("Neshko updateProfile \(error) - Ошибка загрзуки профиля на странице профиля")
         }

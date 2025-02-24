@@ -2,7 +2,7 @@ import SwiftUI
 import Kingfisher
 
 struct ProfileView: View {
-    @StateObject private var viewModel = ProfileViewModel()
+    @StateObject var viewModel = ProfileViewModel()
 
     var body: some View {
         NavigationStack {
