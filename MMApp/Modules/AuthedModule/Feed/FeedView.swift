@@ -2,17 +2,17 @@ import SwiftUI
 
 struct FeedView: View {
     @StateObject private var viewModel = FeedViewModel()
+    @State var selectedDate: Date = Date()
+    
+
 
     var body: some View {
         VStack {
-            Text("Новости и события")
-                .font(.title)
-            List {
-                getCell(title: "Витяля закрыл цель", subtitle: "Полетел на самолете")
-            }
-            .cornerRadius(16)
-            .background(Color.clear)
-            .padding(.horizontal)
+            CalendarViewUIKit(selectedDate: $selectedDate, events: markedDates)
+                .tint(Color.red)
+                .frame(height: 400)
+            Text("Выбранная дата: \(selectedDate.formatted(.dateTime.day().month().year()))")
+            Spacer()
             
         }
         .padding(.top, 24)
@@ -56,3 +56,9 @@ extension FeedView {
 #Preview {
     FeedView()
 }
+
+let markedDates: [Date: [UIColor]] = [
+    Calendar.current.date(from: DateComponents(year: 2025, month: 2, day: 5))!: [.red],
+    Calendar.current.date(from: DateComponents(year: 2025, month: 2, day: 3))!: [.blue, .green,
+                                                                                 .blue, .orange,.yellow,.darkGray,.brown]
+]

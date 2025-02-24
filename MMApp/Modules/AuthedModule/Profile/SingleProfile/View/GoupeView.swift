@@ -15,10 +15,10 @@ struct GroupButton: View {
     var body: some View {
         GeometryReader { geometry in
             
-            Button (action: {
-                //            action()
-                print("dfdf")
-            }, label: {
+//            Button (action: {
+//                //            action()
+//                print("dfdf")
+//            }, label: {
                 VStack {
                     Text(title)
                         .font(.headline)
@@ -34,7 +34,7 @@ struct GroupButton: View {
                 .background(Color.gray)
                 .cornerRadius(16)
                 
-            })
+//            })
             
         }
         .shadow(radius: 8)

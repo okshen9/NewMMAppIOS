@@ -1,8 +1,14 @@
 import SwiftUI
 import Combine
 
+enum Destination: Hashable {
+    case userDetail(userId: Int)
+}
+
 // MARK: - ViewModel
 final class ProfileViewModel: ObservableObject {
+    @Published var navigationPath = NavigationPath()
+    
     @Published var isLoading = true
     @Published var profile: UserProfileResultDto?
     
@@ -11,6 +17,9 @@ final class ProfileViewModel: ObservableObject {
     private let userRepository = UserRepository.shared
     
 
+    init(externalId: Int? = nil) {
+        
+    }
     // MARK: - Public properties
 //    @Published private(set) var input = Input()
 
@@ -47,19 +56,23 @@ final class ProfileViewModel: ObservableObject {
     }
     
     func openTelegramChat(username: String) {
-            // Формируем ссылку для приложения Telegram
-            let telegramURL = URL(string: "tg://resolve?domain=\(username)")!
-
-            // Проверяем, установлен ли Telegram
-            if UIApplication.shared.canOpenURL(telegramURL) {
-                // Открываем Telegram
-                UIApplication.shared.open(telegramURL, options: [:], completionHandler: nil)
-            } else {
-                // Если Telegram не установлен, открываем веб-версию
-                let webURL = URL(string: "https://t.me/\(username)")!
-                UIApplication.shared.open(webURL, options: [:], completionHandler: nil)
-            }
+        // Формируем ссылку для приложения Telegram
+        let telegramURL = URL(string: "tg://resolve?domain=\(username)")!
+        
+        // Проверяем, установлен ли Telegram
+        if UIApplication.shared.canOpenURL(telegramURL) {
+            // Открываем Telegram
+            UIApplication.shared.open(telegramURL, options: [:], completionHandler: nil)
+        } else {
+            // Если Telegram не установлен, открываем веб-версию
+            let webURL = URL(string: "https://t.me/\(username)")!
+            UIApplication.shared.open(webURL, options: [:], completionHandler: nil)
         }
+    }
+    
+    func goToStream() {
+        navigationPath.append(Destination.userDetail(userId: 1))
+    }
 }
 
 // MARK: - Constants

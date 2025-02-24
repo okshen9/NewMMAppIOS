@@ -23,6 +23,8 @@ struct UserProfileResultDto: Codable, Equatable {
     let stream: StreamResultDto?
     let photoUrl: String?
     let activitySphere: String?
+    let biography: String?
+
     
     static func == (lhs: UserProfileResultDto, rhs: UserProfileResultDto) -> Bool {
         return lhs.id == rhs.id
@@ -48,6 +50,8 @@ struct StreamResultDto: Codable {
     let isDeleted: Bool?
     let creationDateTime: String?
     let lastUpdatingDateTime: String? // не обновлялось, но при обновлении должно быть аналогично creationDateTime
+    let owners: [StreamUserProfileShortInfoDto]?
+    let participants: [StreamUserProfileShortInfoDto]?
     
     var isActive: Bool {
         guard let dateToStr = dateTo,

@@ -36,4 +36,7 @@ struct CreateUserProfileBodyModel: JSONRepresentable {
     
     /// "Номер тел", example = "88005553535")
     var phoneNumber: String
+    
+    /// Биография, макс 256 символов
+    var biography: String?
 }

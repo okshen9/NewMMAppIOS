@@ -19,7 +19,7 @@ final class MMDateFormatter {
     ///     - string: Строка, которую необходимо преобразовать в дату.
     ///     - format: Формат даты для преобразования строки.
     /// - Returns: Объект типа Date, полученный из строки, или nil, если преобразование не удалось.
-    static func date(from string: String, format: DateFormat = .apiFullDateFormat, locale: LocaleFormat = .rus) -> Date? {
+    static func date(from string: String, format: MMDateFormat = .apiFullDateFormat, locale: LocaleFormat = .rus) -> Date? {
         let formatter = dateFormatter(for: Configurator(dateFormat: format, locale: locale))
         return formatter.date(from: string)
     }
@@ -40,7 +40,7 @@ final class MMDateFormatter {
     ///     - format: Формат даты для преобразования объекта типа Date.
     ///     - locale: Локализация текстовой репрезентации даты
     /// - Returns: Строковое представление объекта типа Date в указанном формате.
-    static func string(from date: Date, format: DateFormat, locale: LocaleFormat = .rus) -> String {
+    static func string(from date: Date, format: MMDateFormat, locale: LocaleFormat = .rus) -> String {
         let formatter = dateFormatter(for: Configurator(dateFormat: format, locale: locale))
         return formatter.string(from: date)
     }
@@ -82,7 +82,7 @@ final class MMDateFormatter {
      let timeAgo = dateConverterToTimeAgo(from: dateString, format: .apiDateFormat)
      print(timeAgo) // Вывод: "3 дня назад"
      */
-    static func dateConverterToTimeAgo(from string: String, format: DateFormat = .apiFullDateFormat) -> String {
+    static func dateConverterToTimeAgo(from string: String, format: MMDateFormat = .apiFullDateFormat) -> String {
         let dateFormatter = dateFormatter(for: Configurator(dateFormat: format))
 
         if let date = dateFormatter.date(from: string) {
@@ -194,7 +194,7 @@ final class MMDateFormatter {
          print(phrase) // Вывод: "Только что"
      }
      */
-    static func convertDataToTimeAgoType(from string: String, format: DateFormat = .apiFullDateFormat) -> DateConvertedType {
+    static func convertDataToTimeAgoType(from string: String, format: MMDateFormat = .apiFullDateFormat) -> DateConvertedType {
         let dateFormatter = dateFormatter(for: Configurator(dateFormat: format))
 
         if let date = dateFormatter.date(from: string) {
@@ -290,17 +290,17 @@ extension MMDateFormatter {
 extension MMDateFormatter {
     /// Класс `Configurator` представляет собой объект конфигурации, используемый для настройки объекта форматирования даты.
     final class Configurator: Hashable, ScopeFunctionality {
-        private var dateFormat: DateFormat?
+        private var dateFormat: MMDateFormat?
         private var locale: LocaleFormat?
         private var timeZone: TimeZone?
 
-        init(dateFormat: DateFormat? = nil, locale: LocaleFormat? = nil, timeZone: TimeZone? = nil) {
+        init(dateFormat: MMDateFormat? = nil, locale: LocaleFormat? = nil, timeZone: TimeZone? = nil) {
             self.dateFormat = dateFormat
             self.locale = locale
             self.timeZone = timeZone
         }
 
-        func update(dateFormat: DateFormat) {
+        func update(dateFormat: MMDateFormat) {
             self.dateFormat = dateFormat
         }
 
@@ -347,7 +347,7 @@ extension MMDateFormatter {
 // MARK: - DateFormat
 extension MMDateFormatter {
     /// Перечисление для форматов даты
-    enum DateFormat {
+    enum MMDateFormat {
         /// Сокращенное отображение даты, нули вначале обрезаются: "1.2.2024"
         case cutZeroShortDate
         /// Сокращенное отображение даты: "01.02.2024"
@@ -362,7 +362,7 @@ extension MMDateFormatter {
         case cutWordsDate
         /// Отображение времени: ""21:24"
         case time
-        /// Формат даты для использования в API: "2024-02-01T21:24:56.142+0500"
+        /// Формат даты для использования в API: "2024-02-01T21:24:23.999"
         case apiFullDateFormat
         /// Формат даты для использования в API: "2024-02-01T21:24:23"
         case apiFullShortDateFormat
@@ -406,7 +406,7 @@ extension MMDateFormatter {
                 return "yyyy-MM-dd'T'HH:mm:ss.SS"
 
             case .apiFullShortDateFormat:
-                return "yyyy-MM-dd'T'HH:mm:ssZ"
+                return "yyyy-MM-dd'T'HH:mm:ss"
 
             case .apiDateFormat:
                 return "yyyy-MM-dd"
@@ -451,7 +451,7 @@ extension MMDateFormatter {
 
 extension String {
     /// Влзвращает дату из строки указанного формата
-    func dateFromString(_ dateFormat: MMDateFormatter.DateFormat = .apiFullDateFormat) -> Date? {
+    func dateFromString(_ dateFormat: MMDateFormatter.MMDateFormat = .apiFullDateFormat) -> Date? {
         return MMDateFormatter.date(from: self,
                              withConfigurator: .init(dateFormat: dateFormat,
                                                      locale: .rus,
@@ -465,6 +465,16 @@ extension String {
                                                             locale: .rus,
                                                             timeZone: .init(identifier: "Europe/Moscow")))
     }
+    
+    var dateFromStringISO8601: Date? {
+        let pref = String(self.prefix(while: {$0 != "."}))
+        print("Neshko Date \(pref)")
+        return MMDateFormatter.date(from: pref,
+                                    withConfigurator: .init(dateFormat: .apiFullShortDateFormat,
+                                                            locale: .rus,
+                                                            timeZone: .init(identifier: "Europe/Moscow")))
+    }
+    
 }
 
 extension Date {

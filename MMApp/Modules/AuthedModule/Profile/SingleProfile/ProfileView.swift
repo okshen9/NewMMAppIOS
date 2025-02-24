@@ -5,17 +5,18 @@ struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
 
     var body: some View {
-        VStack {
-            if viewModel.profile == nil || $viewModel.isLoading.wrappedValue  {
-                shimerState()
-            } else {
-                contentState()
+        NavigationStack {
+            VStack {
+                if viewModel.profile == nil || $viewModel.isLoading.wrappedValue  {
+                    shimerState()
+                } else {
+                    contentState()
+                }
+            }
+            .onAppear {
+                viewModel.onApper()
             }
         }
-        .onAppear {
-            viewModel.onApper()
-        }
-
     }
     
     
@@ -56,9 +57,34 @@ struct ProfileView: View {
                     profile.stream?.isActive ?? false ? "Текущий" : "Завершен" :
                     nil
                     
-                    GroupButton(title: profile.stream?.title ?? "Поток не назначен",
-                                subTitle: streamStatus,
-                                action: {})
+                    NavigationLink(destination: {
+                        if let stream = profile.stream,
+                           let owners = stream.owners,
+                           let participants = stream.participants
+                        {
+                            
+                            StreamProfileList(
+                                type: .stream(stream.title ?? "Поток без названия"),
+                                status: stream.isActive ? .current : .ended,
+                                mentors: owners,
+                                participants: participants,
+                                dateStart: (profile.stream?.dateFrom?.dateFromStringISO8601) ?? Date.init(timeIntervalSince1970: 232),
+                                dateEnd: (profile.stream?.dateTo?.dateFromStringISO8601) ?? Date.now
+                            )
+                        } else {
+                            Text("Error")
+                        }
+                    }, label: {
+                        GroupButton(
+                            title: profile.stream?.title ?? "Поток не назначен",
+                            subTitle: streamStatus,
+                            action: {})
+                    })
+                    
+                    
+//                    GroupButton(title: profile.stream?.title ?? "Поток не назначен",
+//                                subTitle: streamStatus,
+//                                action: {})
                     GroupButton(title: profile.userGroup?.title ?? "Подгруппа",
                                 subTitle: (profile.userGroup?.title).isNil ? "Не названчена" : nil,
                                 action: {})
