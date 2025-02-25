@@ -14,7 +14,7 @@ extension APIFactory :ChecksRequestProtocol {
     ///   - model: модель получения истории пользователя
     ///   - id: id пользователя
     /// - Returns: подготовленный запрос
-    func getDataRequest(model: ChecksBodyModel, id: Int) throws -> URLRequest {
+    func getCkeckRequest(model: ChecksBodyModel, id: Int) throws -> URLRequest {
         let helper = ChecksRequestHelper.getData(id: id)
         let url = try urlBuilder.buildURL(path: helper.path)
 

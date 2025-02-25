@@ -15,4 +15,10 @@ protocol PayRequestServiceProtocol {
     ///   - id: id пользователя
     /// - Returns: модель пользователя
     func getData(model: PayRequestBodyModel, id: Int) async throws -> PaymentRequestResponseDto
+    
+    /// Получить payments plan пользователя с externalId
+    /// - Parameters:
+    ///   - id: id пользователя
+    /// - Returns: модель пайментов пользователя
+    func getPaymentPlan(id: Int) async throws -> [PaymentRequestResponseDto]?
 }

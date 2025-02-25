@@ -478,6 +478,7 @@ extension String {
 }
 
 extension Date {
+    /// 2024-02-01T21:24:23.999
     var toApiString: String {
         return MMDateFormatter.string(from: self,
                                       withConfigurator: .init(dateFormat: .apiFullDateFormat,
@@ -485,10 +486,16 @@ extension Date {
                                                               timeZone: .init(identifier: "Europe/Moscow")))
     }
     
+    /// 1 Feb 2024
     var toDisplayString: String {
         return MMDateFormatter.string(from: self,
                                       withConfigurator: .init(dateFormat: .cutWordsFullDate,
                                                               locale: .rus,
                                                               timeZone: .init(identifier: "Europe/Moscow")))
+    }
+    
+    var dateComponents: DateComponents {
+        let calendar = Calendar.current
+        return calendar.dateComponents([.year, .month, .day], from: self)
     }
 }

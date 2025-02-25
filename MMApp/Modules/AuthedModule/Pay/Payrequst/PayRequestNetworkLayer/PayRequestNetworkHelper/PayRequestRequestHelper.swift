@@ -9,6 +9,8 @@ enum PayRequestRequestHelper {
     // MARK: - Кейсы
     /// получение данных
     case getData(id: Int)
+    
+    case getPaymentPlan(id: Int)
 
     // MARK: Query
     var query: PayRequestQueryBuilder? {
@@ -25,13 +27,15 @@ enum PayRequestRequestHelper {
         switch self {
         case let .getData(externalId):
             return RequestUrls.tgCallBack + "/test/" + externalId.toString
+        case .getPaymentPlan(let id):
+            return RequestUrls.paymentPlanForExternalId //+ "/" + id.toString
         }
     }
     
     // MARK: Метод
     var method: HTTPMethod {
         switch self {
-        case .getData:
+        case .getData, .getPaymentPlan:
             return .get
         }
     }

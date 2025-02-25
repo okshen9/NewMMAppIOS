@@ -19,4 +19,14 @@ extension ServiceBuilder: PayRequestServiceProtocol {
             try apiFactory.getDataRequest(model: model, id: id)
         }
     }
+    
+    /// Получить payments plan пользователя с externalId
+    /// - Parameters:
+    ///   - id: id пользователя
+    /// - Returns: модель пайментов пользователя
+    func getPaymentPlan(id: Int) async throws -> [PaymentRequestResponseDto]? {
+        try await performRequest {
+            try apiFactory.getPaymentPlanRequest(id: id)
+        }
+    }
 }

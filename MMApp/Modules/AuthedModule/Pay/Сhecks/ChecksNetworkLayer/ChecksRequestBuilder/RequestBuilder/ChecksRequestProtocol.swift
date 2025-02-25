@@ -13,5 +13,6 @@ protocol ChecksRequestProtocol {
     ///   - model: модель получения истории пользователя
     ///   - id: id пользователя
     /// - Returns: подготовленный запрос
-    func getDataRequest(model: ChecksBodyModel, id: Int) throws -> URLRequest
+    func getCkeckRequest(model: ChecksBodyModel, id: Int) throws -> URLRequest
+    
 }

@@ -26,10 +26,10 @@ enum RequestUrls {
     static let userProfileMe = "/user-profile/me"
     
     /// Запрашивает данные пользователя вместе с ролями
-    static let userProfileWithRole = "/user-profile/"
+    static let userProfileWithRole = "/user-profile"
     
     /// Обновляет данные пользователя
-    static let updateUserProfile = "/user-profile/"
+    static let updateUserProfile = "/user-profile"
     
     /// Поиск пользователя по параметрам
     static let userSearch = "/user-profile/search"
@@ -50,7 +50,7 @@ enum RequestUrls {
     static let userTargetAllUpdate = "/user-target/all"
     
     /// Заменить(PATCH) статус подцели по её ID. Если все подцели в статусе FINISHED - закрывается рутовая цель (переводится в FINISHED)
-    static let userTargetUpdateSubTarget = "/user-target/user-sub-target/"
+    static let userTargetUpdateSubTarget = "/user-target/user-sub-target"
     
     /// Отметить(DELETE) подцель как удалённую
     static let userTargetSubTargetDelete = "/user-target/sub-user-target"
@@ -59,31 +59,20 @@ enum RequestUrls {
     static let userTargetReport = "/user-report"
     
     /// Получение(GET) списка отчётов по цели
-    static let userTargetGetReport = "/user-report/user-target/"
+    static let userTargetGetReport = "/user-report/user-target"
     
     // MARK: - Чеками
     
     /// Получение чека по id чека
-    static let getCheckout = "/api/checkout/"
+    static let getCheckout = "/api/checkout"
     /// Получение чека по id пользователя
-    static let getCheckoutForUserId = "/api/checkout/externalId/"
+    static let getCheckoutForUserId = "/api/checkout/externalId"
     /// Создание чека
     static let createCheckout = "/api/checkout"
     
     // MARK: - заявки на опалату
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    /// Создание чека
-    static let createCheck = "/api/checkout"
+    static let paymentPlanForExternalId = "/payment-request/externalId/me"
     
     
 }

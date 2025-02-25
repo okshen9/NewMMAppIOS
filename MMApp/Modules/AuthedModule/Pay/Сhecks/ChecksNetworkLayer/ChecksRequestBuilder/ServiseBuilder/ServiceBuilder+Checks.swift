@@ -14,9 +14,9 @@ extension ServiceBuilder: ChecksServiceProtocol {
     ///   - model: модель получения истории пользователя
     ///   - id: id пользователя
     /// - Returns: модель пользователя
-    func getData(model: ChecksBodyModel, id: Int) async throws -> ChecksResultModel {
+    func getCheck(model: ChecksBodyModel, id: Int) async throws -> ChecksResultModel {
         try await performRequest {
-            try apiFactory.getDataRequest(model: model, id: id)
+            try apiFactory.getCkeckRequest(model: model, id: id)
         }
     }
 }

@@ -23,15 +23,15 @@ struct TabBarView: View {
                     }
                     .tag(0)
                 
-                EmptyView()
-                    .tabItem {
-                        Image(.search)
-                            .renderingMode(.template)
-                            .foregroundColor(selectedTab == 1 ? Color.mainRed : Color.tabbarSecond)
-                        Text("Поиск")
-                            .foregroundColor(selectedTab == 1 ? Color.mainRed : Color.tabbarSecond)
-                    }
-                    .tag(1)
+//                EmptyView()
+//                    .tabItem {
+//                        Image(.search)
+//                            .renderingMode(.template)
+//                            .foregroundColor(selectedTab == 1 ? Color.mainRed : Color.tabbarSecond)
+//                        Text("Поиск")
+//                            .foregroundColor(selectedTab == 1 ? Color.mainRed : Color.tabbarSecond)
+//                    }
+//                    .tag(1)
                 
                 TargetsView()
                     .tabItem {
@@ -43,7 +43,8 @@ struct TabBarView: View {
                     }
                     .tag(2)
                 
-                EmptyView()
+//                EmptyView()
+                PayRequestView()
                     .tabItem {
                         Image(.pay)
                             .renderingMode(.template)

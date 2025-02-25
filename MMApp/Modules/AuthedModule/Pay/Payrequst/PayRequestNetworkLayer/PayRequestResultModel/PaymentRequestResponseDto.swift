@@ -11,10 +11,21 @@ struct PaymentRequestResponseDto: Codable {
     let id: Int?
     let externalId: Int?
     let amount: Double?
-    let dueDate: Date?
+    let dueDate: String?
     let comment: String?
     let paymentRequestStatus: PaymentRequestStatus?
     let userProfilePreview: UserProfileResultDto?
+    
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decodeIfPresent(Int.self, forKey: .id)
+        self.externalId = try container.decodeIfPresent(Int.self, forKey: .externalId)
+        self.amount = try container.decodeIfPresent(Double.self, forKey: .amount)
+        self.dueDate = try container.decodeIfPresent(String.self, forKey: .dueDate)
+        self.comment = try container.decodeIfPresent(String.self, forKey: .comment)
+        self.paymentRequestStatus = try container.decodeIfPresent(PaymentRequestStatus.self, forKey: .paymentRequestStatus)
+        self.userProfilePreview = try container.decodeIfPresent(UserProfileResultDto.self, forKey: .userProfilePreview)
+    }
 }
 
 enum PaymentRequestStatus: String, Codable, UnknownCasedEnum {
@@ -34,7 +45,7 @@ enum PaymentRequestStatus: String, Codable, UnknownCasedEnum {
         case .canceled:
             return "Запрос отменен"
         case .overdue:
-            return "Частично оплачен."
+            return "Просрочено"
         case .unknown:
             return "Нет информации"
         }

@@ -77,6 +77,7 @@ struct UserRow: View {
                 VStack(alignment: .leading) {
                     Text(user.fullName ?? "Неизвестный пользователь")
                         .font(.body)
+                        .foregroundColor(.headerText)
                         .bold()
                     if let username = user.username {
                         Text(username)

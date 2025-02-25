@@ -75,3 +75,9 @@ extension Date {
         return Calendar.current.date(bySettingHour: 12, minute: .zero, second: .zero, of: self) ?? .now
     }
 }
+
+extension Date? {
+    var orNow: Date {
+        self ?? .now
+    }
+}

@@ -15,7 +15,15 @@ struct PaymentRequestRequestPlanDTO: Codable {
     /// Внешний идентификатор
     let externalId: Int?
     /// Дата оплаты
-    let dueDate: Date?
+    let dueDate: String?
     /// Массив идентификаторов связанных PaymentRequest
-    let paymentRequestIds: [Int]?
+    let paymentRequestIds: [PaymentRequestResponseDto]?
+    
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decodeIfPresent(Int.self, forKey: .id)
+        self.externalId = try container.decodeIfPresent(Int.self, forKey: .externalId)
+        self.dueDate = try container.decodeIfPresent(String.self, forKey: .dueDate)
+        self.paymentRequestIds = try container.decodeIfPresent([PaymentRequestResponseDto].self, forKey: .paymentRequestIds)
+    }
 }

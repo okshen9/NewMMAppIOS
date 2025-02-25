@@ -24,6 +24,7 @@ class UserRepository {
     private(set) var userProfile: UserProfileResultDto?
     func setUserProfile(_ newValue: UserProfileResultDto?) {
         userProfile = newValue
+        setExternalId(newValue?.externalId)
     }
     
     // MARK: - tgData

@@ -26,11 +26,21 @@ extension APIFactory :PayRequestRequestProtocol {
             tokenNeccessity: .mandatory
         )
         return urlRequest
+    }
+    
+    /// Получить payments plan пользователя с externalId
+    /// - Parameters:
+    ///   - id: id пользователя
+    /// - Returns: подготовленный запрос
+    func getPaymentPlanRequest(id: Int) throws -> URLRequest {
+        let helper = PayRequestRequestHelper.getPaymentPlan(id: id)
+        let url = try urlBuilder.buildURL(path: helper.path)
         
-//        let urlRequest = try requestBuilder.buildURLRequest(
-//            url: url,
-//            query: helper.query,
-//            method: helper.method)
-//        return try await dataTaskBuilder.buildDataTask(urlRequest).response
+        let urlRequest = try requestBuilder.buildURLRequest(
+            url: url,
+            query: helper.query,
+            method: helper.method,
+            tokenNeccessity: .mandatory)
+        return urlRequest
     }
 }

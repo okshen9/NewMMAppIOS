@@ -14,5 +14,5 @@ protocol ChecksServiceProtocol {
     ///   - model: модель получения истории пользователя
     ///   - id: id пользователя
     /// - Returns: модель пользователя
-    func getData(model: ChecksBodyModel, id: Int) async throws -> ChecksResultModel
+    func getCheck(model: ChecksBodyModel, id: Int) async throws -> ChecksResultModel
 }

@@ -14,4 +14,10 @@ protocol PayRequestRequestProtocol {
     ///   - id: id пользователя
     /// - Returns: подготовленный запрос
     func getDataRequest(model: PayRequestBodyModel, id: Int) throws -> URLRequest
+    
+    /// Получить payments plan пользователя с externalId
+    /// - Parameters:
+    ///   - id: id пользователя
+    /// - Returns: подготовленный запрос
+    func getPaymentPlanRequest(id: Int) throws -> URLRequest
 }

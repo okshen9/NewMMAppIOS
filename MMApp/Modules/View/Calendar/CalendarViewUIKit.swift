@@ -10,8 +10,8 @@ import SwiftUI
 import UIKit
 
 struct CalendarViewUIKit: UIViewRepresentable {
-    @Binding var selectedDate: Date
-    let events: [Date: [UIColor]] // Несколько событий на одну дату
+    @Binding var selectedDate: Date?
+    @State var events: [Date: [UIColor]] // Несколько событий на одну дату
 
     func makeUIView(context: Context) -> UICalendarView {
         let calendarView = UICalendarView()
@@ -45,8 +45,12 @@ struct CalendarViewUIKit: UIViewRepresentable {
             return .image(image)
         }
 
-        func dateSelection(_ selection: UICalendarSelectionSingleDate, didSelectDate dateComponents: DateComponents?) {
-            guard let dateComponents = dateComponents, let date = Calendar.current.date(from: dateComponents) else { return }
+        func dateSelection(_ selection: UICalendarSelectionSingleDate,
+                           didSelectDate dateComponents: DateComponents?) {
+            guard let dateComponents = dateComponents,
+                  let date = Calendar.current.date(from: dateComponents) else {
+                return
+            }
             DispatchQueue.main.async {
                 self.parent.selectedDate = date
             }
@@ -99,8 +103,14 @@ struct CalendarViewUIKit: UIViewRepresentable {
     }
 }
 
+
 /// Пример использования календаря
 struct CustomCalendarView: View {
+    @State var currentComponent = Calendar.current.dateComponents(Set<Calendar.Component>(arrayLiteral: .year, .month, .day), from: Date.now)
+    @State var dateDate2: DateComponents? = DateComponents(year: 2025, month: 2, day: 25)
+    
+    @State var dateDate3: Set<DateComponents> = [DateComponents(year: 2025, month: 2, day: 25)]
+    
     @State var selectedDate: Date
     let markedDates: [Date: [UIColor]] = [
         Calendar.current.date(from: DateComponents(year: 2025, month: 2, day: 5))!: [.red],
@@ -108,17 +118,27 @@ struct CustomCalendarView: View {
                                                                                      .blue, .orange,.yellow,.darkGray,.brown]
     ]
 
+
     var body: some View {
         VStack {
-            CalendarViewUIKit(selectedDate: $selectedDate, events: markedDates)
-                .tint(.mainRed)
-                .frame(height: 400)
-            Text("Выбранная дата: \(selectedDate.formatted(.dateTime.day().month().year()))")
+            CalendarViewUIKit2(visibleDateComponents: $currentComponent, selection: $dateDate2)
+                .decorating(dateDate3, color: .red)
+                .decorating(dateDate3, color: .green)
+                .tint(.blue)
+                .frame(height: 450)
+//            CalendarViewUIKit(selectedDate: $selectedDate, events: markedDates)
+//                .tint(.mainRed)
+//                .frame(height: 450)
         }
         .padding()
+    }
+    
+    func test () {
+        dateDate3
     }
 }
 
 #Preview {
     CustomCalendarView(selectedDate: Date.now)
+//        .background(.green)
 }

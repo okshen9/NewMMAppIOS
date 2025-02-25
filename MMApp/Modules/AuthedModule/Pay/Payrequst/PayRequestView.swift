@@ -11,15 +11,22 @@ struct PayRequestView: View {
     @StateObject private var viewModel = PayRequestViewModel()
     
     var body: some View {
-        VStack {
-            if viewModel.isLoading {
-                shimerState()
-            } else {
-                Text("isLoading: \(viewModel.isLoading)")
+        NavigationView {
+            VStack {
+                if let payRequest = viewModel.payRequest, !viewModel.isLoading {
+                    List(payRequest, id: \.id) { payment in
+                        PaymentRowView(payment: payment)
+                    }
+                    .listStyle(.plain)
+                    .navigationTitle("Платежи")
+                } else {
+                    shimerState()
+                }
             }
-        }
-        .onAppear {
-            viewModel.onApper()
+            .onAppear {
+                viewModel.onApper()
+            }
+            .navigationTitle("Платежи")
         }
     }
     
@@ -52,4 +59,62 @@ struct PayRequestView: View {
 
 #Preview {
     PayRequestView()
+}
+
+struct PaymentRowView: View {
+    let payment: PaymentRequestResponseDto
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // Сумма и статус
+            HStack {
+                Text("Сумма: \(payment.amount ?? 0, specifier: "%.2f") ₽")
+                    .font(.headline)
+                    .foregroundColor(.headerText)
+                Spacer()
+                Text(payment.paymentRequestStatus?.description ?? "Нет информации")
+                    .font(.subheadline)
+                    .foregroundColor(statusColor(for: payment.paymentRequestStatus))
+            }
+
+            // Дата
+            if let dueDate = payment.dueDate?.dateFromStringISO8601 {
+                Text("Срок оплаты: \(dueDate.toDisplayString)")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+            }
+
+            // Комментарий
+            if let comment = payment.comment, !comment.isEmpty {
+                Text("Комментарий: \(comment)")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+            }
+
+            // Профиль пользователя
+            if let userProfile = payment.userProfilePreview {
+                Text("Пользователь: \(userProfile.fullName ?? "Неизвестно")")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+            }
+        }
+        .padding(.vertical, 8)
+    }
+
+    // Цвет текста в зависимости от статуса
+    private func statusColor(for status: PaymentRequestStatus?) -> Color {
+        guard let status = status else { return .gray }
+        switch status {
+        case .fullPaid:
+            return .green
+        case .wait:
+            return .orange
+        case .canceled:
+            return .red
+        case .overdue:
+            return .mainRed
+        case .unknown:
+            return .gray
+        }
+    }
 }
