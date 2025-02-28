@@ -18,6 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
         if let _ = UserRepository.shared.jwt {
+//            window?.rootViewController = UserInfoViewController(viewModel: .init(userModel: auth))
             window?.rootViewController = UIHostingController(rootView: TabBarView())
         } else {
             window?.rootViewController = AuthVC()

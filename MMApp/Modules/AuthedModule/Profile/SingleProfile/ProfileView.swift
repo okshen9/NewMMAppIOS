@@ -30,8 +30,9 @@ struct ProfileView: View {
                         if let urlStr = profile.photoUrl,
                            let photoUrl = URL(string: urlStr) {
                             KFImage(photoUrl)
-                                .resizable()
-                                .placeholder { Image(.profile) }
+                                .placeholder { Image(.profile)
+                                    .resizable(resizingMode: .stretch)}
+                                .resizable(resizingMode: .stretch)
                                 .cancelOnDisappear(true)
                                 .backgroundDecode()
                                 .scaleFactor(UIScreen.main.scale)

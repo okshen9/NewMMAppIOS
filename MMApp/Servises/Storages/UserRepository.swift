@@ -15,9 +15,16 @@ class UserRepository {
     private(set) var authUser: AuthTGRequestModel?
     func setAuthUser(_ newValue: AuthTGRequestModel?) {
         authUser = newValue
-        guard let newValue = newValue else { return }
-        KeyChainStorage.jwtToken.save(value: newValue.jwt)
-        KeyChainStorage.refreshToken.save(value: newValue.refreshToken)
+        guard let newValue = newValue
+        else {
+            print("Neshko error setAuthUser")
+            return
+        }
+
+        let jwt = KeyChainStorage.jwtToken.save(value: newValue.jwt)
+        let ref = KeyChainStorage.refreshToken.save(value: newValue.refreshToken)
+        
+        print("Neshko Refresh jwt: \(jwt) Refresh ref: \(ref)")
     }
     
     // MARK: - UserProfile
@@ -99,7 +106,7 @@ class UserRepository {
 //              let refreshToken = self.authUser?.refreshToken,
 //              let userId = userProfile.externalId,
 //              let roles = authUser.roles,
-              let authDTO = try await networkService.refreshJWT(
+              let authDTO = try await networkService.refreshJWT (
                 refreshModel: .init(
 //                    roles: roles,
 //                    authUserId: userId,

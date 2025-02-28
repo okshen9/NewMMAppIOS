@@ -10,6 +10,7 @@ import Foundation
 enum RequestUrls {
     /// базовый url приложения
     static let baseUrl = "http://194.87.93.98:8080"
+//    static let baseUrl = "http://localhost:8080"
     
     // MARK: - Работа с профилем
     
@@ -72,7 +73,7 @@ enum RequestUrls {
     
     // MARK: - заявки на опалату
     
-    static let paymentPlanForExternalId = "/payment-request/externalId/me"
+    static let paymentPlanForExternalId = "/payment-requests/externalId/me"
     
     
 }

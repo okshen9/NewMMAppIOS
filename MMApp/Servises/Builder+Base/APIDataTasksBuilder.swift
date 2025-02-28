@@ -88,6 +88,13 @@ extension APIDataTasksBuilder {
                     throw ResponseError.invalidToken
                 }
             }
+        case 402:
+            throw ResponseError.responseBase(response: .init(code: httpStatusCode, message: nil, details: response.description), statusCode: httpStatusCode)
+        case 403:
+            print("==== Error bad URL ====")
+            throw ResponseError.responseBase(response: .init(code: 403, message: nil, details: "Закрыт доступ - кривой URL"), statusCode: 403)
+        case 404..<600:
+            throw ResponseError.responseBase(response: .init(code: httpStatusCode, message: nil, details: response.description), statusCode: httpStatusCode)
         default:
             break
         }
@@ -181,11 +188,11 @@ extension URLSession {
             try await withCheckedThrowingContinuation { continuation in
                 dataTask = self.dataTask(with: request) { data, response, error in
                     guard let data = data, let response = response else {
-//                        let error = error ?? URLError.cannotBeFormed
-//                        onError(error)
-//                        return continuation.resume(throwing: error)
-                        print("Neshko cannotBeFormed Error")
-                        return continuation.resume(throwing: error ?? URLError.cannotBeFormed)
+                        let error = error ?? URLError.cannotBeFormed
+                        onError(error)
+                        return continuation.resume(throwing: error)
+//                        print("Neshko cannotBeFormed Error")
+//                        return continuation.resume(throwing: error ?? URLError.cannotBeFormed)
                     }
                     onSuccess(data, response)
                     continuation.resume(returning: (data, response))

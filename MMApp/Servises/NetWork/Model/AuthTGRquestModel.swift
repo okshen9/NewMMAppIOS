@@ -15,6 +15,7 @@ struct AuthTGRequestModel: Codable {
 }
 
 struct AuthUserDtoResult: Codable, JSONRepresentable {
+    /// externalId
     let id: Int?
     let telegramId: String?
     let authDate: String?

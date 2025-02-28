@@ -106,6 +106,11 @@ class UserInfoViewController: UIViewController {
         scrollView.addSubview(contentView)
         contentView.addSubview(stackView)
         
+        contentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.height.equalTo(view.layoutMarginsGuide.snp.height)
+            $0.width.equalTo(view.snp.width)
+        }
         
         stackView.addArrangedSubviews(
             headerStack,
@@ -123,16 +128,15 @@ class UserInfoViewController: UIViewController {
         scrollView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
             make.left.right.equalToSuperview()
-            make.bottom.equalToSuperview().inset(-40)
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
         
-        contentView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
+
         
         
         stackView.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(16)
+            make.top.equalToSuperview()
+//            make.bottom.equalToSuperview()
             make.left.right.equalToSuperview().inset(20)
         }
         
@@ -158,6 +162,8 @@ class UserInfoViewController: UIViewController {
         doneButton.snp.makeConstraints {
             $0.height.equalTo(36)
         }
+        view.setNeedsUpdateConstraints()
+        view.setNeedsLayout()
     }
     
     // MARK: - Bind ViewModel
