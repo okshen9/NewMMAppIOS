@@ -15,14 +15,14 @@ import Combine
 
 
 struct SubTargetRowView: View {
-    
+    @EnvironmentObject var viewModelEnvironment: TargetsViewModel
     
     @Binding var clusedSubTarget: UserSubTargetDtoModel?
     
     @State private var showConfirmationDialog = false
     @State private var isLoading = false
     
-    @Binding var subTarget: UserSubTargetDtoModel
+    var subTarget: UserSubTargetDtoModel
     
     var body: some View {
         HStack {
@@ -56,8 +56,8 @@ struct SubTargetRowView: View {
         Button(action: {
                 showConfirmationDialog = true
         }) {
-            Image(systemName: $subTarget.targetStatus.wrappedValue == .done ? "checkmark.circle.fill" : "circle")
-                .foregroundColor($subTarget.targetStatus.wrappedValue == .done ? .green : .gray)
+            Image(systemName: subTarget.targetStatus == .done ? "checkmark.circle.fill" : "circle")
+                .foregroundColor(subTarget.targetStatus == .done ? .green : .gray)
         }
         .buttonStyle(.plain)
         .alert(isPresented: $showConfirmationDialog,

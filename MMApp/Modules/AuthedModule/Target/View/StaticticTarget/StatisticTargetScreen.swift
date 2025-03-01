@@ -9,6 +9,8 @@ import SwiftUI
 import Foundation
 
 struct StatisticTargetScreen: View {
+    @EnvironmentObject var viewModelEnvironment: TargetsViewModel
+    
     @ObservedObject var viewModel: TargetsViewModel
     // TODO: Убрать TargetsView
     @State var category: String = "Все категории"
@@ -80,13 +82,13 @@ struct StatisticTargetScreen: View {
     
     @ViewBuilder
     private func categorySectionView(for category: TargetCategory) -> some View {
-        var targets = filteredTargets(for: category) // Используем вынесенный метод
-        if !targets.isEmpty {
+        if let filtredTarget = viewModel.groupedTargets[category],
+            !filtredTarget.isEmpty {
             CategorySectionView(
                 clusedSubTarget: $viewModel.clusedSubTarget,
                 clusedTarget: $viewModel.clusedTarget,
                 category: category,
-                targets: targets,
+                targets: filtredTarget,
                 onEdit: {
                     selectedCategory = category
                     isEditingCategory = true
@@ -114,6 +116,7 @@ struct StatisticTargetScreen: View {
 
 #Preview {
     StatisticTargetScreen(viewModel: TargetsViewModel())
+        .environmentObject(TargetsViewModel())
 }
 
 

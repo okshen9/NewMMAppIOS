@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct TargetRowView: View {
+    @EnvironmentObject var viewModelEnvironment: TargetsViewModel
+    
     @Binding var clusedSubTarget: UserSubTargetDtoModel?
     @Binding var clusedTarget: UserTargetDtoModel?
     
@@ -16,7 +18,7 @@ struct TargetRowView: View {
     @State private var showLongTapDialog = false
     
     
-    @Binding var target: UserTargetDtoModel
+    var target: UserTargetDtoModel
     @State private var isExpanded: Bool = false
     @State private var isEditing: Bool = false
     
@@ -28,16 +30,16 @@ struct TargetRowView: View {
             // Заголовок, дата, прогресс-бар
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text($target.title.wrappedValue.orEmpty)
+                    Text(target.title.orEmpty)
                         .font(.subheadline)
                         .foregroundColor(.headerText)
-                    Text("Срок выполнения: \(($target.deadLineDateTime.wrappedValue?.dateFromString ?? Date.now).formatted(date: .abbreviated, time: .shortened))")
+                    Text("Срок выполнения: \((target.deadLineDateTime?.dateFromString ?? Date.now).formatted(date: .abbreviated, time: .shortened))")
                         .font(.subheadline)
                         .foregroundColor(.gray)
                     
-                    let percentTarget: Double = (($target.subTargets.wrappedValue).isEmptyOrNil) ?
-                    ((($target.targetStatus.wrappedValue?.isDone) ?? false) ? 100.0 : 0.0) :
-                    $target.percentage.wrappedValue ?? 0.0
+                    let percentTarget: Double = ((target.subTargets).isEmptyOrNil) ?
+                    (((target.targetStatus?.isDone) ?? false) ? 100.0 : 0.0) :
+                    target.percentage ?? 0.0
                     
                     ProgressView(value: percentTarget, total: 100)
                         .tint(.mainRed)
@@ -50,15 +52,15 @@ struct TargetRowView: View {
                 .buttonStyle(.plain)
                 .contentShape(Rectangle())
                 .sheet(isPresented: $isEditing) {
-                    TargetEditView(target: $target.wrappedValue)
+                    TargetEditView(target: target)
                 }
             }
             
             // Подцели
-            if isExpanded {
-                let subTargetsBinding = Binding($target.subTargets, default: [])
-                ForEach(subTargetsBinding) { $subTarget in
-                    SubTargetRowView(clusedSubTarget: $clusedSubTarget, subTarget: $subTarget)
+            if isExpanded,
+               let subTargets = target.subTargets {
+                ForEach(subTargets) { subTarget in
+                    SubTargetRowView(clusedSubTarget: $clusedSubTarget, subTarget: subTarget)
                 }
             }
             var targetButtonStatus = targetButtonStatus(target: target)

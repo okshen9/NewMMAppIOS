@@ -9,7 +9,6 @@ import Foundation
 import Combine
 import SwiftUI
 
-
 final class TargetsViewModel: ObservableObject, SubscriptionStore {
     
     @Published var targets: [UserTargetDtoModel] = []
@@ -19,6 +18,10 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore {
     @Published var errorMessage: String? = nil
     
     private let networkService = ServiceBuilder()
+    
+    
+    @Published var groupedTargets: [TargetCategory: [UserTargetDtoModel]] = [:]
+    
     
     init(targets: [UserTargetDtoModel] = [], clusedSubTarget: UserSubTargetDtoModel? = nil, isLoading: Bool = false, errorMessage: String? = nil) {
         self.targets = targets.sorted { ($0.id ?? 0 < $1.id  ?? 1) }
@@ -48,6 +51,15 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore {
                 target.targetStatus?.changeSelf()
                 self?.closedSubTarget(subTarget: target)
             }.store(in: &subscriptions)
+        
+        $targets
+            .map { targets in
+                Dictionary(grouping: targets, by: { $0.category ?? .unknown })
+            }
+            .sink { [weak self] targetsDic in
+                self?.groupedTargets = targetsDic
+            }
+            .store(in: &subscriptions)
     }
     
     /// Загружает

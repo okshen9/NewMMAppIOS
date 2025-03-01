@@ -48,8 +48,10 @@ struct TargetsView: View {
                     }
                 } else {
                     StatisticTargetScreen(viewModel: viewModel)
+//                        .environmentObject(viewModel)
                 }
             }
+            .environmentObject(viewModel)
             .navigationTitle("Цели")
         }
         .onChange(of: viewModel.targets, {
@@ -59,18 +61,21 @@ struct TargetsView: View {
     
     @ViewBuilder
     private func categorySectionView(for category: TargetCategory) -> some View {
-        var targets = filteredTargets(for: category) // Используем вынесенный метод
-        if !targets.isEmpty {
+//        var targets = filteredTargets(for: category) // Используем вынесенный метод
+        
+        if let filtredTarget = viewModel.groupedTargets[category],
+            !filtredTarget.isEmpty {
             CategorySectionView(
                 clusedSubTarget: $viewModel.clusedSubTarget,
                 clusedTarget: $viewModel.clusedTarget,
                 category: category,
-                targets: targets,
+                targets: filtredTarget,
                 onEdit: {
                     selectedCategory = category
                     isEditingCategory = true
                 }
             )
+//            .environmentObject(viewModel)
             .onChange(of: viewModel.targets, {
                 print("Изменилась TargetsView categorySectionView")
             })
