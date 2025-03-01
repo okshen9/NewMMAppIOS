@@ -8,16 +8,9 @@
 import SwiftUI
 import Combine
 
-//if subTarget.targetStatus != .done {
-//    isLoading = true
-//    clusedSubTarget = subTarget
-//}
-
 
 struct SubTargetRowView: View {
     @EnvironmentObject var viewModelEnvironment: TargetsViewModel
-    
-    @Binding var clusedSubTarget: UserSubTargetDtoModel?
     
     @State private var showConfirmationDialog = false
     @State private var isLoading = false
@@ -37,7 +30,7 @@ struct SubTargetRowView: View {
                 Text(subTarget.title.orEmpty)
                     .font(.headline)
                     .foregroundColor(.headerText)
-                Text("Срок выполнения: \((subTarget.deadLineDateTime?.dateFromString ?? Date.now).formatted(date: .abbreviated, time: .shortened))")
+                Text("Срок выполнения: \((subTarget.deadLineDateTime?.dateFromString ?? Date.now).toDisplayString)")
                     .font(.caption)
                     .foregroundColor(.gray)
             }
@@ -66,9 +59,8 @@ struct SubTargetRowView: View {
             return Alert(title: Text(title),
                   primaryButton:
                     .default(Text("Да"), action: {
-                        //                        subTarget.targetStatus = .done
                         isLoading = true
-                        clusedSubTarget = subTarget
+                        viewModelEnvironment.closedSubTarget(subTarget)
                         print("Done")
                     }),
                   secondaryButton:

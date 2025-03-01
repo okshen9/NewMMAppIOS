@@ -9,8 +9,6 @@ import SwiftUI
 
 struct CategoryEditView: View {
     let category: TargetCategory
-    @Binding var clusedSubTarget: UserSubTargetDtoModel?
-    @Binding var clusedTarget: UserTargetDtoModel?
     
     @Binding var targets: [UserTargetDtoModel] // Binding к списку целей
     @Binding var isPresented: Bool
@@ -21,7 +19,7 @@ struct CategoryEditView: View {
         NavigationView {
             List {
                 ForEach($targets.filter { $0.category.wrappedValue == category }) { target in
-                    TargetRowView(clusedSubTarget: $clusedSubTarget, clusedTarget: $clusedTarget, target: target.wrappedValue)
+                    TargetRowView(target: target.wrappedValue)
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {
                                 deleteTarget(target.wrappedValue)

@@ -68,4 +68,21 @@ struct UserTargetDtoModel: Codable, JSONRepresentable, Identifiable, Equatable {
         self.lastUpdatingDateTime = try container.decodeIfPresent(String.self, forKey: .lastUpdatingDateTime)
         self.category = try container.decodeIfPresent(TargetCategory.self, forKey: .category)
     }
+    
+    mutating
+    func changeSelfStatus() {
+        switch targetStatus {
+        case .draft, .failed, .inProgress:
+            self.targetStatus = .done
+            
+        case .doneExpired, .cancelled, .done:
+            self.targetStatus = .inProgress
+            
+        case .expired:
+            self.targetStatus = .doneExpired
+            
+        case .unknown, nil:
+            self.targetStatus = .draft
+        }
+    }
 }

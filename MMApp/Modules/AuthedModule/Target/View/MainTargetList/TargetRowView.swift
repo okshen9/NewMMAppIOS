@@ -10,11 +10,9 @@ import SwiftUI
 struct TargetRowView: View {
     @EnvironmentObject var viewModelEnvironment: TargetsViewModel
     
-    @Binding var clusedSubTarget: UserSubTargetDtoModel?
-    @Binding var clusedTarget: UserTargetDtoModel?
-    
+    /// Показать диалоговое окошко
     @State private var showCloseTaskDialog = false
-    
+    /// Показать модалку по лонгтапу
     @State private var showLongTapDialog = false
     
     
@@ -33,7 +31,7 @@ struct TargetRowView: View {
                     Text(target.title.orEmpty)
                         .font(.subheadline)
                         .foregroundColor(.headerText)
-                    Text("Срок выполнения: \((target.deadLineDateTime?.dateFromString ?? Date.now).formatted(date: .abbreviated, time: .shortened))")
+                    Text("Срок выполнения: \((target.deadLineDateTime?.dateFromString ?? Date.now).toDisplayString)")
                         .font(.subheadline)
                         .foregroundColor(.gray)
                     
@@ -60,16 +58,12 @@ struct TargetRowView: View {
             if isExpanded,
                let subTargets = target.subTargets {
                 ForEach(subTargets) { subTarget in
-                    SubTargetRowView(clusedSubTarget: $clusedSubTarget, subTarget: subTarget)
+                    SubTargetRowView(subTarget: subTarget)
                 }
             }
             var targetButtonStatus = targetButtonStatus(target: target)
             
             // Кнопка "Развернуть/Свернуть" Открыть / Закрыть задачу
-            if isLoading {
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle())
-            } else {
                 Button(action: {
                     withAnimation {
                         switch targetButtonStatus {
@@ -80,34 +74,34 @@ struct TargetRowView: View {
                         }
                     }
                 }) {
-                    
-                    
                     Text(targetButtonStatus.name)
                         .font(.caption)
-                        .foregroundColor(.mainRed)
+                        .foregroundColor(isLoading ? .gray.opacity(0.5) : .mainRed)
                         .frame(alignment: .leading)
                 }
                 .contentShape(Rectangle())
+                .overlay(content: {
+                    if isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle())
+                    }
+                })
                 .alert(isPresented: $showCloseTaskDialog,
                        content: {
                     let title = (target.targetStatus?.isDone) ?? false ? "Вы хотите открыть цель?" : "Вы закрыли цель?"
                     return Alert(title: Text(title),
                                  primaryButton:
                             .default(Text("Да"), action: {
-                                //                        subTarget.targetStatus = .done
                                 isLoading = true
-                                clusedTarget = target
+                                viewModelEnvironment.closedTarget(target: target)
                                 print("Done")
                             }),
                                  secondaryButton:
                             .destructive(Text("Нет"), action: {
-                                //                        subTarget.targetStatus = .inProgress
                                 print("Not Done")
                             })
                     )
                 })
-            }
-
         }
         .padding()
         .background(Color(.systemBackground))

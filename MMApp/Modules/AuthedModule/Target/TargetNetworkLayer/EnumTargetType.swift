@@ -126,7 +126,7 @@ enum TargetSubStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable,
         }
     }
     
-    mutating func changeSelf() {
+    mutating func changeSelfStatus() {
         self = self == .done ? .notDone : .done
     }
     

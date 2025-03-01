@@ -85,8 +85,6 @@ struct StatisticTargetScreen: View {
         if let filtredTarget = viewModel.groupedTargets[category],
             !filtredTarget.isEmpty {
             CategorySectionView(
-                clusedSubTarget: $viewModel.clusedSubTarget,
-                clusedTarget: $viewModel.clusedTarget,
                 category: category,
                 targets: filtredTarget,
                 onEdit: {

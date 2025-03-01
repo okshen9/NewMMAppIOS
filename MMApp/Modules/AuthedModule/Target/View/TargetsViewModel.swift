@@ -12,8 +12,7 @@ import SwiftUI
 final class TargetsViewModel: ObservableObject, SubscriptionStore {
     
     @Published var targets: [UserTargetDtoModel] = []
-    @Published var clusedSubTarget: UserSubTargetDtoModel?
-    @Published var clusedTarget: UserTargetDtoModel?
+    
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
     
@@ -23,38 +22,14 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore {
     @Published var groupedTargets: [TargetCategory: [UserTargetDtoModel]] = [:]
     
     
-    init(targets: [UserTargetDtoModel] = [], clusedSubTarget: UserSubTargetDtoModel? = nil, isLoading: Bool = false, errorMessage: String? = nil) {
+    init(targets: [UserTargetDtoModel] = [], isLoading: Bool = false, errorMessage: String? = nil) {
         self.targets = targets.sorted { ($0.id ?? 0 < $1.id  ?? 1) }
-        self.clusedSubTarget = clusedSubTarget
         self.isLoading = isLoading
-        $clusedSubTarget
-            .sink { [weak self] subTarget in
-                guard var targets = self?.targets,
-                      let subTarget
-                else { return }
-                
-                // Ищем TargetModel, содержащую нужный SubTarget
-                for (targetIndex, target) in targets.enumerated() {
-                    if let subTargets = target.subTargets,
-                       let subTargetIndex = subTargets.firstIndex(where: { $0.id == subTarget.id }) {
-                        // Обновляем статус SubTarget
-                        let status = subTarget.targetStatus ?? .notDone
-                        targets[targetIndex].subTargets?[subTargetIndex].targetStatus = status == .done ? TargetSubStatus.notDone : .done
-                        self?.closedSubTarget(subTarget: targets[targetIndex])
-                    }
-                }
-            }.store(in: &subscriptions)
-        
-        $clusedTarget
-            .sink { [weak self] target in
-                guard var target = target else { return }
-                target.targetStatus?.changeSelf()
-                self?.closedSubTarget(subTarget: target)
-            }.store(in: &subscriptions)
         
         $targets
             .map { targets in
                 Dictionary(grouping: targets, by: { $0.category ?? .unknown })
+                    .mapValues { $0.sorted { ($0.id ?? 0 < $1.id  ?? 1) }}
             }
             .sink { [weak self] targetsDic in
                 self?.groupedTargets = targetsDic
@@ -79,18 +54,37 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore {
         }
     }
     
-    func closedSubTarget(subTarget: UserTargetDtoModel) {
+    func closedSubTarget(_ subTarget: UserSubTargetDtoModel) {
+        
         isLoading = true
         errorMessage = nil
+        
+        var findedTarget: UserTargetDtoModel? = nil
+        
+        // Ищем TargetModel, содержащую нужный SubTarget
+        for (targetIndex, target) in targets.enumerated() {
+            if let subTargets = target.subTargets,
+               let subTargetIndex = subTargets.firstIndex(where: { $0.id == subTarget.id }) {
+                // Обновляем статус SubTarget
+                let status = subTarget.targetStatus ?? .notDone
+                
+                findedTarget = targets[targetIndex]
+                
+                findedTarget?.subTargets?[subTargetIndex].targetStatus?.changeSelfStatus()
+            }
+        }
+        guard let findedTarget else { return }
+        
         Task { [weak self] in
             do {
-                let updatedTarget = try await self?.networkService.updateTargetAll(model: subTarget)
+                let updatedTarget = try await self?.networkService.updateTargetAll(model: findedTarget)
+                let externalId = (UserRepository.shared.userProfile?.externalId) ?? 0
                 
-                let targets = try await self?.networkService.getUserTargets(externalId: (UserRepository.shared.userProfile?.externalId) ?? 0).userTargets
-                guard !targets.isNil else { return }
+                let newTargets = try await self?.networkService.getUserTargets(externalId: externalId).userTargets
+                guard !newTargets.isNil else { return }
                 DispatchQueue.main.async { [weak self] in
                     withAnimation {
-                        self?.targets = targets?.sorted(by: { ($0.id ?? 0 < $1.id  ?? 1) }) ?? []
+                        self?.targets = newTargets?.sorted(by: { ($0.id ?? 0 < $1.id  ?? 1) }) ?? []
                     }
                 }
             } catch {
@@ -99,26 +93,27 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore {
         }
     }
     
-    //    func closedTarget(target: UserTargetDtoModel) {
-    //        isLoading = true
-    //        errorMessage = nil
-    //        Task { [weak self] in
-    //            do {
-    ////                guard let self else { return }
-    //                let updatedTarget = try await self?.networkService.updateTargetAll(model: target)
-    //
-    //                let targets = try await self?.networkService.getUserTargets(externalId: (UserRepository.shared.userProfile?.externalId) ?? 0).userTargets
-    //                guard !targets.isNil else { return }
-    //                DispatchQueue.main.async { [weak self] in
-    //                    withAnimation {
-    //                        self?.targets = targets ?? []
-    //                    }
-    //                }
-    //            } catch {
-    //                print(error.localizedDescription)
-    //            }
-    //        }
-    //    }
+    func closedTarget(target: UserTargetDtoModel) {
+        var tempTarget = target
+        tempTarget.changeSelfStatus()
+        isLoading = true
+        errorMessage = nil
+        Task { [weak self] in
+            do {
+                let updatedTarget = try await self?.networkService.updateTargetAll(model: tempTarget)
+                
+                let targets = try await self?.networkService.getUserTargets(externalId: (UserRepository.shared.userProfile?.externalId) ?? 0).userTargets
+                guard !targets.isNil else { return }
+                DispatchQueue.main.async { [weak self] in
+                    withAnimation {
+                        self?.targets = targets ?? []
+                    }
+                }
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
+    }
     
 }
 

@@ -32,12 +32,11 @@ struct TargetsView: View {
                         }
                         .padding()
                     }
+                    // DOTO: Neshko
                     .sheet(isPresented: $isEditingCategory) {
                         if let category = selectedCategory {
                             CategoryEditView(
                                 category: category,
-                                clusedSubTarget: $viewModel.clusedSubTarget,
-                                clusedTarget: $viewModel.clusedTarget,
                                 targets: $viewModel.targets, // Передаем Binding к списку целей
                                 isPresented: $isEditingCategory
                             )
@@ -66,8 +65,6 @@ struct TargetsView: View {
         if let filtredTarget = viewModel.groupedTargets[category],
             !filtredTarget.isEmpty {
             CategorySectionView(
-                clusedSubTarget: $viewModel.clusedSubTarget,
-                clusedTarget: $viewModel.clusedTarget,
                 category: category,
                 targets: filtredTarget,
                 onEdit: {
