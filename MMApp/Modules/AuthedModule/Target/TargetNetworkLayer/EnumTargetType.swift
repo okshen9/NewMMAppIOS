@@ -9,13 +9,15 @@ import Foundation
 import SwiftUICore
 
 /// Категории задач
-enum TargetCategory: String, UnknownCasedEnum, JSONRepresentable, CaseIterable, Equatable {
+enum TargetCategory: String, UnknownCasedEnum, JSONRepresentable, CaseIterable, Equatable, Identifiable {
     case money = "Бизнес"
     case personal = "Личное"
     case family = "Семья"
     case health = "Здоровье"
     case other = "Свободная тема"
     case unknown = "unknown"
+    
+    var id: String { rawValue }
     
     var color: Color {
         switch self {

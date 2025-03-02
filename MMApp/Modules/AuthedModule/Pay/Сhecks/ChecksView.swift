@@ -25,7 +25,7 @@ struct ChecksView: View {
     
     // MARK: - ViewBuilder
     @ViewBuilder
-    func shimerState() -> some View {
+    private func shimerState() -> some View {
         VStack(spacing: 20) {
             ShimmeringRectangle()
                 .frame(width: 88, height: 88)

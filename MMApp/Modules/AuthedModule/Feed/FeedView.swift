@@ -11,24 +11,44 @@ struct FeedView: View {
             NavigationView {
                 ScrollView {
                 VStack {
-                    if !viewModel.payRequest.isEmptyOrNil && !viewModel.targets.isEmptyOrNil {
-                        VStack(alignment: .leading) {
-                            CalendarViewUIKit(selectedDate: $selectedDate, events: markedDates) //$viewModel.eventsCalendar)
-                                .tint(Color.red)
-                                .frame(height: 450)
-                            .padding(.horizontal, 24)
-                            .padding(.top, 24)
-                            eventList2()
-                                .padding()
+                    if viewModel.isLoading == false {
+                        if !viewModel.payRequest.isEmptyOrNil || !viewModel.targets.isEmptyOrNil {
+                            VStack(alignment: .leading) {
+                                CalendarViewUIKit(selectedDate: $selectedDate, events: markedDates) //$viewModel.eventsCalendar)
+                                    .tint(Color.red)
+                                    .frame(height: 450)
+                                    .padding(.horizontal, 24)
+                                    .padding(.top, 24)
+                                eventList2()
+                                    .padding()
+                                Spacer()
+                                
+                            }
+                            .navigationTitle(Text("Рассписание"))
+                        } else {
                             Spacer()
-                            
+                            Text("У вас нет событий")
+                                .font(.headline)
+                                .foregroundColor(.headerText)
+                            Spacer()
                         }
-                        .navigationTitle(Text("Рассписание"))
                     }
                     
                     else {
                         ShimmeringRectangle()
-                            .frame(width: 88, height: 88)
+                            .frame(width: 350, height: 450)
+                            .cornerRadius(44)
+                        
+                        ShimmeringRectangle()
+                            .frame(width: 350, height: 50)
+                            .cornerRadius(44)
+                        
+                        ShimmeringRectangle()
+                            .frame(width: 350, height: 50)
+                            .cornerRadius(44)
+                        
+                        ShimmeringRectangle()
+                            .frame(width: 350, height: 50)
                             .cornerRadius(44)
                         Spacer()
                     }

@@ -12,17 +12,19 @@ struct SubTargetEditView: View {
     @State private var newDescription = ""
     @State private var newDeadline = Date()
 
-    let subTarget: UserSubTargetDtoModel
+    @Binding var subTarget: UserSubTargetDtoModel
 
     var body: some View {
         Form {
-            Section(header: Text("Редактирование подцели")) {
-                TextField("Название", text: $newTitle)
-                TextField("Описание", text: $newDescription)
-                DatePicker("Срок выполнения", selection: $newDeadline, displayedComponents: .date)
-            }
+            Section() {
+        VStack {
+            TextField("Название", text: $newTitle)
+            TextField("Описание", text: $newDescription)
+            DatePicker("Срок выполнения", selection: $newDeadline, displayedComponents: .date)
+                        }
+                    }
+                    .navigationTitle("Подцель")
         }
-        .navigationTitle("Редактирование подцели")
         .onAppear {
             newTitle = subTarget.title.orEmpty
             newDescription = subTarget.description.orEmpty

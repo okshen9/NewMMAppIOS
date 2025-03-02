@@ -36,6 +36,20 @@ struct UserTargetDtoModel: Codable, JSONRepresentable, Identifiable, Equatable {
     /// Категория цели
     var category: TargetCategory?
     
+    mutating func update(_ newTitle: String? = nil,
+                         _ newDescription: String? = nil,
+                         _ newDeadLineDateTime: String? = nil,
+                         _ newCategory: TargetCategory? = nil,
+                         _ newSubTargets: [UserSubTargetDtoModel]? = nil) {
+        self.title = newTitle ?? self.title
+        self.description = newDescription ?? self.description
+        self.deadLineDateTime = newDeadLineDateTime ?? self.deadLineDateTime
+        self.category = newCategory ?? self.category
+        self.subTargets = newSubTargets ?? self.subTargets
+        
+        self.targetStatus = .draft
+    }
+    
     init(id: Int? = nil, title: String? = nil, description: String? = nil, userExternalId: Int? = nil, percentage: Double? = nil, deadLineDateTime: String? = nil, streamId: Int? = nil, targetStatus: TargetStatus? = nil, subTargets: [UserSubTargetDtoModel]? = nil, isDeleted: Bool? = nil, creationDateTime: String? = nil, lastUpdatingDateTime: String? = nil, category: TargetCategory? = nil) {
         self.id = id
         self.title = title

@@ -8,12 +8,17 @@
 import SwiftUI
 
 struct TargetEditView: View {
+    @EnvironmentObject var viewModelEnvironment: TargetsViewModel
+    @Environment(\.dismiss) var dismiss
+    
     @State private var newTitle = ""
     @State private var newDescription = ""
     @State private var newDeadline = Date()
+    @State private var newCategory = TargetCategory.other
+    @State private var newSubtarget = [UserSubTargetDtoModel]()
     @State var isLoading = false
 
-    let target: UserTargetDtoModel
+    var target: UserTargetDtoModel
 
     var body: some View {
         NavigationView {
@@ -21,11 +26,27 @@ struct TargetEditView: View {
                 Section(header: headerView()) {
                     TextField("Название", text: $newTitle)
                     textEditor(textBinding: $newDescription)
+                    Picker("Категория цели", selection: $newCategory) {
+                        ForEach(TargetCategory.allCases.filter({ $0 != .unknown })) { category in
+                                    Text(category.rawValue).tag(category)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .tint(.mainRed)
                     DatePicker("Срок выполнения", selection: $newDeadline, displayedComponents: .date)
                 }
-                Section {
-                    Button("Добавить подцель") {
-                        // Добавить подцель
+                Section(header: Text("Подцели")) {
+                    VStack(spacing: 20) {
+                        ForEach($newSubtarget) { $subView in
+                            SubTargetEditView(subTarget: $subView)
+                        }
+                        
+                        Button(action: {
+                            newSubtarget.append(UserSubTargetDtoModel(title: "", description: "", targetSubStatus: .notDone, rootTargetId: target.id, deadLineDateTime: Date.now.toApiString))
+                        }, label: {
+                            Text("Добавить подцель")
+                                .foregroundColor(.mainRed)
+                        })
                     }
                 }
             }
@@ -33,6 +54,8 @@ struct TargetEditView: View {
                 newTitle = target.title.orEmpty
                 newDescription = target.description.orEmpty
                 newDeadline = target.deadLineDateTime?.dateFromString ?? Date.now
+                newCategory = target.category ?? .other
+                newSubtarget = target.subTargets ?? []
             }
         }
         
@@ -71,11 +94,28 @@ struct TargetEditView: View {
                     ///SAVE
                     //Neshko TODO
                     isLoading = true
-                    print("SAVE")
+                    var newTarget = target
+                    newTarget.update(newTitle, newDescription, newDeadline.toApiString, newCategory)
+                    Task {
+                        if await viewModelEnvironment.editTarget(newTarget) != nil {
+                            
+                            isLoading = false
+                            ToastManager.shared.show(
+//                                🎯
+                                ToastModel(message: "Цель успешно отправлена на рассмотерение", icon: "checkmark.circle", duration: 2)
+                            )
+                            dismiss()
+                        } else {
+                            ToastManager.shared.show(
+                                ToastModel(message: "Ошибка изменения цели", icon: "xmark", duration: 2)
+                            )
+                            isLoading = false
+                        }
+                    }
                 }, label: {
                     Image.init(systemName: "checkmark")
                         .resizable()
-                        .tint(.mainRed)
+                        .foregroundColor(.mainRed)
                         .frame(width: 16,
                                height: 16)
                         .padding(4)
@@ -85,5 +125,6 @@ struct TargetEditView: View {
 }
 
 #Preview {
-    TargetEditView(target: .init(title: "Test", targetStatus: .inProgress))
+    TargetEditView(target: .init(title: "Test", targetStatus: .inProgress, subTargets: [.init(title: "TestSub", targetSubStatus: .notDone)]))
+        .environmentObject(TargetsViewModel())
 }

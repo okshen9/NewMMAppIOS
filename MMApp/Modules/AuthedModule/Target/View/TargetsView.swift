@@ -17,36 +17,56 @@ struct TargetsView: View {
     var body: some View {
         NavigationView {
             VStack(alignment: .leading, spacing: 8) {
-                Picker("Key", selection: $selectedTab) {
-                    Text("Список").tag(0)
-                    Text("Статистика").tag(1)
-                }
-                .pickerStyle(.segmented)
-                .padding(.horizontal, 16)
-                if selectedTab == 0 {
-                    ScrollView {
-                        LazyVStack {
-                            ForEach(TargetCategory.allCases, id: \.self) { category in
-                                categorySectionView(for: category)
-                            }
-                        }
+                
+                if viewModel.targets.isEmpty, !viewModel.isLoading  {
+                    Spacer()
+                    Text("У вас пока нет целей")
+                        .font(.headline)
+                        .foregroundColor(.headerText)
                         .padding()
+                    Spacer()
+                } else {
+                    Picker("Key", selection: $selectedTab) {
+                        Text("Список").tag(0)
+                        Text("Статистика").tag(1)
                     }
-                    .sheet(isPresented: $isEditingCategory) {
-                        if let category = selectedCategory {
-                            CategoryEditView(
-                                category: category,
-                                targets: $viewModel.targets, // Передаем Binding к списку целей
-                                isPresented: $isEditingCategory
-                            )
+                    .pickerStyle(.segmented)
+                    .padding(.horizontal, 16)
+                    if viewModel.isLoading {
+                        shimerView()
+                    } else {
+                        if selectedTab == 0 {
+                            ScrollView {
+                                LazyVStack {
+                                    ForEach(TargetCategory.allCases, id: \.self) { category in
+                                        categorySectionView(for: category)
+                                    }
+                                }
+                                .padding()
+                            }
+                            .refreshable {
+                                withAnimation {
+                                    viewModel.loadTargets()
+                                }
+                            }
+                            .sheet(isPresented: $isEditingCategory) {
+                                if let category = selectedCategory {
+                                    CategoryEditView(
+                                        category: category,
+                                        targets: $viewModel.targets, // Передаем Binding к списку целей
+                                        isPresented: $isEditingCategory
+                                    )
+                                }
+                            }
+                        } else {
+                            StatisticTargetScreen(viewModel: viewModel)
                         }
                     }
-                    .onAppear {
-                        viewModel.loadTargets()
-                    }
-                } else {
-                    StatisticTargetScreen(viewModel: viewModel)
-//                        .environmentObject(viewModel)
+                }
+            }
+            .onAppear {
+                if viewModel.targets.isEmpty {
+                    viewModel.loadTargets()
                 }
             }
             .environmentObject(viewModel)
@@ -58,9 +78,29 @@ struct TargetsView: View {
     }
     
     @ViewBuilder
+    private func shimerView() -> some View {
+        VStack(spacing: 8) {
+            ShimmeringRectangle()
+                .frame(height: 40)
+                .cornerRadius(8)
+                .padding(.top, 20)
+            
+            ShimmeringRectangle()
+                .frame(height: 40)
+                .cornerRadius(8)
+                .padding(.top, 20)
+            
+            ShimmeringRectangle()
+                .frame(height: 40)
+                .cornerRadius(8)
+                .padding(.top, 20)
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+    }
+    
+    @ViewBuilder
     private func categorySectionView(for category: TargetCategory) -> some View {
-//        var targets = filteredTargets(for: category) // Используем вынесенный метод
-        
         if let filtredTarget = viewModel.groupedTargets[category],
             !filtredTarget.isEmpty {
             CategorySectionView(
@@ -71,7 +111,6 @@ struct TargetsView: View {
                     isEditingCategory = true
                 }
             )
-//            .environmentObject(viewModel)
             .onChange(of: viewModel.targets, {
                 print("Изменилась TargetsView categorySectionView")
             })

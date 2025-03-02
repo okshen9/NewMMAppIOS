@@ -37,6 +37,24 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore {
             .store(in: &subscriptions)
     }
     
+    func editTarget(_ target: UserTargetDtoModel) async -> UserTargetDtoModel? {
+            do {
+                let updatedTarget = try await networkService.updateTargetAll(model: target)
+                
+                let targets = try await networkService.getUserTargets(externalId: (UserRepository.shared.userProfile?.externalId) ?? 0).userTargets
+                guard !targets.isNil else { return nil }
+                DispatchQueue.main.async { [weak self] in
+                    withAnimation {
+                        self?.targets = targets ?? []
+                    }
+                }
+                return updatedTarget
+            } catch {
+                print(error.localizedDescription)
+                return nil
+            }
+    }
+    
     /// Загружает
     @MainActor
     func loadTargets() {
@@ -45,9 +63,9 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore {
         Task { [weak self] in
             do {
                 let targets = try await self?.networkService.getUserTargets(externalId: (UserRepository.shared.userProfile?.externalId) ?? 0).userTargets
-                guard let self, !targets.isNil else { return }
-                self.targets = targets ?? []
-                self.isLoading = false
+                guard !targets.isNil else { return }
+                self?.targets = targets ?? []
+                self?.isLoading = false
             } catch {
                 print(error.localizedDescription)
             }
@@ -55,8 +73,6 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore {
     }
     
     func closedSubTarget(_ subTarget: UserSubTargetDtoModel) {
-        
-        isLoading = true
         errorMessage = nil
         
         var findedTarget: UserTargetDtoModel? = nil
@@ -96,7 +112,6 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore {
     func closedTarget(target: UserTargetDtoModel) {
         var tempTarget = target
         tempTarget.changeSelfStatus()
-        isLoading = true
         errorMessage = nil
         Task { [weak self] in
             do {

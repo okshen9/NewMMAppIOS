@@ -112,6 +112,22 @@ struct TargetRowView: View {
             .sheet(isPresented: $isEditing) {
                 TargetEditView(target: target)
             }
+            let statusText: (String, Color) = switch target.targetStatus ?? .draft {
+            case .draft, .unknown: ("На рассмотрении", .orange)
+            case .done: ("Выполнено", .green)
+            case .expired: ("Просрочено", .red)
+            case .inProgress:
+                ("В процессе", .yellow)
+            case .doneExpired:
+                ("Выполненно с задержкой", .red)
+            case .cancelled:
+                ("Отменено", .red)
+            case .failed:
+                ("Провалено", .red)
+            }
+            Text(statusText.0)
+                .font(.subheadline)
+                .foregroundColor(statusText.1)
         }
     }
     
@@ -198,6 +214,8 @@ extension TargetRowView {
         }
     }
 }
+
+
 
 #Preview {
     TargetRowView(target: .init(title: "Test",

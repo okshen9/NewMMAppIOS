@@ -494,6 +494,7 @@ extension Date {
                                                               timeZone: .init(identifier: "Europe/Moscow")))
     }
     
+    /// Компонетны даты год, месяц, день
     var dateComponents: DateComponents {
         let calendar = Calendar.current
         return calendar.dateComponents([.year, .month, .day], from: self)

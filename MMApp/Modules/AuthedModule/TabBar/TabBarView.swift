@@ -10,6 +10,7 @@ struct TabBarView: View {
                 .onAppear {
                     viewModel.fetchUserProfile()
                 }
+                .withToast()
         } else {
             TabView(selection: $selectedTab) {
                 FeedView()
@@ -43,7 +44,6 @@ struct TabBarView: View {
                     }
                     .tag(2)
                 
-//                EmptyView()
                 PayRequestView()
                     .tabItem {
                         Image(.pay)
@@ -66,9 +66,11 @@ struct TabBarView: View {
                     }
                     .tag(4)
             }
+            .withToast()
             .accentColor(Color.mainRed)
             .foregroundColor(Color.tabbarSecond)
         }
+            
 
         
         
