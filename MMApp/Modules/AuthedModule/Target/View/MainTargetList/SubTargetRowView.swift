@@ -73,6 +73,6 @@ struct SubTargetRowView: View {
     }
 }
 
-//#Preview {
-//    SubTargetRowView(subTarget: UserSubTarget.init(id: 0, title: "ssf", description: "sfsdf", subTargetPercentage: 13, targetStatus: "sdfsdf", rootTargetId: 12312, isDeleted: false, creationDateTime: Date.now, lastUpdatingDateTime: Date.now, deadLineDateTime: Date.now))
-//}
+#Preview {
+    SubTargetRowView(subTarget: .init(title: "Test", targetSubStatus: .done))
+}

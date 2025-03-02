@@ -32,7 +32,6 @@ struct TargetsView: View {
                         }
                         .padding()
                     }
-                    // DOTO: Neshko
                     .sheet(isPresented: $isEditingCategory) {
                         if let category = selectedCategory {
                             CategoryEditView(

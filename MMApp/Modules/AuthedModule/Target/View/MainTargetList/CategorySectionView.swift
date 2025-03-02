@@ -23,10 +23,6 @@ struct CategorySectionView: View {
                     .bold()
                     .foregroundColor(.headerText)
                 Spacer()
-                Button(action: onEdit) {
-                    Image(systemName: "pencil")
-                        .foregroundColor(.mainRed)
-                }
             }
         ) {
             ForEach(targets) { target in
