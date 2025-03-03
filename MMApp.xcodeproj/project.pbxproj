@@ -30,24 +30,11 @@
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		AC6B3B862D664B7500980A38 /* Exceptions for "MMApp" folder in "Copy Bundle Resources" phase from "MMApp" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = AC041CE22D11FB2D003CE128 /* Resources */;
-			membershipExceptions = (
-				Extention/Binding.swift,
-				Servises/CoreDate/CoreDataManagerFetch.swift,
-				Servises/CoreDate/CoreDataManagerSave.swift,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		AC041CE62D11FB2D003CE128 /* MMApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				AC041CF62D11FB2D003CE128 /* Exceptions for "MMApp" folder in "MMApp" target */,
-				AC6B3B862D664B7500980A38 /* Exceptions for "MMApp" folder in "Copy Bundle Resources" phase from "MMApp" target */,
 			);
 			path = MMApp;
 			sourceTree = "<group>";
