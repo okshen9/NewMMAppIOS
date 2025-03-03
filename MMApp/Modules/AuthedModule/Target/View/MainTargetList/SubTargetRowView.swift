@@ -8,9 +8,12 @@
 import SwiftUI
 import Combine
 
+protocol SubTargetRowViewModelProtocol: ObservableObject {
+    func closedSubTarget(_ target: UserSubTargetDtoModel)
+}
 
-struct SubTargetRowView: View {
-    @EnvironmentObject var viewModelEnvironment: TargetsViewModel
+struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
+    @EnvironmentObject var viewModelEnvironment: ViewModel
     
     @State private var showConfirmationDialog = false
     @State private var isLoading = false
@@ -74,5 +77,6 @@ struct SubTargetRowView: View {
 }
 
 #Preview {
-    SubTargetRowView(subTarget: .init(title: "Test", targetSubStatus: .done))
+    SubTargetRowView<TargetsViewModel>(subTarget: .init(title: "Test", targetSubStatus: .done))
+        .environmentObject(TargetsViewModel())
 }

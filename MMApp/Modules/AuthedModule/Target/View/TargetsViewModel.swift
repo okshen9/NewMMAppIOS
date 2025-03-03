@@ -9,7 +9,10 @@ import Foundation
 import Combine
 import SwiftUI
 
-final class TargetsViewModel: ObservableObject, SubscriptionStore {
+/// Протокол функционала вьюшек
+protocol SubViewScopeProtocol: TargetRowViewModelProtocol, SubTargetRowViewModelProtocol, TargetEditViewProtocol {}
+
+final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeProtocol {
     
     @Published var targets: [UserTargetDtoModel] = []
     

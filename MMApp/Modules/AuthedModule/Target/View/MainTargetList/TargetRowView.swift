@@ -7,8 +7,13 @@
 
 import SwiftUI
 
-struct TargetRowView: View {
-    @EnvironmentObject var viewModelEnvironment: TargetsViewModel
+protocol TargetRowViewModelProtocol: ObservableObject {
+    func closedTarget(target: UserTargetDtoModel)
+}
+
+struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
+    @EnvironmentObject var viewModelEnvironment: ViewModel
+
     /// Отображаемый таргет
     var target: UserTargetDtoModel
     
@@ -35,7 +40,7 @@ struct TargetRowView: View {
             if isExpanded,
                let subTargets = target.subTargets {
                 ForEach(subTargets) { subTarget in
-                    SubTargetRowView(subTarget: subTarget)
+                    SubTargetRowView<TargetsViewModel>(subTarget: subTarget)
                 }
             }
             let targetButtonStatus = targetButtonStatus(target: target)
@@ -110,7 +115,7 @@ struct TargetRowView: View {
             .buttonStyle(.plain)
             .contentShape(Rectangle())
             .sheet(isPresented: $isEditing) {
-                TargetEditView(target: target)
+                TargetEditView<TargetsViewModel>(target: target)
             }
             let statusText: (String, Color) = switch target.targetStatus ?? .draft {
             case .draft, .unknown: ("На рассмотрении", .orange)
@@ -218,7 +223,7 @@ extension TargetRowView {
 
 
 #Preview {
-    TargetRowView(target: .init(title: "Test",
+    TargetRowView<TargetsViewModel>(target: .init(title: "Test",
                                 subTargets: [.init(title: "Test", targetSubStatus: .notDone)]))
         .environmentObject(TargetsViewModel())
 }

@@ -7,8 +7,12 @@
 
 import SwiftUI
 
-struct TargetEditView: View {
-    @EnvironmentObject var viewModelEnvironment: TargetsViewModel
+protocol TargetEditViewProtocol: ObservableObject {
+    func editTarget(_ target: UserTargetDtoModel) async -> UserTargetDtoModel?
+}
+
+struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
+    @EnvironmentObject var viewModelEnvironment: ViewModel
     @Environment(\.dismiss) var dismiss
     
     @State private var newTitle = ""
@@ -125,6 +129,9 @@ struct TargetEditView: View {
 }
 
 #Preview {
-    TargetEditView(target: .init(title: "Test", targetStatus: .inProgress, subTargets: [.init(title: "TestSub", targetSubStatus: .notDone)]))
+    TargetEditView<TargetsViewModel>(target: .init(title: "Test",
+                                                   targetStatus: .inProgress,
+                                                   subTargets: [.init(title: "TestSub", targetSubStatus: .notDone)]
+                                                  ))
         .environmentObject(TargetsViewModel())
 }

@@ -19,7 +19,7 @@ struct CategoryEditView: View {
         NavigationView {
             List {
                 ForEach($targets.filter { $0.category.wrappedValue == category }) { target in
-                    TargetRowView(target: target.wrappedValue)
+                    TargetRowView<TargetsViewModel>(target: target.wrappedValue)
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {
                                 deleteTarget(target.wrappedValue)

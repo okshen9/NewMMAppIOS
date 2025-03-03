@@ -8,9 +8,6 @@
 import SwiftUI
 
 struct CategorySectionView: View {
-    @EnvironmentObject var viewModelEnvironment: TargetsViewModel
-    
-    
     var category: TargetCategory
     var targets: [UserTargetDtoModel] // Список целей для выбранной категории
     @State var onEdit: () -> Void // Замыкание для редактирования категории
@@ -26,7 +23,7 @@ struct CategorySectionView: View {
             }
         ) {
             ForEach(targets) { target in
-                TargetRowView(target: target)
+                TargetRowView<TargetsViewModel>(target: target)
             }
             .onChange(of: targets, {
                 print("Изменилась CategorySectionView")
@@ -36,9 +33,3 @@ struct CategorySectionView: View {
     }
 
 }
-
-//extension Array: Equatable where Element == UserTargetDtoModel {
-//    static func == (lhs: Self, rhs: Self) -> Bool {
-//        
-//    }
-//}
