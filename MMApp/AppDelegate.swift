@@ -17,8 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        guard let windowScene = (scene as? UIWindowScene) else { return }
 //        window = UIWindow(frame: windowScene.coordinateSpace.bounds)
 //        window?.windowScene = windowScene
-//        window?.rootViewController =
-    ()
+//        window?.rootViewController = ()
 //        window?.makeKeyAndVisible()
         
 //        YMKMapKit.setApiKey("6b181ff1-bf64-4778-8f1f-907b98768b65")

@@ -23,6 +23,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         } else {
             window?.rootViewController = AuthVC()
         }
+        window?.overrideUserInterfaceStyle = .light
         window?.makeKeyAndVisible()
     }
 

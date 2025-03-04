@@ -16,16 +16,17 @@ struct ProfileStatsView: View {
     var body: some View {
         VStack(spacing: 8) {
             CircularProgressView(progress: progress, lineWidth: lineWidth)
+                .frame(height: 60)
             Text(title)
                 .multilineTextAlignment(.center)
                 .font(.caption)
                 .foregroundStyle(Color.headerText)
         }
-        .frame(width: 70)
+        .frame(width: 85)
         .padding(4)
     }
 }
 
 #Preview {
-    ProfileStatsView(progress: 0.5, lineWidth: 4, title: "Вовлек 2/4")
+    ProfileStatsView(progress: 0.5, lineWidth: 4, title: "Вовлек: 20/40 \nTesting")
 }

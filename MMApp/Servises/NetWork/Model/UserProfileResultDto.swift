@@ -24,6 +24,7 @@ struct UserProfileResultDto: Codable, Equatable {
     let photoUrl: String?
     let activitySphere: String?
     let biography: String?
+    let targetCalculationInfo: TargetCalculationInfoDto?
 
     static func == (lhs: UserProfileResultDto, rhs: UserProfileResultDto) -> Bool {
         return lhs.id == rhs.id

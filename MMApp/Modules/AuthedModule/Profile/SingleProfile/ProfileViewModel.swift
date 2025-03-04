@@ -22,6 +22,12 @@ final class ProfileViewModel: ObservableObject {
         self.externalId = externalId
     }
     
+    /// Only Debug
+    convenience init(profile: UserProfileResultDto) {
+        self.init()
+        self.profile = profile
+    }
+    
     // MARK: - Public properties
 //    @Published private(set) var input = Input()
 

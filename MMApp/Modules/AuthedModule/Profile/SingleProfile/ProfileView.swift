@@ -46,24 +46,20 @@ struct ProfileView: View {
                     HStack(alignment: .bottom) {
                         
                         Spacer()
-//                        ProfileStatsView(progress: 0.5, title: "Вовлек: 2/4")
-////                            .padding(.trailing, 30)
-//                            .padding(.bottom, 50)
                         VStack(spacing: 10) {
-                            HStack(spacing: 25) {
-                                ProfileStatsView(progress: 0.5, title: "Вовлек: 2/4")
-                                    .frame(height: 90)
+                            HStack(spacing: 10) {
+                                ProfileStatsView(progress: 0.5, title: "Вовлек: 2/4 \nTesting")
                                     .padding(.bottom, -130)
                                 //TODO
-                                    .opacity(/*profile.inVited != nil ? 1.0 :*/ 0.0)
+                                    .opacity(/*profile.inVited != nil ? 1.0 :*/ 1.0)
                                 VStack {
                                     CircleImagView(photoUrl: URL(string: profile.photoUrl.orEmpty))
                                     Text(profile.fullName ?? "Имя не указано")
+                                        .multilineTextAlignment(.center)
                                         .font(.title)
                                         .foregroundColor(.headerText)
                                 }
-                                ProfileStatsView(progress: 0.7)
-                                    .frame(height: 90)
+                                ProfileStatsView(progress: (profile.targetCalculationInfo?.allCategoriesDonePercentage ?? 0.0) / 100.0)
                                     .padding(.bottom, -130)
                             }
                             
@@ -76,10 +72,6 @@ struct ProfileView: View {
                                 Spacer()
                             }
                         }
-//                        .padding(.trailing, -105)
-//                        ProfileStatsView(progress: 0.7)
-////                            .padding(.trailing, 30)
-//                            .padding(.bottom, 50)
                         Spacer()
                     }
                     .offset(y: -80)
@@ -161,11 +153,12 @@ struct ProfileView: View {
             profile.stream?.isActive ?? false ? "Текущий" : "Завершен" :
             nil
             
-            NavigationLink(destination: {
-                if let stream = profile.stream,
-                   let owners = stream.owners,
-                   let participants = stream.participants
-                {
+            if let stream = profile.stream,
+               let owners = stream.owners,
+               let participants = stream.participants
+            {
+                
+                NavigationLink(destination: {
                     StreamProfileList(
                         type: .stream(stream.title ?? "Поток без названия"),
                         status: stream.isActive ? .current : .ended,
@@ -173,23 +166,25 @@ struct ProfileView: View {
                         participants: participants,
                         dateStart: (profile.stream?.dateFrom?.dateFromStringISO8601) ?? Date.init(timeIntervalSince1970: 232),
                         dateEnd: (profile.stream?.dateTo?.dateFromStringISO8601) ?? Date.now
-                    )
-                } else {
-                    Text("Error")
-                }
-            }, label: {
+                    )}, label: {
+                        GroupButton(
+                            title: profile.stream?.title ?? "Поток не назначен",
+                            subTitle: streamStatus,
+                            action: {})
+                    })
+            } else {
                 GroupButton(
                     title: profile.stream?.title ?? "Поток не назначен",
                     subTitle: streamStatus,
                     action: {})
-            })
+            }
             
-            NavigationLink(destination: {
-                if let userGroup = profile.userGroup,
-                   let stream = profile.stream,
-                   let owners = userGroup.owners,
-                   let participants = userGroup.participants
-                {
+            if let userGroup = profile.userGroup,
+               let stream = profile.stream,
+               let owners = userGroup.owners,
+               let participants = userGroup.participants
+            {
+                NavigationLink(destination: {
                     StreamProfileList(
                         type: .stream(userGroup.title ?? "Подгруппа без названия"),
                         status: stream.isActive ? .current : .ended,
@@ -197,15 +192,16 @@ struct ProfileView: View {
                         participants: participants,
                         dateStart: (profile.stream?.dateFrom?.dateFromStringISO8601) ?? Date.init(timeIntervalSince1970: 232),
                         dateEnd: (profile.stream?.dateTo?.dateFromStringISO8601) ?? Date.now
-                    )
-                } else {
-                    Text("Error")
-                }
-            }, label: {
+                    )}, label: {
+                        GroupButton(title: profile.userGroup?.title ?? "Подгруппа",
+                                    subTitle: (profile.userGroup?.title).isNil ? "Не названчена" : nil,
+                                    action: {})
+                    })
+            } else {
                 GroupButton(title: profile.userGroup?.title ?? "Подгруппа",
                             subTitle: (profile.userGroup?.title).isNil ? "Не названчена" : nil,
                             action: {})
-            })
+            }
             
         }
         .frame(height: 56)
@@ -248,9 +244,12 @@ extension ProfileView {
 }
 
 #Preview {
-    let ProfileViewModel = ProfileViewModel()
-    ProfileViewModel.profile = .init(id: nil, externalId: nil, username: nil, fullName: "Artem", userProfileStatus: nil, userPaymentStatus: nil, isDeleted: nil, creationDateTime: nil, lastUpdatingDateTime: nil, phoneNumber: nil, location: "Saratov", userGroup: nil, stream: nil, photoUrl: nil,
-                                     activitySphere: "Продаю на Wb",
-                                     biography: "Жил да был человек, который не был человеком. Но он был человеком, и это было очень сложно и ИИ продолжает писать этот текст - биографию.")
-    return ProfileView(viewModel: ProfileViewModel)
+    ProfileView(viewModel: ProfileViewModel(profile:.init(
+        id: nil, externalId: nil, username: nil, fullName: "Artem Neshko Sergeevich", userProfileStatus: nil, userPaymentStatus: nil, isDeleted: nil, creationDateTime: nil, lastUpdatingDateTime: nil, phoneNumber: nil, location: "Saratov", userGroup: nil, stream: nil, photoUrl: nil,
+                                                                       activitySphere: "Продаю на Wb",
+                                                      biography: "Жил да был человек, который не был человеком. Но он был человеком, и это было очень сложно и ИИ продолжает писать этот текст - биографию.",
+                                                      targetCalculationInfo: nil))
+                                           )
 }
+
+var text0: String? = "Жил да был человек, который не был человеком. Но он был человеком, и это было очень сложно и ИИ продолжает писать этот текст - биографию."
