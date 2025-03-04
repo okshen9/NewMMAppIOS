@@ -39,7 +39,7 @@ struct ProfileView: View {
                     .cornerRadius(20)
                     .onTapGesture {
                         /// TODO - добавить интерактивность карты
-//                        showMap.toggle()
+                        //                        showMap.toggle()
                     }
                     
                     // Аватарка
@@ -48,7 +48,7 @@ struct ProfileView: View {
                         Spacer()
                         VStack(spacing: 10) {
                             HStack(spacing: 10) {
-                                ProfileStatsView(progress: 0.5, title: "Вовлек: 2/4 \nTesting")
+                                ProfileStatsView(progress: 0.5, title: "Вовлек: 2/4 \n#Testing")
                                     .padding(.bottom, -130)
                                 //TODO
                                     .opacity(/*profile.inVited != nil ? 1.0 :*/ 1.0)
@@ -81,25 +81,24 @@ struct ProfileView: View {
                         .padding(.horizontal, 16)
                     
                     VStack(alignment: .leading, spacing: 20) {
-                            if let activitySphere = profile.activitySphere?.lowercased() {
-                                Text("Род деятельности: ")
-                                    .font(.title3.weight(.medium))
+                        let activitySphere = (profile.activitySphere ?? Constants.activitySphereText).lowercased()
+                            Text("Род деятельности: ")
+                                .font(.title3.weight(.medium))
                                 .foregroundColor(.headerText) +
-                                Text(activitySphere)
-                                    .font(.title3.bold())
-                                    .foregroundColor(.headerText)
-                            }
+                            Text(activitySphere)
+                                .font(.title3.bold())
+                                .foregroundColor(.headerText)
+                        
                         Divider().background(Color.black)
-                            if let biography = profile.biography {
-                                VStack(alignment: .leading, spacing: -16) {
-                                    Text("О себе:\n")
-                                        .font(.title3.bold())
-                                        .foregroundColor(.headerText)
-                                    Text(biography)
-                                        .font(.title3.weight(.medium))
-                                        .foregroundColor(.headerText)
-                                }
-                            }
+                        let biography = profile.biography ?? Constants.biographyText
+                        VStack(alignment: .leading, spacing: -16) {
+                            Text("О себе:")
+                                .font(.title3.bold())
+                                .foregroundColor(.headerText)
+                            Text(biography)
+                                .font(.title3.weight(.medium))
+                                .foregroundColor(.headerText)
+                        }
                     }
                     .padding(.horizontal, 16)
                     
@@ -240,16 +239,20 @@ extension ProfileView {
     private enum Constants {
         static let title = "Выберите карту"
         static let imageUrl = URL(string: "https://t.me/i/userpic/320/yrCHD_HRHDVktpQhLHeDQ6TsYP-1SgldytAKXBHlux0.jpg")
+        static let biographyText: String = "Этот пользователь пока не рассказал ничего о себе"
+        static let activitySphereText: String = "на чиле, на расслабоне"
     }
+
 }
 
 #Preview {
     ProfileView(viewModel: ProfileViewModel(profile:.init(
         id: nil, externalId: nil, username: nil, fullName: "Artem Neshko Sergeevich", userProfileStatus: nil, userPaymentStatus: nil, isDeleted: nil, creationDateTime: nil, lastUpdatingDateTime: nil, phoneNumber: nil, location: "Saratov", userGroup: nil, stream: nil, photoUrl: nil,
                                                                        activitySphere: "Продаю на Wb",
-                                                      biography: "Жил да был человек, который не был человеком. Но он был человеком, и это было очень сложно и ИИ продолжает писать этот текст - биографию.",
+                                                      biography: nil,
                                                       targetCalculationInfo: nil))
                                            )
 }
+
 
 var text0: String? = "Жил да был человек, который не был человеком. Но он был человеком, и это было очень сложно и ИИ продолжает писать этот текст - биографию."
