@@ -90,7 +90,7 @@ struct ProfileView: View {
                     
                     VStack(alignment: .leading, spacing: 20) {
                             if let activitySphere = profile.activitySphere?.lowercased() {
-                                Text("Моя стезя: ")
+                                Text("Род деятельности: ")
                                     .font(.title3.weight(.medium))
                                 .foregroundColor(.headerText) +
                                 Text(activitySphere)
@@ -98,7 +98,7 @@ struct ProfileView: View {
                                     .foregroundColor(.headerText)
                             }
                         Divider().background(Color.black)
-                            if let biography = profile.biography ?? text {
+                            if let biography = profile.biography {
                                 VStack(alignment: .leading, spacing: -16) {
                                     Text("О себе:\n")
                                         .font(.title3.bold())
@@ -254,6 +254,3 @@ extension ProfileView {
                                      biography: "Жил да был человек, который не был человеком. Но он был человеком, и это было очень сложно и ИИ продолжает писать этот текст - биографию.")
     return ProfileView(viewModel: ProfileViewModel)
 }
-
-
-var text: String? = "Жил да был человек, который не был человеком. Но он был человеком, и это было очень сложно и ИИ продолжает писать этот текст - биографию."
