@@ -17,7 +17,7 @@ struct ProfileView: View {
                         
                 }
             }
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .onAppear {
                 viewModel.onApper()
             }

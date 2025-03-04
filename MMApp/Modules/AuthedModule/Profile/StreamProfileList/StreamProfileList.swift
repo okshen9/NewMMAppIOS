@@ -17,7 +17,6 @@ struct StreamProfileList: View {
     var dateEnd: Date = Date.now
     
     var body: some View {
-        NavigationView {
             VStack {
                 HStack {
                     let dateStr1 = DateFormatter.localizedString(from: dateStart, dateStyle: .short, timeStyle: .none)
@@ -56,7 +55,6 @@ struct StreamProfileList: View {
             }
             .navigationTitle(type.name)
         }
-    }
 }
 
 #Preview {
