@@ -91,7 +91,7 @@ struct ProfileView: View {
                         
                         Divider().background(Color.black)
                         let biography = profile.biography ?? Constants.biographyText
-                        VStack(alignment: .leading, spacing: -16) {
+                        VStack(alignment: .leading, spacing: 8) {
                             Text("О себе:")
                                 .font(.title3.bold())
                                 .foregroundColor(.headerText)
@@ -248,7 +248,7 @@ extension ProfileView {
 #Preview {
     ProfileView(viewModel: ProfileViewModel(profile:.init(
         id: nil, externalId: nil, username: nil, fullName: "Artem Neshko Sergeevich", userProfileStatus: nil, userPaymentStatus: nil, isDeleted: nil, creationDateTime: nil, lastUpdatingDateTime: nil, phoneNumber: nil, location: "Saratov", userGroup: nil, stream: nil, photoUrl: nil,
-                                                                       activitySphere: "Продаю на Wb",
+                                                                       activitySphere: nil,
                                                       biography: nil,
                                                       targetCalculationInfo: nil))
                                            )
