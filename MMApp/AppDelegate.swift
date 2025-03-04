@@ -21,6 +21,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     ()
 //        window?.makeKeyAndVisible()
         
+//        YMKMapKit.setApiKey("6b181ff1-bf64-4778-8f1f-907b98768b65")
+//        YMKMapKit.sharedInstance()
+        
         
         return true
     }

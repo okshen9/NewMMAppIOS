@@ -1,0 +1,31 @@
+//
+//  ProfileStatsView.swift
+//  MMApp
+//
+//  Created by artem on 04.03.2025.
+//
+
+import SwiftUI
+
+struct ProfileStatsView: View {
+    let progress: Double
+    var lineWidth: CGFloat = 3
+    
+    var title: String = "Цели"
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            CircularProgressView(progress: progress, lineWidth: lineWidth)
+            Text(title)
+                .multilineTextAlignment(.center)
+                .font(.caption)
+                .foregroundStyle(Color.headerText)
+        }
+        .frame(width: 70)
+        .padding(4)
+    }
+}
+
+#Preview {
+    ProfileStatsView(progress: 0.5, lineWidth: 4, title: "Вовлек 2/4")
+}

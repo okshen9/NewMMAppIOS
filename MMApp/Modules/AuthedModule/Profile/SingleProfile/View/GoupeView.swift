@@ -30,8 +30,8 @@ struct GroupButton: View {
                     }
                 }
                 .frame(width: geometry.size.width,
-                       height: 56)
-                .background(Color.gray)
+                       height: 46)
+                .background(Color.gray.opacity(0.5))
                 .cornerRadius(16)
                 
 //            })
@@ -42,5 +42,5 @@ struct GroupButton: View {
 }
 
 #Preview {
-    GroupButton(title: "dfdf", subTitle: nil, action: {})
+    GroupButton(title: "dfdf", subTitle: "nil", action: {})
 }

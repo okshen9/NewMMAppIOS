@@ -31,13 +31,15 @@ struct UserProfileResultDto: Codable, Equatable {
 }
 
 struct UserGroupResultDto: Codable {
-    let id: Int
-    let title: String
+    let id: Int?
+    let title: String?
     let groupOwner: Int? //для получения владельца группы ищем группу (id)
     let isDeleted: Bool?
     let creationDateTime: String?
     let lastUpdatingDateTime: String? // не обновлялось, но при обновлении должно быть аналогично creationDateTime
     let streamDto: Int? // для получения стрима группы ищем группу (id)
+    let owners: [StreamUserProfileShortInfoDto]?
+    let participants: [StreamUserProfileShortInfoDto]?
 }
 
 struct StreamResultDto: Codable {

@@ -21,7 +21,8 @@ class AuthViewModel {
     /// - MARK: Routing
     @MainActor
     func navigateToUserForm(_ from: UIViewController, user: AuthUserDtoResult) {
-        let nextVC = UserInfoViewController(viewModel: UserInfoViewModel(userModel: user))
+        let viewModel = UserInfoViewModel(userModel: user)
+        let nextVC = UserInfoViewController(viewModel: viewModel)
 //        SwiftUI экрана
 //        let hostingController = UIHostingController(rootView: testScreen)
 //        TabBarView

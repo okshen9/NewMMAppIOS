@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import CoreLocation
 
 enum Destination: Hashable {
     case userDetail(userId: Int)
@@ -9,7 +10,7 @@ enum Destination: Hashable {
 final class ProfileViewModel: ObservableObject {
     @Published var navigationPath = NavigationPath()
     
-    @Published var isLoading = true
+    @Published var isLoading = false
     @Published var profile: UserProfileResultDto?
     
     // MARK: - Private properties
@@ -76,6 +77,7 @@ final class ProfileViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Navigation
     func goToStream() {
         navigationPath.append(Destination.userDetail(userId: 1))
     }
