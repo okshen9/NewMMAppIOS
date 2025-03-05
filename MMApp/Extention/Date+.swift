@@ -78,6 +78,8 @@ extension Date {
 
 extension Date? {
     var orNow: Date {
-        self ?? .now
+        
+        get { self ?? .now }
+        set { self = newValue }
     }
 }

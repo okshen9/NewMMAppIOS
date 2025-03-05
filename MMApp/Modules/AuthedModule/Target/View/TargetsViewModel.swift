@@ -112,6 +112,26 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
         }
     }
     
+    func deleteTarget(target: UserTargetDtoModel) {
+        errorMessage = nil
+        var tempTarget = target
+        tempTarget.isDeleted = true
+        Task { [weak self] in
+            do {
+                try await self?.networkService.updateTargetAll(model: tempTarget)
+                
+                let externalId = (UserRepository.shared.userProfile?.externalId) ?? 0
+                let newTargets = try await self?.networkService.getUserTargets(externalId: externalId).userTargets
+                guard !newTargets.isNil else { return }
+                DispatchQueue.main.async { [weak self] in
+                    withAnimation {
+                        self?.targets = newTargets?.sorted(by: { ($0.id ?? 0 < $1.id  ?? 1) }) ?? []
+                    }
+                }
+            }
+        }
+    }
+    
     func closedTarget(target: UserTargetDtoModel) {
         var tempTarget = target
         tempTarget.changeSelfStatus()

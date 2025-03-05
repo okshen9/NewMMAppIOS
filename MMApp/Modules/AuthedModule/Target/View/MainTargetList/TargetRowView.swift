@@ -8,7 +8,10 @@
 import SwiftUI
 
 protocol TargetRowViewModelProtocol: ObservableObject {
+    /// Закрыть цель
     func closedTarget(target: UserTargetDtoModel)
+    /// удлить цель
+    func deleteTarget(target: UserTargetDtoModel)
 }
 
 struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
@@ -80,7 +83,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
                         isEditing = true
                     },
                     .destructive(Text("Удалить цель")) {
-                        //                        selection = "Green"
+                        viewModelEnvironment.deleteTarget(target: target)
                         
                     },
                     .cancel(Text("Отмена")) {

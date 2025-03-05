@@ -21,9 +21,9 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
     @State private var newCategory = TargetCategory.other
     @State private var newSubtarget = [UserSubTargetDtoModel]()
     @State var isLoading = false
-
+    
     var target: UserTargetDtoModel
-
+    
     var body: some View {
         NavigationView {
             Form {
@@ -32,27 +32,19 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                     textEditor(textBinding: $newDescription)
                     Picker("Категория цели", selection: $newCategory) {
                         ForEach(TargetCategory.allCases.filter({ $0 != .unknown })) { category in
-                                    Text(category.rawValue).tag(category)
-                                }
-                            }
-                            .pickerStyle(.menu)
-                            .tint(.mainRed)
+                            Text(category.rawValue).tag(category)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .tint(.mainRed)
                     DatePicker("Срок выполнения", selection: $newDeadline, displayedComponents: .date)
                 }
-                Section(header: Text("Подцели")) {
-                    VStack(spacing: 20) {
-                        ForEach($newSubtarget) { $subView in
-                            SubTargetEditView(subTarget: $subView)
-                        }
-                        
-                        Button(action: {
-                            newSubtarget.append(UserSubTargetDtoModel(title: "", description: "", targetSubStatus: .notDone, rootTargetId: target.id, deadLineDateTime: Date.now.toApiString))
-                        }, label: {
-                            Text("Добавить подцель")
-                                .foregroundColor(.mainRed)
-                        })
-                    }
-                }
+                
+                Text("Подцели")
+                    .font(.title3.weight(.medium))
+                    .foregroundStyle(Color.gray.opacity(0.9))
+                subTargetsSection()
+                
             }
             .onAppear {
                 newTitle = target.title.orEmpty
@@ -62,8 +54,35 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                 newSubtarget = target.subTargets ?? []
             }
         }
+    }
+    
+    @ViewBuilder
+    func subTargetsSection() -> some View {
         
-        
+        List {
+            ForEach($newSubtarget, id: \.creationDateTime) { $item in
+                SubTargetEditView(subTarget: $item)
+                    .swipeActions(edge: .trailing) {
+                        Button("Удалить") {
+                            newSubtarget.removeAll(where: {
+                                $0 == $item.wrappedValue
+                            })
+                        }
+                        .tint(.red)
+                    }
+            }
+            
+            
+
+        }
+        Button(action: {
+            
+            newSubtarget.append(UserSubTargetDtoModel(title: "", description: "", targetSubStatus: .notDone, rootTargetId: target.id, creationDateTime: Date.now.toApiString, deadLineDateTime: Date.now.toApiString))
+            print("Добавить \(newSubtarget.count)")
+        }, label: {
+            Text("Добавить подцель")
+                .foregroundColor(.mainRed)
+        })
     }
     
     /// Многострочное текстовое поле
@@ -105,7 +124,7 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                             
                             isLoading = false
                             ToastManager.shared.show(
-//                                🎯
+                                //                                🎯
                                 ToastModel(message: "Цель успешно отправлена на рассмотерение", icon: "checkmark.circle", duration: 2)
                             )
                             dismiss()
@@ -117,12 +136,17 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                         }
                     }
                 }, label: {
-                    Image.init(systemName: "checkmark")
-                        .resizable()
-                        .foregroundColor(.mainRed)
-                        .frame(width: 16,
-                               height: 16)
-                        .padding(4)
+                    HStack(spacing: 0) {
+                        Text("Готово")
+                            .font(.caption.weight(.medium))
+                            .foregroundColor(.mainRed)
+                        Image.init(systemName: "checkmark")
+                            .resizable()
+                            .foregroundColor(.mainRed)
+                            .frame(width: 16,
+                                   height: 16)
+                            .padding(4)
+                    }
                 })}
         }
     }
@@ -131,7 +155,7 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
 #Preview {
     TargetEditView<TargetsViewModel>(target: .init(title: "Test",
                                                    targetStatus: .inProgress,
-                                                   subTargets: [.init(title: "TestSub", targetSubStatus: .notDone)]
+                                                   subTargets: [.init(title: "TestSub", targetSubStatus: .notDone, creationDateTime: Date.now.toApiString)]
                                                   ))
         .environmentObject(TargetsViewModel())
 }

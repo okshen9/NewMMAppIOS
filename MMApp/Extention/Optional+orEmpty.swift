@@ -6,10 +6,12 @@
 //
 
 import UIKit
+import SwiftUICore
 
 extension String? {
     var orEmpty: String {
-        self ?? ""
+        get { self ?? "" }
+        set { self = newValue.isEmpty ? nil : newValue }
     }
 }
 
@@ -29,5 +31,21 @@ extension UIView? {
     /// В случае отсутствия вью - подставляем пустую вью
     var orEmpty: UIView {
         self ?? UIView()
+    }
+}
+
+extension Binding where Value == String? {
+    var asDate: Binding<Date> {
+        Binding<Date>(
+            get: { (wrappedValue?.dateFromStringISO8601) ?? Date() },
+            set: { wrappedValue = $0.toApiString }
+        )
+    }
+    
+    var orEmptyBinding: Binding<String> {
+        Binding<String>(
+            get: { wrappedValue ?? "" },
+            set: { wrappedValue = $0.isEmpty ? nil : $0 }
+        )
     }
 }

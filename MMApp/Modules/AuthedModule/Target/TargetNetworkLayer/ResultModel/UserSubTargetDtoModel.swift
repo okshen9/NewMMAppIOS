@@ -29,6 +29,10 @@ struct UserSubTargetDtoModel: Codable, JSONRepresentable, Identifiable, Equatabl
     /// Срок выполнения подцели
     var deadLineDateTime: String?
     
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.id == rhs.id && lhs.title == rhs.title && lhs.description == rhs.description && lhs.creationDateTime == rhs.creationDateTime && lhs.deadLineDateTime == rhs.deadLineDateTime && lhs.lastUpdatingDateTime == rhs.lastUpdatingDateTime
+    }
+    
     init(id: Int? = nil, title: String? = nil, description: String? = nil, subTargetPercentage: Double? = nil, targetSubStatus: TargetSubStatus? = nil, rootTargetId: Int? = nil, isDeleted: Bool? = nil, creationDateTime: String? = nil, lastUpdatingDateTime: String? = nil, deadLineDateTime: String? = nil) {
         self.id = id
         self.title = title

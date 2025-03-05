@@ -473,6 +473,7 @@ extension String {
                                     withConfigurator: .init(dateFormat: .apiFullShortDateFormat,
                                                             locale: .rus,
                                                             timeZone: .init(identifier: "Europe/Moscow")))
+        
     }
     
 }
@@ -480,10 +481,11 @@ extension String {
 extension Date {
     /// 2024-02-01T21:24:23.999
     var toApiString: String {
-        return MMDateFormatter.string(from: self,
+        let temp = MMDateFormatter.string(from: self,
                                       withConfigurator: .init(dateFormat: .apiFullDateFormat,
                                                               locale: .rus,
                                                               timeZone: .init(identifier: "Europe/Moscow")))
+        return String(temp.prefix(while: {$0 != "."})) + ".000"
     }
     
     /// 1 Feb 2024
