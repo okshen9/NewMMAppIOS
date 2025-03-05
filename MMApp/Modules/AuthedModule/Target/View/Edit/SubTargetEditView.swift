@@ -18,7 +18,7 @@ struct SubTargetEditView: View {
                 .foregroundStyle(Color.black.opacity(0.8))
             TextField("Описание", text: $subTarget.description.orEmptyBinding)
                 .foregroundStyle(Color.black.opacity(0.8))
-            DatePicker("Срок выполнения", selection: $subTarget.deadLineDateTime.asDate, displayedComponents: .date)
+            DatePicker("Срок выполнения", selection: $subTarget.deadLineDateTime.asBindingDate, displayedComponents: .date)
                 .tint(Color.mainRed)
         }
     }

@@ -7,7 +7,7 @@
 import Foundation
 
 /// Модель результата для UserSubTargetDto
-struct UserSubTargetDtoModel: Codable, JSONRepresentable, Identifiable, Equatable {
+struct UserSubTargetDtoModel: Codable, JSONRepresentable, Identifiable {
     /// Идентификатор подцели
     var id: Int?
     /// Название подцели
@@ -28,10 +28,6 @@ struct UserSubTargetDtoModel: Codable, JSONRepresentable, Identifiable, Equatabl
     var lastUpdatingDateTime: String?
     /// Срок выполнения подцели
     var deadLineDateTime: String?
-    
-    static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.id == rhs.id && lhs.title == rhs.title && lhs.description == rhs.description && lhs.creationDateTime == rhs.creationDateTime && lhs.deadLineDateTime == rhs.deadLineDateTime && lhs.lastUpdatingDateTime == rhs.lastUpdatingDateTime
-    }
     
     init(id: Int? = nil, title: String? = nil, description: String? = nil, subTargetPercentage: Double? = nil, targetSubStatus: TargetSubStatus? = nil, rootTargetId: Int? = nil, isDeleted: Bool? = nil, creationDateTime: String? = nil, lastUpdatingDateTime: String? = nil, deadLineDateTime: String? = nil) {
         self.id = id
@@ -58,5 +54,20 @@ struct UserSubTargetDtoModel: Codable, JSONRepresentable, Identifiable, Equatabl
         self.creationDateTime = try container.decodeIfPresent(String.self, forKey: .creationDateTime)
         self.lastUpdatingDateTime = try container.decodeIfPresent(String.self, forKey: .lastUpdatingDateTime)
         self.deadLineDateTime = try container.decodeIfPresent(String.self, forKey: .deadLineDateTime)
+    }
+}
+
+extension UserSubTargetDtoModel: Equatable {
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.id == rhs.id &&
+        lhs.title == rhs.title &&
+        lhs.description == rhs.description &&
+        lhs.subTargetPercentage == rhs.subTargetPercentage &&
+        lhs.targetStatus == rhs.targetStatus &&
+        lhs.rootTargetId == rhs.rootTargetId &&
+        lhs.isDeleted == rhs.isDeleted &&
+        lhs.creationDateTime == rhs.creationDateTime &&
+        lhs.lastUpdatingDateTime == rhs.lastUpdatingDateTime &&
+        lhs.deadLineDateTime == rhs.deadLineDateTime
     }
 }

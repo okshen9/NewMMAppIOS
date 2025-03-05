@@ -35,7 +35,7 @@ extension UIView? {
 }
 
 extension Binding where Value == String? {
-    var asDate: Binding<Date> {
+    var asBindingDate: Binding<Date> {
         Binding<Date>(
             get: { (wrappedValue?.dateFromStringISO8601) ?? Date() },
             set: { wrappedValue = $0.toApiString }

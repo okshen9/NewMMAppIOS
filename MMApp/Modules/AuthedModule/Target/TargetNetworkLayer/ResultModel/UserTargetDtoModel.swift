@@ -8,7 +8,7 @@
 import Foundation
 
 /// Модель результата для UserTargetDto
-struct UserTargetDtoModel: Codable, JSONRepresentable, Identifiable, Equatable {
+struct UserTargetDtoModel: Codable, JSONRepresentable, Identifiable {
     /// Уникальный идентификатор цели
     var id: Int?
     /// Наименование цели
@@ -98,5 +98,23 @@ struct UserTargetDtoModel: Codable, JSONRepresentable, Identifiable, Equatable {
         case .unknown, nil:
             self.targetStatus = .draft
         }
+    }
+}
+
+extension UserTargetDtoModel: Equatable {
+    static func ==(lhs: Self, rhs: Self) -> Bool {
+        return lhs.id == rhs.id &&
+        lhs.title == rhs.title &&
+        lhs.description == rhs.description &&
+        lhs.userExternalId == rhs.userExternalId &&
+        lhs.percentage == rhs.percentage &&
+        lhs.deadLineDateTime == rhs.deadLineDateTime &&
+        lhs.streamId == rhs.streamId &&
+        lhs.targetStatus == rhs.targetStatus &&
+        lhs.subTargets == rhs.subTargets &&
+        lhs.isDeleted == rhs.isDeleted &&
+        lhs.creationDateTime == rhs.creationDateTime &&
+        lhs.lastUpdatingDateTime == rhs.lastUpdatingDateTime &&
+        lhs.category == rhs.category
     }
 }
