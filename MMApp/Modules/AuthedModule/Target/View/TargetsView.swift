@@ -13,6 +13,7 @@ struct TargetsView: View {
     @State private var isEditingCategory: Bool = false
     @State private var selectedCategory: TargetCategory? = nil
     @State private var selectedTab = 0
+    @State private var showAddTarget = false
     
     var body: some View {
         NavigationView {
@@ -64,6 +65,9 @@ struct TargetsView: View {
                     }
                 }
             }
+            .sheet(isPresented: $showAddTarget) {
+                TargetEditView<TargetsViewModel>(target: UserTargetDtoModel())
+            }
             .onAppear {
                 if viewModel.targets.isEmpty {
                     viewModel.loadTargets()
@@ -71,6 +75,18 @@ struct TargetsView: View {
             }
             .environmentObject(viewModel)
             .navigationTitle("Цели")
+            .toolbar {
+                // Кнопка в правой части навигационной панели
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        showAddTarget = true
+                    }) {
+                        Image(systemName: "plus") // Иконка
+                            .foregroundColor(.mainRed)
+                    }
+                }
+            }
+
         }
         .onChange(of: viewModel.targets, {
             print("Изменилась target")
