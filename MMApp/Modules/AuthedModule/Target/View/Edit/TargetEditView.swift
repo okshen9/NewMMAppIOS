@@ -14,30 +14,33 @@ protocol TargetEditViewProtocol: ObservableObject {
 struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
     @EnvironmentObject var viewModelEnvironment: ViewModel
     @Environment(\.dismiss) var dismiss
-    
-    @State private var newTitle = ""
-    @State private var newDescription = ""
-    @State private var newDeadline = Date()
-    @State private var newCategory = TargetCategory.other
-    @State private var newSubtarget = [UserSubTargetDtoModel]()
+
     @State var isLoading = false
     
     var target: UserTargetDtoModel
+    @State private var newTarget: UserTargetDtoModel
+    
+    init(target: UserTargetDtoModel) {
+        self.target = target
+        _newTarget = State(initialValue: target)
+    }
     
     var body: some View {
         NavigationView {
             Form {
                 Section(header: headerView()) {
-                    TextField("Название", text: $newTitle)
-                    textEditor(textBinding: $newDescription)
-                    Picker("Категория цели", selection: $newCategory) {
+                    TextField("Название", text: $newTarget.title.orEmpty)
+                        .foregroundStyle(Color.black.opacity(0.8))
+                    textEditor(textBinding: $newTarget.description.orEmpty)
+                        .foregroundStyle(Color.black.opacity(0.8))
+                    Picker("Категория цели", selection:  $newTarget.category.orDefault(.other)) {
                         ForEach(TargetCategory.allCases.filter({ $0 != .unknown })) { category in
                             Text(category.rawValue).tag(category)
                         }
                     }
                     .pickerStyle(.menu)
                     .tint(.mainRed)
-                    DatePicker("Срок выполнения", selection: $newDeadline, displayedComponents: .date)
+                    DatePicker("Срок выполнения", selection: $newTarget.deadLineDateTime.asBindingDate, displayedComponents: .date)
                 }
                 
                 Text("Подцели")
@@ -46,13 +49,6 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                 subTargetsSection()
                 
             }
-            .onAppear {
-                newTitle = target.title.orEmpty
-                newDescription = target.description.orEmpty
-                newDeadline = target.deadLineDateTime?.dateFromString ?? Date.now
-                newCategory = target.category ?? .other
-                newSubtarget = target.subTargets ?? []
-            }
         }
     }
     
@@ -60,11 +56,12 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
     func subTargetsSection() -> some View {
         
         List {
-            ForEach($newSubtarget, id: \.creationDateTime) { $item in
+            ForEach($newTarget.subTargets.orDefault([]), id: \.creationDateTime) { $item in
                 SubTargetEditView(subTarget: $item)
+                    .padding(.vertical, 4)
                     .swipeActions(edge: .trailing) {
                         Button("Удалить") {
-                            newSubtarget.removeAll(where: {
+                            newTarget.subTargets?.removeAll(where: {
                                 $0 == $item.wrappedValue
                             })
                         }
@@ -77,8 +74,8 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
         }
         Button(action: {
             
-            newSubtarget.append(UserSubTargetDtoModel(title: "", description: "", targetSubStatus: .notDone, rootTargetId: target.id, creationDateTime: Date.now.toApiString, deadLineDateTime: Date.now.toApiString))
-            print("Добавить \(newSubtarget.count)")
+            newTarget.subTargets?.append(UserSubTargetDtoModel(title: "", description: "", targetSubStatus: .notDone, rootTargetId: target.id, creationDateTime: Date.now.toApiString, deadLineDateTime: Date.now.toApiString))
+            print("Добавить \(newTarget.subTargets?.count)")
         }, label: {
             Text("Добавить подцель")
                 .foregroundColor(.mainRed)
@@ -113,12 +110,10 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                            height: 16)
                     .padding(4)
             } else {
+                let isActive = target != $newTarget.wrappedValue
                 Button(action: {
                     ///SAVE
-                    //Neshko TODO
                     isLoading = true
-                    var newTarget = target
-                    newTarget.update(newTitle, newDescription, newDeadline.toApiString, newCategory)
                     Task {
                         if await viewModelEnvironment.editTarget(newTarget) != nil {
                             
@@ -139,15 +134,17 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                     HStack(spacing: 0) {
                         Text("Готово")
                             .font(.caption.weight(.medium))
-                            .foregroundColor(.mainRed)
+                            .foregroundColor(isActive ? .mainRed : .gray)
                         Image.init(systemName: "checkmark")
                             .resizable()
-                            .foregroundColor(.mainRed)
+                            .foregroundColor(isActive ? .mainRed : .gray)
                             .frame(width: 16,
                                    height: 16)
                             .padding(4)
                     }
-                })}
+                })
+                .disabled(!isActive)
+            }
         }
     }
 }
@@ -159,3 +156,4 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                                                   ))
         .environmentObject(TargetsViewModel())
 }
+
