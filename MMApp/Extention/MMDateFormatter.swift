@@ -482,9 +482,9 @@ extension Date {
     /// 2024-02-01T21:24:23.999
     var toApiString: String {
         let temp = MMDateFormatter.string(from: self,
-                                      withConfigurator: .init(dateFormat: .apiFullDateFormat,
-                                                              locale: .rus,
-                                                              timeZone: .init(identifier: "Europe/Moscow")))
+                                          withConfigurator: .init(dateFormat: .apiFullDateFormat,
+                                                                  locale: .rus,
+                                                                  timeZone: .init(identifier: "Europe/Moscow")))
         return String(temp.prefix(while: {$0 != "."})) + ".000"
     }
     
@@ -500,5 +500,22 @@ extension Date {
     var dateComponents: DateComponents {
         let calendar = Calendar.current
         return calendar.dateComponents([.year, .month, .day], from: self)
+    }
+    
+    /// Компонетны даты год, месяц, день или кастомные
+    func dateComponentsFor(_ dateComponents: Set<Calendar.Component> = [.year, .month, .day]) -> DateComponents {
+        let calendar = Calendar.current
+        return calendar.dateComponents(dateComponents, from: self)
+    }
+}
+
+extension DateComponents {
+    // Проверка совпадения по [.year, .month, .day] или кастомниму
+    func equalDate(_ toComponents: DateComponents, _ forComponents: Set<Calendar.Component> = [.year, .month, .day]) -> Bool {
+        var isEquals: [Bool] = []
+        for component in forComponents {
+            isEquals.append(self.value(for: component) ?? -1 == toComponents.value(for: component) ?? -1)
+        }
+        return isEquals.allSatisfy({$0})
     }
 }

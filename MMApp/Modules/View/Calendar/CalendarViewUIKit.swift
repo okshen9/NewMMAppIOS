@@ -11,7 +11,7 @@ import UIKit
 
 struct CalendarViewUIKit: UIViewRepresentable {
     @Binding var selectedDate: Date?
-    @State var events: [Date: [UIColor]] // Несколько событий на одну дату
+    var events: [DateComponents: [UIColor]] // Несколько событий на одну дату
 
     func makeUIView(context: Context) -> UICalendarView {
         let calendarView = UICalendarView()
@@ -36,7 +36,7 @@ struct CalendarViewUIKit: UIViewRepresentable {
 
         func calendarView(_ calendarView: UICalendarView, decorationFor dateComponents: DateComponents) -> UICalendarView.Decoration? {
             let calendar = Calendar.current
-            guard let date = calendar.date(from: dateComponents), let colors = parent.events[date] else {
+            guard let colors = parent.events.first(where: {$0.key.equalDate(dateComponents)})?.value else {
                 return nil
             }
 
@@ -111,30 +111,32 @@ struct CustomCalendarView: View {
     
     @State var dateDate3: Set<DateComponents> = [DateComponents(year: 2025, month: 2, day: 25)]
     
-    @State var selectedDate: Date
+    @State var selectedDate: Date?
     let markedDates: [Date: [UIColor]] = [
-        Calendar.current.date(from: DateComponents(year: 2025, month: 2, day: 5))!: [.red],
-        Calendar.current.date(from: DateComponents(year: 2025, month: 2, day: 3))!: [.blue, .green,
+        Calendar.current.date(from: DateComponents(year: 2025, month: 3, day: 5))!: [.red],
+        Calendar.current.date(from: DateComponents(year: 2025, month: 3, day: 3))!: [.blue, .green,
+                                                                                     .blue, .orange,.yellow,.darkGray,.brown]
+    ]
+    
+    let markedDates2: [DateComponents: [UIColor]] = [
+        DateComponents(year: 2025, month: 3, day: 5): [.red],
+        DateComponents(year: 2025, month: 3, day: 3): [.blue, .green,
                                                                                      .blue, .orange,.yellow,.darkGray,.brown]
     ]
 
 
     var body: some View {
         VStack {
-            CalendarViewUIKit2(visibleDateComponents: $currentComponent, selection: $dateDate2)
-                .decorating(dateDate3, color: .red)
-                .decorating(dateDate3, color: .green)
-                .tint(.blue)
-                .frame(height: 450)
-//            CalendarViewUIKit(selectedDate: $selectedDate, events: markedDates)
-//                .tint(.mainRed)
+//            CalendarViewUIKit(visibleDateComponents: $currentComponent, selection: $dateDate2)
+//                .decorating(dateDate3, color: .red)
+//                .decorating(dateDate3, color: .green)
+//                .tint(.blue)
 //                .frame(height: 450)
+            CalendarViewUIKit(selectedDate: $selectedDate, events: markedDates2)
+                .tint(.mainRed)
+                .frame(height: 450)
         }
         .padding()
-    }
-    
-    func test () {
-        dateDate3
     }
 }
 

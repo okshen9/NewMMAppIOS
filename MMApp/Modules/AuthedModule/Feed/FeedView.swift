@@ -14,7 +14,7 @@ struct FeedView: View {
                     if viewModel.isLoading == false {
                         if !viewModel.payRequest.isEmptyOrNil || !viewModel.targets.isEmptyOrNil {
                             VStack(alignment: .leading) {
-                                CalendarViewUIKit(selectedDate: $selectedDate, events: markedDates) //$viewModel.eventsCalendar)
+                                CalendarViewUIKit(selectedDate: $selectedDate, events: markedDates2) //$viewModel.eventsCalendar)
                                     .tint(Color.red)
                                     .frame(height: 450)
                                     .padding(.horizontal, 24)
@@ -127,5 +127,11 @@ extension FeedView {
 let markedDates: [Date: [UIColor]] = [
     Calendar.current.date(from: DateComponents(year: 2025, month: 2, day: 5))!: [.red],
     Calendar.current.date(from: DateComponents(year: 2025, month: 2, day: 3))!: [.blue, .green,
+                                                                                 .blue, .orange,.yellow,.darkGray,.brown]
+]
+
+let markedDates2: [DateComponents: [UIColor]] = [
+    DateComponents(year: 2025, month: 3, day: 5): [.red],
+    DateComponents(year: 2025, month: 3, day: 3): [.blue, .green,
                                                                                  .blue, .orange,.yellow,.darkGray,.brown]
 ]
