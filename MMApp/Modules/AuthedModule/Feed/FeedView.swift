@@ -94,10 +94,10 @@ struct FeedView: View {
         
         
         if filteredEvents.isEmpty {
-                Spacer()
-                Text("У вас нет событий")
+                Text("У вас нет событий запланированных на выбранную дату")
                     .font(.headline)
                     .foregroundColor(.headerText)
+                    .padding(.horizontal, 16)
                 Spacer()
         } else {
             //        ScrollView {
