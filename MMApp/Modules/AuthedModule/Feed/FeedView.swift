@@ -1,20 +1,17 @@
 import SwiftUI
 
 struct FeedView: View {
-    @StateObject private var viewModel = FeedViewModel()
-    @State var selectedDate: Date?
-    
-
-
+    @StateObject var viewModel = FeedViewModel()
+    @State private var selectedDate: Date?
+    @State private var hashebleDate: Int? = Date().hashValue
     var body: some View {
-        
-            NavigationView {
-                ScrollView {
+        NavigationView {
+            ScrollView {
                 VStack {
                     if viewModel.isLoading == false {
-                        if !viewModel.payRequest.isEmptyOrNil || !viewModel.targets.isEmptyOrNil {
+                        if !viewModel.scheduleListItems.isEmpty {
                             VStack(alignment: .leading) {
-                                CalendarViewUIKit(selectedDate: $selectedDate, events: markedDates2) //$viewModel.eventsCalendar)
+                                CalendarViewUIKit(selectedDate: $selectedDate, events: viewModel.calendarComponetsItems)
                                     .tint(Color.red)
                                     .frame(height: 450)
                                     .padding(.horizontal, 24)
@@ -25,16 +22,21 @@ struct FeedView: View {
                                 
                             }
                             .navigationTitle(Text("Рассписание"))
+                            .toolbar(content: {
+                                Button("За все время", action: {
+                                    selectedDate = nil
+                                })
+                                .foregroundStyle(Color.mainRed)
+                            })
                         } else {
                             Spacer()
                             Text("У вас нет событий")
                                 .font(.headline)
                                 .foregroundColor(.headerText)
+                                .frame(width: .infinity, alignment: .center)
                             Spacer()
                         }
-                    }
-                    
-                    else {
+                    } else {
                         ShimmeringRectangle()
                             .frame(width: 350, height: 450)
                             .cornerRadius(44)
@@ -52,25 +54,21 @@ struct FeedView: View {
                             .cornerRadius(44)
                         Spacer()
                     }
-                    //        .padding(.top, 24)
-                    //        .frame(alignment: .leading)
-                    //        .background(Color.secondbackGraund)
-                    //        .cornerRadius(16)
                 }
             }
+            .scrollPosition(id: $hashebleDate, anchor: .top)
         }
-        .onChange(of: viewModel.eventsCalendar) {
+        .onChange(of: selectedDate) {
             print("change eventsCalendar: \($0)")
-            
+            hashebleDate = $0.hashValue
         }
         .onAppear {
-            viewModel.onApper()
+                        viewModel.onApper()
         }
-        
     }
     
     @ViewBuilder
-    func getCell2(event: EventMM) -> some View {
+    func getCell2(event: CalendatItem) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text(event.title)
@@ -90,25 +88,42 @@ struct FeedView: View {
     
     @ViewBuilder
     private func eventList2() -> some View {
-        // Фильтруем события по выбранной дате
-        let filteredEvents = viewModel.events.filter { selectedDate == nil || Calendar.current.isDate($0.key, inSameDayAs: selectedDate!) }
+        // Фильтруем события по выбранной дате (дню)
+        let filteredEvents = viewModel.scheduleListItems.filter { selectedDate == nil || Calendar.current.isDate($0.key, inSameDayAs: selectedDate!) }
 
-        LazyVStack {
-            // Преобразуем отфильтрованный словарь в массив кортежей и сортируем по дате
-            ForEach(filteredEvents.sorted(by: { $0.key < $1.key }), id: \.key) { date, events in
-                Section(header:
-                            Text("События за \(date.toDisplayString):")
-                    .foregroundColor(.headerText)
+        
+        
+        if filteredEvents.isEmpty {
+                Spacer()
+                Text("У вас нет событий")
                     .font(.headline)
-                ) {
-                    ForEach(events) { event in
-                        EventRowView(event: event)
-                    }
+                    .foregroundColor(.headerText)
+                Spacer()
+        } else {
+            //        ScrollView {
+            LazyVStack {
+                // Преобразуем отфильтрованный словарь в массив кортежей и сортируем по дате
+                ForEach(filteredEvents.sorted(by: { $0.key < $1.key }), id: \.key) { date, events in
+                    
+                    Section(header: Text("События за \(date.toDisplayString):")
+                        .foregroundColor(.headerText)
+                        .font(.headline)) {
+                            ForEach(events) { event in
+                                EventRowView(event: event)
+                            }
+                        }
+                        .id(date.hashValue)
                 }
             }
+            
+            .listStyle(.grouped)
+            //        }
+            
+            
+            .scrollDisabled(false)
+            .padding()
         }
-        .listStyle(.grouped)
-        .padding()
+        
         
     }
 }
@@ -121,7 +136,22 @@ extension FeedView {
 }
 
 #Preview {
-    FeedView()
+    FeedView(viewModel: FeedViewModel(
+        payRequest: [
+            PaymentRequestResponseDto(dueDate: Date().toApiString),
+            PaymentRequestResponseDto(dueDate: Date.nowWith(plus: 1).toApiString),
+            PaymentRequestResponseDto(dueDate: Date.nowWith(plus: 2).toApiString),
+            PaymentRequestResponseDto(dueDate: Date.nowWith(plus: 3).toApiString)
+        ],
+        targets: [
+            UserTargetDtoModel(deadLineDateTime: Date.nowWith(plus: 1).toApiString),
+            UserTargetDtoModel(deadLineDateTime: Date.nowWith(plus: 2).toApiString),
+            UserTargetDtoModel(deadLineDateTime: Date.nowWith(plus: 3).toApiString),
+            UserTargetDtoModel(deadLineDateTime: Date.nowWith(plus: 4).toApiString),
+            UserTargetDtoModel(deadLineDateTime: Date.nowWith(plus: 6).toApiString)
+        ]
+    )
+    )
 }
 
 let markedDates: [Date: [UIColor]] = [

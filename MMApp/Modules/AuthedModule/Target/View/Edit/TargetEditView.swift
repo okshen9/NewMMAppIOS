@@ -45,7 +45,7 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                 
                 Text("Подцели")
                     .font(.title3.weight(.medium))
-                    .foregroundStyle(Color.gray.opacity(0.9))
+                    .foregroundStyle(Color.black.opacity(0.9))
                 subTargetsSection()
                 
             }

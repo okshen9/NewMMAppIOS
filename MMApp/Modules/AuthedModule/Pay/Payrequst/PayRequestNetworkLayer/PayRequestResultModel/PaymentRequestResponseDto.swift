@@ -26,6 +26,32 @@ struct PaymentRequestResponseDto: Codable {
         self.paymentRequestStatus = try container.decodeIfPresent(PaymentRequestStatus.self, forKey: .paymentRequestStatus)
         self.userProfilePreview = try container.decodeIfPresent(UserProfileResultDto.self, forKey: .userProfilePreview)
     }
+    
+    init(id: Int? = nil,
+         externalId: Int? = nil,
+         amount: Double? = nil,
+         dueDate: String? = nil,
+         comment: String? = nil,
+         paymentRequestStatus: PaymentRequestStatus? = nil,
+         userProfilePreview: UserProfileResultDto? = nil) {
+        self.id = id
+        self.externalId = externalId ?? .random(in: 1...100)
+        self.amount = amount ?? .random(in: 1000...100000)
+        self.dueDate = dueDate ?? Date.nowWith(plus: .random(in: 0...10)).toApiString
+        self.comment = comment ?? "Какой-то комент"
+        self.paymentRequestStatus = paymentRequestStatus ?? PaymentRequestStatus.overdue
+        self.userProfilePreview = userProfilePreview ?? UserRepository.shared.userProfile
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }
 
 enum PaymentRequestStatus: String, Codable, UnknownCasedEnum {

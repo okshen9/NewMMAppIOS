@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct EventRowView: View {
-    let event: EventMM
+    let event: CalendatItem
 
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text(event.title)
                     .font(.headline)
+                    .foregroundColor(.headerText)
                 Text(event.type.name)
                     .font(.subheadline)
                     .foregroundColor(.gray)

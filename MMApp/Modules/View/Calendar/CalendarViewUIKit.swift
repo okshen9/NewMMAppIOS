@@ -21,13 +21,22 @@ struct CalendarViewUIKit: UIViewRepresentable {
         return calendarView
     }
 
-    func updateUIView(_ uiView: UICalendarView, context: Context) {}
+    func updateUIView(_ uiView: UICalendarView, context: Context) {
+        // Синхронизация выбранной даты в UICalendarView с selectedDate
+        if let selectedDate = selectedDate {
+            let dateComponents = Calendar.current.dateComponents([.year, .month, .day], from: selectedDate)
+            (uiView.selectionBehavior as? UICalendarSelectionSingleDate)?.setSelected(dateComponents, animated: true)
+        } else {
+            // Если selectedDate стало nil, сбрасываем выбор даты
+            (uiView.selectionBehavior as? UICalendarSelectionSingleDate)?.setSelected(nil, animated: true)
+        }
+    }
 
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
 
-    class Coordinator: NSObject, UICalendarViewDelegate, UICalendarSelectionSingleDateDelegate {
+    class Coordinator: NSObject, UICalendarViewDelegate, UICalendarSelectionSingleDateDelegate, SubscriptionStore {
         var parent: CalendarViewUIKit
 
         init(_ parent: CalendarViewUIKit) {
@@ -132,6 +141,11 @@ struct CustomCalendarView: View {
 //                .decorating(dateDate3, color: .green)
 //                .tint(.blue)
 //                .frame(height: 450)
+            Button("text", action: {
+                print("govno")
+                selectedDate = nil
+            })
+            .background(.green)
             CalendarViewUIKit(selectedDate: $selectedDate, events: markedDates2)
                 .tint(.mainRed)
                 .frame(height: 450)

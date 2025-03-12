@@ -83,3 +83,10 @@ extension Date? {
         set { self = newValue }
     }
 }
+
+
+extension Date {
+    static func nowWith(plus days: Int) -> Date {
+        return Date().addingTimeInterval(3600.0 * 24 * Double(days))
+    }
+}

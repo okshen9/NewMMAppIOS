@@ -496,13 +496,10 @@ extension Date {
                                                               timeZone: .init(identifier: "Europe/Moscow")))
     }
     
-    /// Компонетны даты год, месяц, день
-    var dateComponents: DateComponents {
-        let calendar = Calendar.current
-        return calendar.dateComponents([.year, .month, .day], from: self)
-    }
-    
-    /// Компонетны даты год, месяц, день или кастомные
+    /// Компонетны даты DateComponents [.year, .month, .day]
+    /// - Parameters:
+    ///   - dateComponents: необходимые компоненты, по дефолту: c
+    /// - Returns: DateComponents
     func dateComponentsFor(_ dateComponents: Set<Calendar.Component> = [.year, .month, .day]) -> DateComponents {
         let calendar = Calendar.current
         return calendar.dateComponents(dateComponents, from: self)
@@ -510,7 +507,7 @@ extension Date {
 }
 
 extension DateComponents {
-    // Проверка совпадения по [.year, .month, .day] или кастомниму
+    /// Проверка совпадения по [.year, .month, .day] или кастомниму
     func equalDate(_ toComponents: DateComponents, _ forComponents: Set<Calendar.Component> = [.year, .month, .day]) -> Bool {
         var isEquals: [Bool] = []
         for component in forComponents {

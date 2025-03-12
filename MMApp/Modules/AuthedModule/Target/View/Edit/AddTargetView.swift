@@ -25,8 +25,7 @@ struct AddTargetView: View {
     @State private var newSubTargetDeadline: Date = Date()
     
     var body: some View {
-        // Neshkotodo
-//        Text("sdsds")
+        // Neshko TODO
         NavigationView {
             Form {
                 // Секция для основной цели
