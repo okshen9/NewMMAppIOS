@@ -1,167 +1,55 @@
+//
+//  FeedView.swift
+//  MMApp
+//
+//  Created by artem on 13.03.2025.
+//
+
 import SwiftUI
 
 struct FeedView: View {
-    @StateObject var viewModel = FeedViewModel()
-    @State private var selectedDate: Date?
-    @State private var hashebleDate: Int? = Date().hashValue
+    @StateObject private var viewModel = FeedViewModel()
+    
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack {
-                    if viewModel.isLoading == false {
-                        if !viewModel.scheduleListItems.isEmpty {
-                            VStack(alignment: .leading) {
-                                CalendarViewUIKit(selectedDate: $selectedDate, events: viewModel.calendarComponetsItems)
-                                    .tint(Color.red)
-                                    .frame(height: 450)
-                                    .padding(.horizontal, 24)
-                                    .padding(.top, 24)
-                                eventList2()
-                                    .padding()
-                                Spacer()
-                                
-                            }
-                            .navigationTitle(Text("Рассписание"))
-                            .toolbar(content: {
-                                Button("За все время", action: {
-                                    selectedDate = nil
-                                })
-                                .foregroundStyle(Color.mainRed)
-                            })
-                        } else {
-                            Spacer()
-                            Text("У вас нет событий")
-                                .font(.headline)
-                                .foregroundColor(.headerText)
-                                .frame(width: .infinity, alignment: .center)
-                            Spacer()
-                        }
-                    } else {
-                        ShimmeringRectangle()
-                            .frame(width: 350, height: 450)
-                            .cornerRadius(44)
-                        
-                        ShimmeringRectangle()
-                            .frame(width: 350, height: 50)
-                            .cornerRadius(44)
-                        
-                        ShimmeringRectangle()
-                            .frame(width: 350, height: 50)
-                            .cornerRadius(44)
-                        
-                        ShimmeringRectangle()
-                            .frame(width: 350, height: 50)
-                            .cornerRadius(44)
-                        Spacer()
-                    }
-                }
+        VStack {
+            if viewModel.isLoading {
+                shimerState()
+            } else {
+                Text("isLoading: \(viewModel.isLoading)")
             }
-            .scrollPosition(id: $hashebleDate, anchor: .top)
-        }
-        .onChange(of: selectedDate) {
-            print("change eventsCalendar: \($0)")
-            hashebleDate = $0.hashValue
         }
         .onAppear {
-                        viewModel.onApper()
+            viewModel.onApper()
         }
     }
     
+    // MARK: - ViewBuilder
     @ViewBuilder
-    func getCell2(event: CalendatItem) -> some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(event.title)
-                    .font(.headline)
-                Text(event.type.name)
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-            }
+    func shimerState() -> some View {
+        VStack(spacing: 20) {
+            ShimmeringRectangle()
+                .frame(width: 88, height: 88)
+                .cornerRadius(44)
+            
+            ShimmeringRectangle()
+                .frame(height: 20)
+                .cornerRadius(8)
+            
+            ShimmeringRectangle()
+                .frame(height: 20)
+                .cornerRadius(8)
+                .padding(.horizontal, 40)
+            
+            ShimmeringRectangle()
+                .frame(height: 40)
+                .cornerRadius(8)
+                .padding(.top, 20)
             Spacer()
-            Circle()
-                .fill(Color(event.type.color))
-                .frame(width: 10, height: 10)
         }
-        .padding(.vertical, 8)
-    }
-    
-    
-    @ViewBuilder
-    private func eventList2() -> some View {
-        // Фильтруем события по выбранной дате (дню)
-        let filteredEvents = viewModel.scheduleListItems.filter { selectedDate == nil || Calendar.current.isDate($0.key, inSameDayAs: selectedDate!) }
-
-        
-        
-        if filteredEvents.isEmpty {
-                Text("У вас нет событий запланированных на выбранную дату")
-                    .font(.headline)
-                    .foregroundColor(.headerText)
-                    .padding(.horizontal, 16)
-                Spacer()
-        } else {
-            //        ScrollView {
-            LazyVStack {
-                // Преобразуем отфильтрованный словарь в массив кортежей и сортируем по дате
-                ForEach(filteredEvents.sorted(by: { $0.key < $1.key }), id: \.key) { date, events in
-                    
-                    Section(header: Text("События за \(date.toDisplayString):")
-                        .foregroundColor(.headerText)
-                        .font(.headline)) {
-                            ForEach(events) { event in
-                                EventRowView(event: event)
-                            }
-                        }
-                        .id(date.hashValue)
-                }
-            }
-            
-            .listStyle(.grouped)
-            //        }
-            
-            
-            .scrollDisabled(false)
-            .padding()
-        }
-        
-        
-    }
-}
-
-// MARK: - Constants
-extension FeedView {
-    private enum Constants {
-        static let title = "Выберите карту"
+        .padding(.horizontal, 16)
     }
 }
 
 #Preview {
-    FeedView(viewModel: FeedViewModel(
-        payRequest: [
-            PaymentRequestResponseDto(dueDate: Date().toApiString),
-            PaymentRequestResponseDto(dueDate: Date.nowWith(plus: 1).toApiString),
-            PaymentRequestResponseDto(dueDate: Date.nowWith(plus: 2).toApiString),
-            PaymentRequestResponseDto(dueDate: Date.nowWith(plus: 3).toApiString)
-        ],
-        targets: [
-            UserTargetDtoModel(deadLineDateTime: Date.nowWith(plus: 1).toApiString),
-            UserTargetDtoModel(deadLineDateTime: Date.nowWith(plus: 2).toApiString),
-            UserTargetDtoModel(deadLineDateTime: Date.nowWith(plus: 3).toApiString),
-            UserTargetDtoModel(deadLineDateTime: Date.nowWith(plus: 4).toApiString),
-            UserTargetDtoModel(deadLineDateTime: Date.nowWith(plus: 6).toApiString)
-        ]
-    )
-    )
+    FeedView()
 }
-
-let markedDates: [Date: [UIColor]] = [
-    Calendar.current.date(from: DateComponents(year: 2025, month: 2, day: 5))!: [.red],
-    Calendar.current.date(from: DateComponents(year: 2025, month: 2, day: 3))!: [.blue, .green,
-                                                                                 .blue, .orange,.yellow,.darkGray,.brown]
-]
-
-let markedDates2: [DateComponents: [UIColor]] = [
-    DateComponents(year: 2025, month: 3, day: 5): [.red],
-    DateComponents(year: 2025, month: 3, day: 3): [.blue, .green,
-                                                                                 .blue, .orange,.yellow,.darkGray,.brown]
-]

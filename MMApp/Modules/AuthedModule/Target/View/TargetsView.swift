@@ -66,7 +66,7 @@ struct TargetsView: View {
                 }
             }
             .sheet(isPresented: $showAddTarget) {
-                TargetEditView<TargetsViewModel>(target: UserTargetDtoModel())
+                TargetEditView<TargetsViewModel>(target: UserTargetDtoModel(), isCreateTarget: true)
             }
             .onAppear {
                 if viewModel.targets.isEmpty {

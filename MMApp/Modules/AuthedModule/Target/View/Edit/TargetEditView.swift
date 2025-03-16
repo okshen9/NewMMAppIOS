@@ -8,7 +8,7 @@
 import SwiftUI
 
 protocol TargetEditViewProtocol: ObservableObject {
-    func editTarget(_ target: UserTargetDtoModel) async -> UserTargetDtoModel?
+    func saveTarget(_ target: UserTargetDtoModel, isCreateTarget: Bool) async -> UserTargetDtoModel?
 }
 
 struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
@@ -18,10 +18,12 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
     @State var isLoading = false
     
     var target: UserTargetDtoModel
+    var isCreateTarget: Bool
     @State private var newTarget: UserTargetDtoModel
     
-    init(target: UserTargetDtoModel) {
+    init(target: UserTargetDtoModel, isCreateTarget: Bool) {
         self.target = target
+        self.isCreateTarget = isCreateTarget
         _newTarget = State(initialValue: target)
     }
     
@@ -54,7 +56,6 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
     
     @ViewBuilder
     func subTargetsSection() -> some View {
-        
         List {
             ForEach($newTarget.subTargets.orDefault([]), id: \.creationDateTime) { $item in
                 SubTargetEditView(subTarget: $item)
@@ -68,12 +69,12 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                         .tint(.red)
                     }
             }
-            
-            
-
         }
+        
         Button(action: {
-            
+            if newTarget.subTargets == nil {
+                newTarget.subTargets = []
+            }
             newTarget.subTargets?.append(UserSubTargetDtoModel(title: "", description: "", targetSubStatus: .notDone, rootTargetId: target.id, creationDateTime: Date.now.toApiString, deadLineDateTime: Date.now.toApiString))
             print("Добавить \(newTarget.subTargets?.count)")
         }, label: {
@@ -115,7 +116,7 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                     ///SAVE
                     isLoading = true
                     Task {
-                        if await viewModelEnvironment.editTarget(newTarget) != nil {
+                        if await viewModelEnvironment.saveTarget(newTarget, isCreateTarget: isCreateTarget) != nil {
                             
                             isLoading = false
                             ToastManager.shared.show(
@@ -153,7 +154,7 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
     TargetEditView<TargetsViewModel>(target: .init(title: "Test",
                                                    targetStatus: .inProgress,
                                                    subTargets: [.init(title: "TestSub", targetSubStatus: .notDone, creationDateTime: Date.now.toApiString)]
-                                                  ))
+                                                  ), isCreateTarget: false)
         .environmentObject(TargetsViewModel())
 }
 

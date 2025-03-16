@@ -29,7 +29,7 @@ struct UserSubTargetDtoModel: Codable, JSONRepresentable, Identifiable {
     /// Срок выполнения подцели
     var deadLineDateTime: String?
     
-    init(id: Int? = nil, title: String? = nil, description: String? = nil, subTargetPercentage: Double? = nil, targetSubStatus: TargetSubStatus? = nil, rootTargetId: Int? = nil, isDeleted: Bool? = nil, creationDateTime: String? = nil, lastUpdatingDateTime: String? = nil, deadLineDateTime: String? = nil) {
+    init(id: Int? = nil, title: String? = "", description: String? = nil, subTargetPercentage: Double? = 0.0, targetSubStatus: TargetSubStatus? = .notDone, rootTargetId: Int? = nil, isDeleted: Bool? = nil, creationDateTime: String? = nil, lastUpdatingDateTime: String? = nil, deadLineDateTime: String? = nil) {
         self.id = id
         self.title = title
         self.description = description

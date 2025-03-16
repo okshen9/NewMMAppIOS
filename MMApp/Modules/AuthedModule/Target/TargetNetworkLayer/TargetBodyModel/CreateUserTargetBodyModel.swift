@@ -11,7 +11,7 @@ struct CreateUserTargetBodyModel: JSONRepresentable {
     let title: String?
     let description: String?
     let userExternalId: Int?
-    let deadLineDateTime: Date?
+    let deadLineDateTime: String?
     let streamId: Int?
     let subTargets: [CreateSubTargetBodyModel]?
     let category: TargetCategory?

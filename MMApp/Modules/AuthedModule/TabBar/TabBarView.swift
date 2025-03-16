@@ -13,7 +13,18 @@ struct TabBarView: View {
                 .withToast()
         } else {
             TabView(selection: $selectedTab) {
-                FeedView()
+//                FeedView()
+//                    .tabItem {
+//                        Image(ImageResource.pay)
+//                            .renderingMode(.template)
+//                            .foregroundColor(selectedTab == 0 ? Color.mainRed : Color.tabbarSecond)
+//                        
+//                        Text("Главная")
+//                            .foregroundColor(selectedTab == 0 ? Color.mainRed : Color.tabbarSecond)
+//                    }
+//                    .tag(3)
+                
+                SchedulerView()
                     .tabItem {
                         Image(.MM)
                             .renderingMode(.template)
@@ -32,7 +43,7 @@ struct TabBarView: View {
 //                        Text("Поиск")
 //                            .foregroundColor(selectedTab == 1 ? Color.mainRed : Color.tabbarSecond)
 //                    }
-//                    .tag(1)
+//                    .tag(5)
                 
                 TargetsView()
                     .tabItem {

@@ -51,14 +51,16 @@ struct UserTargetDtoModel: Codable, JSONRepresentable, Identifiable {
     }
     
     init(id: Int? = nil, title: String? = nil, description: String? = nil, userExternalId: Int? = nil, percentage: Double? = nil, deadLineDateTime: String? = nil, streamId: Int? = nil, targetStatus: TargetStatus? = nil, subTargets: [UserSubTargetDtoModel]? = nil, isDeleted: Bool? = nil, creationDateTime: String? = nil, lastUpdatingDateTime: String? = nil, category: TargetCategory? = nil) {
+        Date()
+        
         self.id = id
-        self.title = title ?? "какой-то тайтл"
-        self.description = description ?? "какой-то описание"
-        self.userExternalId = userExternalId ?? .random(in: 1...10000)
-        self.percentage = percentage ?? .random(in: 0...100)
-        self.deadLineDateTime = deadLineDateTime ?? Date.nowWith(plus: .random(in: 0...10)).toApiString
-        self.streamId = streamId ?? .random(in: 1...10000)
-        self.targetStatus = targetStatus ?? .expired
+        self.title = title.orEmpty
+        self.description = description.orEmpty
+        self.userExternalId = userExternalId ?? UserRepository.shared.externalId
+        self.percentage = percentage ?? 0
+        self.deadLineDateTime = deadLineDateTime ?? Date().toApiString
+        self.streamId = streamId ?? 0
+        self.targetStatus = targetStatus ?? .draft
         self.subTargets = subTargets ?? .none
         self.isDeleted = isDeleted ?? false
         self.creationDateTime = creationDateTime ?? deadLineDateTime ?? Date.nowWith(plus: .random(in: 0...10)).toApiString

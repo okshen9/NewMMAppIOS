@@ -1,41 +1,12 @@
 //
-//  EnumTargetType.swift
+//  TargetStatus.swift
 //  MMApp
 //
-//  Created by artem on 16.02.2025.
+//  Created by artem on 15.03.2025.
 //
 
 import Foundation
 import SwiftUICore
-
-/// Категории задач
-enum TargetCategory: String, UnknownCasedEnum, JSONRepresentable, CaseIterable, Equatable, Identifiable {
-    case money = "Бизнес"
-    case personal = "Личное"
-    case family = "Семья"
-    case health = "Здоровье"
-    case other = "Свободная тема"
-    case unknown = "unknown"
-    
-    var id: String { rawValue }
-    
-    var color: Color {
-        switch self {
-        case .money:
-                .yellow
-        case .personal:
-                .blue
-        case .family:
-                .mainRed
-        case .health:
-                .green
-        case .unknown:
-                .purple
-        case .other:
-                .cyan
-        }
-    }
-}
 
 enum TargetStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable, Equatable {
     /// Цель успешно завершена в срок.
@@ -99,44 +70,6 @@ enum TargetStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable, Eq
         case .draft, .expired, .inProgress, .cancelled:
             false
         default:
-            false
-        }
-    }
-}
-
-
-enum TargetSubStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable, Equatable {
-    // Для целей и подцелей
-    /// Подцель не выполнена
-    case notDone = "NOT_DONE"
-    /// Цель успешно завершена в срок.
-    case done = "DONE"
-    
-    
-    // Другие
-    case unknown = "unknown"
-    
-
-    var title: String {
-        switch self {
-        case .unknown:
-            return "инзвестно"
-        case .done:
-            return "Завершене"
-        case .notDone:
-            return "Не завершена"
-        }
-    }
-    
-    mutating func changeSelfStatus() {
-        self = self == .done ? .notDone : .done
-    }
-    
-    var isDone: Bool {
-        return switch self {
-        case .done:
-            true
-        case .notDone, .unknown:
             false
         }
     }

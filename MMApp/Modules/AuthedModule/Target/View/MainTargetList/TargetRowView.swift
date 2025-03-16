@@ -118,7 +118,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
             .buttonStyle(.plain)
             .contentShape(Rectangle())
             .sheet(isPresented: $isEditing) {
-                TargetEditView<TargetsViewModel>(target: target)
+                TargetEditView<TargetsViewModel>(target: target, isCreateTarget: false)
             }
             let statusText: (String, Color) = switch target.targetStatus ?? .draft {
             case .draft, .unknown: ("На рассмотрении", .orange)

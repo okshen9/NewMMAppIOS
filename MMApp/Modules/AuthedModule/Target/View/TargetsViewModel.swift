@@ -28,7 +28,6 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
     init(targets: [UserTargetDtoModel] = [], isLoading: Bool = false, errorMessage: String? = nil) {
         self.targets = targets.sorted { ($0.id ?? 0 < $1.id  ?? 1) }
         self.isLoading = isLoading
-        
         $targets
             .map { targets in
                 Dictionary(grouping: targets, by: { $0.category ?? .unknown })
@@ -40,22 +39,66 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
             .store(in: &subscriptions)
     }
     
-    func editTarget(_ target: UserTargetDtoModel) async -> UserTargetDtoModel? {
-            do {
-                let updatedTarget = try await networkService.updateTargetAll(model: target)
-                
-                let targets = try await networkService.getUserTargets(externalId: (UserRepository.shared.userProfile?.externalId) ?? 0).userTargets
-                guard !targets.isNil else { return nil }
-                DispatchQueue.main.async { [weak self] in
-                    withAnimation {
-                        self?.targets = targets ?? []
-                    }
+    func saveTarget(_ target: UserTargetDtoModel, isCreateTarget: Bool) async -> UserTargetDtoModel? {
+        if isCreateTarget {
+            return await createTarget(target)
+        } else {
+            return await editTarget(target)
+        }
+    }
+    
+    private func editTarget(_ target: UserTargetDtoModel) async -> UserTargetDtoModel? {
+        do {
+            let updatedTarget = try await networkService.updateTargetAll(model: target)
+            
+            let targets = try await networkService.getUserTargets(externalId: (UserRepository.shared.userProfile?.externalId) ?? 0).userTargets
+            guard !targets.isNil else { return nil }
+            DispatchQueue.main.async { [weak self] in
+                withAnimation {
+                    self?.targets = targets ?? []
                 }
-                return updatedTarget
-            } catch {
-                print(error.localizedDescription)
-                return nil
             }
+            return updatedTarget
+        } catch {
+            print(error.localizedDescription)
+            return nil
+        }
+    }
+    
+    private func createTarget(_ target: UserTargetDtoModel) async -> UserTargetDtoModel? {
+        do {
+            let createSubTarget = target.subTargets?.map { CreateSubTargetBodyModel(
+                title: $0.title,
+                description: $0.description,
+                subTargetPercentage: $0.subTargetPercentage,
+                deadLineDateTime: $0.deadLineDateTime,
+                targetSubStatus: $0.targetStatus)
+            }
+            
+            let createTargetBodyModel: CreateUserTargetBodyModel = .init(
+                title: target.title,
+                description: target.description,
+                userExternalId: target.userExternalId,
+                deadLineDateTime: target.deadLineDateTime,
+                streamId: target.streamId,
+                subTargets: createSubTarget,
+                category: target.category
+                
+            )
+            let updatedTarget = try await networkService.createUserTarget(model: createTargetBodyModel)
+            
+            let targets = try await networkService.getUserTargets(externalId: (UserRepository.shared.userProfile?.externalId) ?? 0).userTargets
+            guard !targets.isNil else { return nil }
+            DispatchQueue.main.async { [weak self] in
+                withAnimation {
+                    self?.targets = targets ?? []
+                }
+            }
+            return updatedTarget
+        } catch {
+            print(error.localizedDescription)
+            return nil
+        }
     }
     
     /// Загружает

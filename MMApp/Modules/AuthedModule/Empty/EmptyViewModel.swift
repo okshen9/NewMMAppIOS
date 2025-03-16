@@ -6,6 +6,8 @@ class EmptyViewModel: ObservableObject {
     struct Input {
         @State var title: String = Constants.title
     }
+    
+    let servise: EventsServiceProtocol = ServiceBuilder()
 
     // MARK: - Private properties
     private let apiFactory = APIFactory.global
