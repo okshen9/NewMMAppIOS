@@ -21,7 +21,6 @@ struct SchedulerView: View {
                                 Spacer()
                                 
                             }
-                            .navigationTitle(Text("Рассписание"))
                             .toolbar(content: {
                                 Button("За все время", action: {
                                     selectedDate = nil
@@ -55,15 +54,17 @@ struct SchedulerView: View {
                         Spacer()
                     }
                 }
+                
             }
+            .navigationTitle(Text("Рассписание"))
             .scrollPosition(id: $hashebleDate, anchor: .top)
         }
-        .onChange(of: selectedDate) {
-            print("change eventsCalendar: \($0)")
-            hashebleDate = $0.hashValue
+        .onChange(of: selectedDate) { oldState, newState in
+            print("change eventsCalendar: \(newState)")
+            hashebleDate = newState.hashValue
         }
         .onAppear {
-                        viewModel.onApper()
+            viewModel.onApper()
         }
     }
     

@@ -13,8 +13,13 @@ struct EventDTO: Codable, JSONRepresentable {
     let startDate: String?
     let endDate: String?
     let type: String?
+    /// автор эвента
     let creatorExternalId: String?
+    /// кому названем евент
     let assigneeExternalIds: [String]?
+    /// сучноть к которой он привязан (паймент/таска/стрим) определяется по типу
     let issueId: Int?
     let description: String?
+    /// дата для отображения
+    let displayDate: String?
 }

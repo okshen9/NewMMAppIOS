@@ -83,9 +83,17 @@ extension APIDataTasksBuilder {
                     var request = request
                     let newRequest = setTokensToRequest(&request, authTokens: newToken)
                     return try await buildDataTask(newRequest, allowRetry: false)
-
                 } catch {
-                    throw ResponseError.invalidToken
+                    refreshManager.clearAll()
+                    await MainActor.run {
+                        let newViewController = AuthVC()
+                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                           let window = windowScene.windows.first {
+                            window.rootViewController = newViewController
+                            UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: {}, completion: nil)
+                        }
+                    }
+                    throw ResponseError.invalidRefreshToken
                 }
             }
         case 402:

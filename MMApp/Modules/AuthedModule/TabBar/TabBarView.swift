@@ -13,31 +13,30 @@ struct TabBarView: View {
                 .withToast()
         } else {
             TabView(selection: $selectedTab) {
-//                FeedView()
-//                    .tabItem {
-//                        Image(ImageResource.pay)
-//                            .renderingMode(.template)
-//                            .foregroundColor(selectedTab == 0 ? Color.mainRed : Color.tabbarSecond)
-//                        
-//                        Text("Главная")
-//                            .foregroundColor(selectedTab == 0 ? Color.mainRed : Color.tabbarSecond)
-//                    }
-//                    .tag(3)
-                
-                SchedulerView()
+                FeedView()
                     .tabItem {
                         Image(.MM)
                             .renderingMode(.template)
                             .foregroundColor(selectedTab == 0 ? Color.mainRed : Color.tabbarSecond)
-                        
                         Text("Главная")
                             .foregroundColor(selectedTab == 0 ? Color.mainRed : Color.tabbarSecond)
                     }
                     .tag(0)
                 
+                SchedulerView()
+                    .tabItem {
+                        Image(.calendar)
+                            .renderingMode(.template)
+                            .foregroundColor(selectedTab == 0 ? Color.mainRed : Color.tabbarSecond)
+                        
+                        Text("Рассписание")
+                            .foregroundColor(selectedTab == 0 ? Color.mainRed : Color.tabbarSecond)
+                    }
+                    .tag(1)
+                
 //                EmptyView()
 //                    .tabItem {
-//                        Image(.search)
+//                Image(ImageResource.search)
 //                            .renderingMode(.template)
 //                            .foregroundColor(selectedTab == 1 ? Color.mainRed : Color.tabbarSecond)
 //                        Text("Поиск")

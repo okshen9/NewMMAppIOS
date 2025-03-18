@@ -15,6 +15,7 @@ public enum ResponseError: Error {
     case response(response: HTTPURLResponse, responseData: Data, statusCode: Int, decoder: JSONDecoder)
     case mapping(response: HTTPURLResponse, error: Error, stringData: String)
     case invalidToken
+    case invalidRefreshToken
     
     public var statusCode: Int? {
         switch self {
@@ -62,6 +63,8 @@ extension ResponseError {
             return error.message ?? "error message is empty"
         case .invalidToken:
             return "invalidToken"
+        case .invalidRefreshToken:
+            return "invalidRefreshToken"
         }
     }
 
@@ -81,6 +84,8 @@ extension ResponseError {
             return nil
         case .invalidToken:
             return "invalidToken"
+        case .invalidRefreshToken:
+            return "invalidRefreshToken"
         }
     }
 }

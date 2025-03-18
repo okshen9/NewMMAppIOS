@@ -10,7 +10,7 @@ struct EmptyView: View {
                 .foregroundColor(.mainRed)
             Button(action: {
                 Task {
-                    let createEvent = try? await servise.createEvent(model: EventDTO(id: nil, title: "test", startDate: Date().toApiString, endDate: Date().toApiString, type: "nil", creatorExternalId: "11", assigneeExternalIds: ["11"], issueId: 1, description: "test"))
+                    let createEvent = try? await servise.createEvent(model: EventDTO(id: nil, title: "test", startDate: Date().toApiString, endDate: Date().toApiString, type: "nil", creatorExternalId: "11", assigneeExternalIds: ["11"], issueId: 1, description: "test", displayDate: nil))
                 }
             }, label: {
                 Text("createEvent")
@@ -26,7 +26,7 @@ struct EmptyView: View {
             
             Button(action: {
                 Task {
-                    let createEvent = try? await servise.updateEvent(id: 1, model: EventDTO(id: nil, title: "test", startDate: Date().toApiString, endDate: Date().toApiString, type: "nil", creatorExternalId: "11", assigneeExternalIds: ["11"], issueId: 1, description: "test"))
+                    let createEvent = try? await servise.updateEvent(id: 1, model: EventDTO(id: nil, title: "test", startDate: Date().toApiString, endDate: Date().toApiString, type: "nil", creatorExternalId: "11", assigneeExternalIds: ["11"], issueId: 1, description: "test", displayDate: nil))
                 }
             }, label: {
                 Text("updateEvent")
