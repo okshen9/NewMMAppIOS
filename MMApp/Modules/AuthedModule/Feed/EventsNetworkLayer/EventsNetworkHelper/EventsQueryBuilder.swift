@@ -105,24 +105,50 @@ struct EventsQuery {
         case targetDone
         case targetInProgress
         case anyValue(String)
-        
+
+        var name: String {
+            switch self {
+            case .targetExpired: return Costants.Name.TARGET_EXPIRED.rawValue
+            case .targetExpiredDone: return Costants.Name.TARGET_EXPIRED_DONE.rawValue
+            case .targetDone: return Costants.Name.TARGET_DONE.rawValue
+            case .targetInProgress: return Costants.Name.TARGET_IN_PROGRESS.rawValue
+            case .anyValue(let value): return value
+            }
+        }
+
         init (rawValue: String) {
             switch rawValue {
-                case "TARGER_EXPIRED": self = .targetExpired
-            case "TARGER_EXPIRED_DONE": self = .targetExpiredDone
-            case "TARGER_DONE": self = .targetDone
-            case "TARGER_IN_PROGRESS": self = .targetInProgress
+            case Costants.Key.TARGET_EXPIRED: self = .targetExpired
+            case Costants.Key.TARGET_EXPIRED_DONE: self = .targetExpiredDone
+            case Costants.Key.TARGET_DONE: self = .targetDone
+            case Costants.Key.TARGET_IN_PROGRESS: self = .targetInProgress
             default: self = .anyValue(rawValue)
             }
         }
-        
+
         var rawValue: String {
             switch self {
-            case .targetExpired: return "TARGER_EXPIRED"
-            case .targetExpiredDone: return "TARGER_EXPIRED_DONE"
-            case .targetDone: return "TARGER_DONE"
-            case .targetInProgress: return "TARGER_IN_PROGRESS"
+            case .targetExpired: return Costants.Key.TARGET_EXPIRED
+            case .targetExpiredDone: return Costants.Key.TARGET_EXPIRED_DONE
+            case .targetDone: return Costants.Key.TARGET_DONE
+            case .targetInProgress: return Costants.Key.TARGET_IN_PROGRESS
             case .anyValue(let value): return value
+            }
+        }
+
+        enum Costants {
+            enum Key {
+                static let TARGET_EXPIRED = "TARGET_EXPIRED"
+                static let TARGET_EXPIRED_DONE = "TARGET_EXPIRED_DONE"
+                static let TARGET_DONE = "TARGET_DONE"
+                static let TARGET_IN_PROGRESS = "TARGET_IN_PROGRESS"
+            }
+
+            enum Name: String {
+                case TARGET_EXPIRED = "Цель просрочена"
+                case TARGET_EXPIRED_DONE = "Цель завершена с просрочкой"
+                case TARGET_DONE = "Цель завершена"
+                case TARGET_IN_PROGRESS = "Цель в работе"
             }
         }
     }

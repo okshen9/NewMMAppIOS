@@ -18,7 +18,7 @@ public extension Binding {
 }
 
 public extension Binding {
-    public func orDefault<T>(_ defaultValue: T) -> Binding<T> where Value == T? {
+    func orDefault<T>(_ defaultValue: T) -> Binding<T> where Value == T? {
         return Binding<T>(
             get: { self.wrappedValue ?? defaultValue },
             set: { self.wrappedValue = $0 }

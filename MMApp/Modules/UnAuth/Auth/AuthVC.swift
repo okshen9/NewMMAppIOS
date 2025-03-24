@@ -290,8 +290,12 @@ extension AuthVC {
     enum Constants {
         static let queryParamQuestion = "#"
         static let tgAuthResult = "tgAuthResult="
-        static let tgBotdev = "https://oauth.telegram.org/auth?bot_id=7585753405&origin=http%3A%2F%2F194.87.93.98&embed=1&return_to=http%3A%2F%2F194.87.93.98%2Fauth%2Fauthentication"
-        static let tgBotLocalHost = "https://oauth.telegram.org/auth?bot_id=7621034824&origin=http%3A%2F%2F127.0.0.1&embed=1&return_to=http%3A%2F%2F127.0.0.1%2Fauth%2Fauthentication"
+//        static let tgBotdev = "https://oauth.telegram.org/auth?bot_id=7585753405&origin=http%3A%2F%2F194.87.93.98&embed=1&return_to=http%3A%2F%2F194.87.93.98%2Fauth%2Fauthentication"
+
+        static let tgBotdev = "https://oauth.telegram.org/auth?bot_id=7585753405&origin=https%3A%2F%2Fappmastermind.ru&embed=1&return_to=http%3A%2F%2Fappmastermind.ru%2Fauth%2Fauthentication"
+
+//        appmastermind.ru
+//        static let tgBotLocalHost = "https://oauth.telegram.org/auth?bot_id=7621034824&origin=http%3A%2F%2F127.0.0.1&embed=1&return_to=http%3A%2F%2F127.0.0.1%2Fauth%2Fauthentication"
     }
 }
 

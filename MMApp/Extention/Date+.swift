@@ -64,6 +64,10 @@ extension Date {
     var dayBefore: Date {
         return Calendar.current.date(byAdding: .day, value: -.one, to: noon) ?? .now
     }
+    
+    var toDay: Date {
+        return Calendar.current.date(byAdding: .day, value: 0, to: noon) ?? .now
+    }
 
     /// День после текущей даты
     var dayAfter: Date {

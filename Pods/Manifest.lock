@@ -1,24 +1,20 @@
 PODS:
   - Kingfisher (8.1.3)
   - SnapKit (5.7.1)
-  - Swinject (2.9.1)
 
 DEPENDENCIES:
   - Kingfisher
   - SnapKit
-  - Swinject
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
     - Kingfisher
     - SnapKit
-    - Swinject
 
 SPEC CHECKSUMS:
   Kingfisher: f2af9028b16baf9dc6c07c570072bc41cbf009ef
   SnapKit: d612e99e678a2d3b95bf60b0705ed0a35c03484a
-  Swinject: a827d508c6270da03ec74e558e728917a888fa9b
 
-PODFILE CHECKSUM: 85fc6c823baafd70acdad0e93f5b51bd866f78b7
+PODFILE CHECKSUM: 8d7bb889ea3b376630fb457fe5018cc6fb364111
 
 COCOAPODS: 1.16.2

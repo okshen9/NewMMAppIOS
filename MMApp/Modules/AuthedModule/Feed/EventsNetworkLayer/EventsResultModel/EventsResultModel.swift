@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct EventDTO: Codable, JSONRepresentable {
+struct EventDTO: Codable, JSONRepresentable, Identifiable {
     let id: Int?
     let title: String?
     let startDate: String?

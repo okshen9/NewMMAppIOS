@@ -20,6 +20,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         if let _ = UserRepository.shared.jwt {
 //            window?.rootViewController = UserInfoViewController(viewModel: .init(userModel: auth))
             window?.rootViewController = UIHostingController(rootView: TabBarView())
+//
+//
+//            let viewModel = UserInfoViewModel(userModel: AuthUserDtoResult(id: nil, telegramId: nil, authDate: nil, hash: nil, lastName: nil, firstName: nil, username: nil, enabled: true, authStatus: nil, roles: nil))
+//            let nextVC = UserInfoViewController(viewModel: viewModel)
+//
+//            window?.rootViewController = nextVC
+//
         } else {
             window?.rootViewController = AuthVC()
         }

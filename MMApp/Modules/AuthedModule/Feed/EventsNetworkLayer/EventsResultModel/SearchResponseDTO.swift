@@ -8,7 +8,7 @@
 import Foundation
 
 struct SearchResponseDTO: Codable {
-    let results: [EventDTO]
+    let results: [EventDTO]?
     let totalRecords: Int?
     let pageNumber: Int?
     let pageSize: Int?

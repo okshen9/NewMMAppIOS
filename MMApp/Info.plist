@@ -7,29 +7,29 @@
 		<key>Global Exceptions</key>
 		<dict>
 			<key>NSAllowsArbitraryLoads</key>
-			<true/>
+			<false/>
 			<key>NSAllowsArbitraryLoadsInWebContent</key>
-			<true/>
+			<false/>
 		</dict>
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>127.0.0.1</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
+				<false/>
 				<key>NSExceptionRequiresForwardSecrecy</key>
 				<false/>
 				<key>NSIncludesSubdomains</key>
-				<true/>
+				<false/>
 			</dict>
 			<key>194.87.93.98</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
+				<false/>
 				<key>NSExceptionRequiresForwardSecrecy</key>
 				<false/>
 				<key>NSIncludesSubdomains</key>
-				<true/>
+				<false/>
 			</dict>
 		</dict>
 	</dict>
