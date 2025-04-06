@@ -3,18 +3,20 @@ import Kingfisher
 //import Yamobaile
 
 struct ProfileView: View {
+    @EnvironmentObject var appStateService: AppStateService
     @StateObject var viewModel = ProfileViewModel()
-    @State var showMap = false
+    @State private var showMap = false
+    @State private var showEditProfile = false
 
     var body: some View {
         NavigationStack {
-            
+
             VStack {
                 if viewModel.profile == nil || $viewModel.isLoading.wrappedValue  {
                     shimerState()
                 } else {
                     contentState()
-                        
+
                 }
             }
             .toolbarBackground(.hidden, for: .navigationBar)
@@ -24,8 +26,8 @@ struct ProfileView: View {
             .ignoresSafeArea(edges: .top)
         }
     }
-    
-    
+
+
     @ViewBuilder
     func contentState() -> some View {
         if let profile = viewModel.profile {
@@ -35,16 +37,16 @@ struct ProfileView: View {
                             .init(nameCity: viewModel.profile?.location ?? "Москва",
                                   nameUser: viewModel.profile?.fullName ?? "Пользователь без имени"))
                     .padding(.horizontal, -16)
-                    .frame(height: showMap ? 800 : 230)
+                    .frame(height: showMap ? 800 : 240)
                     .cornerRadius(20)
                     .onTapGesture {
                         /// TODO - добавить интерактивность карты
                         //                        showMap.toggle()
                     }
-                    
+
                     // Аватарка
                     HStack(alignment: .bottom) {
-                        
+
                         Spacer()
                         VStack(spacing: 10) {
                             HStack(spacing: 10) {
@@ -62,7 +64,7 @@ struct ProfileView: View {
                                 ProfileStatsView(progress: (profile.targetCalculationInfo?.allCategoriesDonePercentage ?? 0.0) / 100.0)
                                     .padding(.bottom, -130)
                             }
-                            
+
                             HStack(alignment:.center) {
                                 Spacer()
                                 Image(systemName: "mappin.and.ellipse")
@@ -76,19 +78,19 @@ struct ProfileView: View {
                     }
                     .offset(y: -80)
                     .padding(.bottom, -80)
-                    
+
                     groupeButton(profile)
                         .padding(.horizontal, 16)
-                    
+
                     VStack(alignment: .leading, spacing: 20) {
                         let activitySphere = (profile.activitySphere ?? Constants.activitySphereText).lowercased()
-                            Text("Род деятельности: ")
-                                .font(.title3.weight(.medium))
-                                .foregroundColor(.headerText) +
-                            Text(activitySphere)
-                                .font(.title3.bold())
-                                .foregroundColor(.headerText)
-                        
+                        Text("Род деятельности: ")
+                            .font(.title3.weight(.medium))
+                            .foregroundColor(.headerText) +
+                        Text(activitySphere)
+                            .font(.title3.bold())
+                            .foregroundColor(.headerText)
+
                         Divider().background(Color.black)
                         let biography = profile.biography ?? Constants.biographyText
                         VStack(alignment: .leading, spacing: 8) {
@@ -101,7 +103,47 @@ struct ProfileView: View {
                         }
                     }
                     .padding(.horizontal, 16)
-                    
+
+                }
+            }
+            .sheet(isPresented: $showEditProfile) {
+                ProfileInfoView(viewModel: .editProfileViewModel())
+            }
+            .toolbar {
+                // Кнопка справа (trailing)
+                if viewModel.isMyProfile {
+//                    ToolbarItem(placement: .navigationBarTrailing) {
+//                        Button(action: {
+//                            print("Кнопка справа нажата")
+//                            showEditProfile = true
+//                        }) {
+//                            Image(systemName: "square.and.pencil")
+//                                .foregroundStyle(Color.mainRed)
+//                        }
+//                    }
+
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Menu {
+
+                            Button(action: {
+                                print("Кнопка справа нажата")
+                                showEditProfile = true
+                            }, label: {
+                                HStack {
+                                    Text("Редактировать")
+                                    Image(systemName: "square.and.pencil")
+                                        .foregroundStyle(Color.mainRed)
+                                }
+                            })
+                            Button("Выйти", action: {
+                                viewModel.logout()
+                                appStateService.setNewState(.unAuthorized)
+                            })
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
+                                .foregroundStyle(Color.mainRed)
+                        }
+                    }
                 }
             }
             Spacer()
@@ -112,11 +154,11 @@ struct ProfileView: View {
             Spacer()
         }
     }
-    
+
     @ViewBuilder
     func tgView(_ profile: UserProfileResultDto) -> some View{
         HStack {
-//            Text("Telegram:")
+            //            Text("Telegram:")
             Button (action: {
                 //GOTO Telegram
                 guard let username = profile.username else { return }
@@ -132,18 +174,18 @@ struct ProfileView: View {
             })
         }
     }
-    
+
     /// Описания человека
     @ViewBuilder
     func descriptionView(_ key: String, _ value: String) -> some View {
-            Text(key)
+        Text(key)
             .font(.title3.bold())
             .foregroundColor(.headerText) +
-            Text(value)
-                .font(.subheadline)
-                .foregroundColor(.headerText)
+        Text(value)
+            .font(.subheadline)
+            .foregroundColor(.headerText)
     }
-    
+
     /// Кнопки груп и подгрупп
     @ViewBuilder
     func groupeButton(_ profile: UserProfileResultDto) -> some View {
@@ -151,12 +193,12 @@ struct ProfileView: View {
             let streamStatus = profile.stream?.title != nil ?
             profile.stream?.isActive ?? false ? "Текущий" : "Завершен" :
             nil
-            
+
             if let stream = profile.stream,
                let owners = stream.owners,
                let participants = stream.participants
             {
-                
+
                 NavigationLink(destination: {
                     StreamProfileList(
                         type: .stream(stream.title ?? "Поток без названия"),
@@ -177,7 +219,7 @@ struct ProfileView: View {
                     subTitle: streamStatus,
                     action: {})
             }
-            
+
             if let userGroup = profile.userGroup,
                let stream = profile.stream,
                let owners = userGroup.owners,
@@ -201,11 +243,11 @@ struct ProfileView: View {
                             subTitle: (profile.userGroup?.title).isNil ? "Не названчена" : nil,
                             action: {})
             }
-            
+
         }
         .frame(height: 56)
     }
-    
+
     /// Шимеры
     @ViewBuilder
     func shimerState() -> some View {
@@ -213,16 +255,16 @@ struct ProfileView: View {
             ShimmeringRectangle()
                 .frame(width: 200, height: 200)
                 .cornerRadius(100)
-            
+
             ShimmeringRectangle()
                 .frame(height: 20)
                 .cornerRadius(8)
-            
+
             ShimmeringRectangle()
                 .frame(height: 20)
                 .cornerRadius(8)
                 .padding(.horizontal, 40)
-            
+
             ShimmeringRectangle()
                 .frame(height: 40)
                 .cornerRadius(8)
@@ -247,11 +289,11 @@ extension ProfileView {
 
 #Preview {
     ProfileView(viewModel: ProfileViewModel(profile:.init(
-        id: nil, externalId: nil, username: nil, fullName: "Artem Neshko Sergeevich", userProfileStatus: nil, userPaymentStatus: nil, isDeleted: nil, creationDateTime: nil, lastUpdatingDateTime: nil, phoneNumber: nil, location: "Saratov", userGroup: nil, stream: nil, photoUrl: nil,
-                                                                       activitySphere: nil,
-                                                      biography: nil,
-                                                      targetCalculationInfo: nil))
-                                           )
+        id: nil, externalId: nil, username: nil, fullName: "Artem Neshko Sergeevich", userProfileStatus: nil, userPaymentStatus: nil, isDeleted: nil, creationDateTime: nil, lastUpdatingDateTime: nil, phoneNumber: nil, location: "Saratov", userGroup: nil, stream: nil, photoUrl: nil, activitySphere: nil,
+        biography: nil,
+        targetCalculationInfo: nil, comment: nil,
+        roles: nil))
+    )
 }
 
 

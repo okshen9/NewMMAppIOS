@@ -17,7 +17,7 @@ final class FeedViewModel: ObservableObject {
     
     
     private var searchResponseDTO: SearchResponseDTO?
-    private let service = ServiceBuilder()
+    private let service = ServiceBuilder.shared
     private let userRepository = UserRepository.shared
     
     // MARK: - Public Methods
@@ -60,7 +60,7 @@ final class FeedViewModel: ObservableObject {
 //            let myUpcomingEventTmp = min(of: firstPayment.?.dueDate?.dateFromString ?? Date(), firstTask, firstSubTask)
             
             let searchEnets: [EventsQuery.QueryValue] = [.type([.targetDone, .targetExpired, .targetExpiredDone])]
-            let events = try await service.searchEvents(searchParams: searchEnets)
+            let events = try await service.searchEvents(searchParams: [])//(searchParams: searchEnets)
             
             await updateUI(events: events.results, myUpcomingEvent: nil)
         } catch {

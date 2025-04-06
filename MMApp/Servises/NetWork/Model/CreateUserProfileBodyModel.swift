@@ -26,7 +26,7 @@ struct CreateUserProfileBodyModel: JSONRepresentable {
     var userPaymentStatus: String
     
     /// "Комментрий к профилю", example = "Хороший чел")
-    var comment: String
+//    var comment: String
     
     /// "Ссылка на фото в ТГ", example = "http://telegram.com/photourl")
     var photoUrl: String
@@ -39,4 +39,7 @@ struct CreateUserProfileBodyModel: JSONRepresentable {
     
     /// Биография, макс 256 символов
     var biography: String?
+
+    /// Чем занимется человек
+    var activitySphere: String?
 }

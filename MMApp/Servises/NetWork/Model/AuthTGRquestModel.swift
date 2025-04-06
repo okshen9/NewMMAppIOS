@@ -14,7 +14,7 @@ struct AuthTGRequestModel: Codable {
     let status: AuthStatus?
 }
 
-struct AuthUserDtoResult: Codable, JSONRepresentable {
+struct AuthUserDtoResult: Codable, JSONRepresentable, Hashable {
     /// externalId
     let id: Int?
     let telegramId: String?
@@ -29,7 +29,7 @@ struct AuthUserDtoResult: Codable, JSONRepresentable {
     var photoUrl: String?
 }
 
-enum AuthStatus: String, Codable {
+enum AuthStatus: String, Codable, Hashable {
     case approved = "APPROVED"
     case wait = "WAIT"
     case reject = "REJECT"
@@ -55,7 +55,7 @@ enum AuthStatus: String, Codable {
     }
 }
 
-enum Roles: String, Codable, UnknownCasedEnum {
+enum Roles: String, Codable, UnknownCasedEnum, Hashable {
     case user = "ROLE_USER"
     case admin = "ROLE_ADMIN"
     case draft = "ROLE_DRAFT"

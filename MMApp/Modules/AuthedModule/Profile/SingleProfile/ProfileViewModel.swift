@@ -12,9 +12,13 @@ final class ProfileViewModel: ObservableObject {
     
     @Published var isLoading = false
     @Published var profile: UserProfileResultDto?
-    
+
+    var isMyProfile: Bool {
+        profile == userRepository.userProfile
+    }
+
     // MARK: - Private properties
-    private let serviceNetwork = ServiceBuilder()
+    private let serviceNetwork = ServiceBuilder.shared
     private let userRepository = UserRepository.shared
     private let externalId: Int?
 
@@ -45,6 +49,9 @@ final class ProfileViewModel: ObservableObject {
     func updateProfile(externalId: Int? = nil) async {
         do {
             await setIsLoading(true)
+//            guard let updatetedProfile = try await serviceNetwork.getUserProfile(externalId: 10) else { return }
+//            await updateUI(profile: updatetedProfile)
+
             if let externalId = self.externalId {
                 guard let updatetedProfile = try await serviceNetwork.getUserProfile(externalId: externalId) else { return }
                 await updateUI(profile: updatetedProfile)
@@ -82,7 +89,11 @@ final class ProfileViewModel: ObservableObject {
             UIApplication.shared.open(webURL, options: [:], completionHandler: nil)
         }
     }
-    
+
+    func logout() {
+        userRepository.clearAll()
+    }
+
     // MARK: - Navigation
     func goToStream() {
         navigationPath.append(Destination.userDetail(userId: 1))

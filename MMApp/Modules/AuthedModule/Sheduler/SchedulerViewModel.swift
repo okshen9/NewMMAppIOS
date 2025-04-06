@@ -8,7 +8,7 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
     private var targets: [UserTargetDtoModel]?
     @Published var isLoading: Bool = false
     
-    private let serviceNetwork = ServiceBuilder()
+    private let serviceNetwork = ServiceBuilder.shared
     private let userRepository = UserRepository.shared
     
     @Published var scheduleListItems = [Date: [CalendatItem]]()

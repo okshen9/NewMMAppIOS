@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import WebKit
 
 //actor
 class UserRepository {
@@ -54,7 +55,8 @@ class UserRepository {
             KeyChainStorage.deleteAllKeychain()
         }
     }
-    
+
+
     // MARK: - JWT
     private var _jwt: String?
     var jwt: String? {
@@ -98,7 +100,7 @@ class UserRepository {
     
     // MARK: - Token Refresh
     func makeRefreshToken() async throws -> String {
-        let networkService = ServiceBuilder()
+        let networkService = ServiceBuilder.shared
         print("Old JWT: \(String(describing: jwt))")
         guard let refreshToken = refreshJWT,
 //              let authUser = authUser?.authUserDto,
@@ -121,7 +123,8 @@ class UserRepository {
         print("New JWT from keychain: \(String(describing: jwt))")
         return authDTO.jwt
     }
-    
+
+
     // MARK: - Roles and External ID
     private var _externalId: Int?
     var externalId: Int? {
@@ -162,11 +165,13 @@ class UserRepository {
             UserDefaultsStorege.roles.clearDefaults()
         }
     }
-    
+
+
     // MARK: - Clear
     func clearAll() {
         clearAuth()
         clearTGData()
+        clearWebViewCache()
     }
     
     func clearAuth() {
@@ -180,5 +185,26 @@ class UserRepository {
     
     func clearTGData() {
         setTGData(nil)
+    }
+
+    func clearWebViewCache() {
+        let websiteDataTypes = Set([
+            WKWebsiteDataTypeCookies,
+            WKWebsiteDataTypeDiskCache,
+            WKWebsiteDataTypeMemoryCache,
+            WKWebsiteDataTypeLocalStorage,
+            WKWebsiteDataTypeSessionStorage,
+            WKWebsiteDataTypeIndexedDBDatabases,
+            WKWebsiteDataTypeWebSQLDatabases
+        ])
+
+        let dateFrom = Date(timeIntervalSince1970: 0) // Удалить данные с самого начала времени
+
+        WKWebsiteDataStore.default().removeData(
+            ofTypes: websiteDataTypes,
+            modifiedSince: dateFrom
+        ) {
+            print("All webview caches cleared.")
+        }
     }
 }

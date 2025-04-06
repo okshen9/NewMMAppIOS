@@ -46,4 +46,10 @@ extension ServiceBuilder: AuthServiceProtocol {
             try apiFactory.getUserProfile(externalId: externalId)
         }
     }
+
+    func patchMe(profileData: EditProfileBodyDTO) async throws -> UserProfileResultDto? {
+        try await performRequest {
+            try apiFactory.patchMe(profileData: profileData)
+        }
+    }
 }

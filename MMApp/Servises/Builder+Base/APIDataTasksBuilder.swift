@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import SwiftUI
 
 struct EmptyResponse: Codable {}
 
@@ -86,7 +87,8 @@ extension APIDataTasksBuilder {
                 } catch {
                     refreshManager.clearAll()
                     await MainActor.run {
-                        let newViewController = AuthVC()
+                        let authView = AuthSUIView()
+                        let newViewController = UIHostingController(rootView: authView)
                         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                            let window = windowScene.windows.first {
                             window.rootViewController = newViewController

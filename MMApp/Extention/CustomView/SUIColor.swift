@@ -19,4 +19,8 @@ extension Color {
     static let subtitleText = Color(hex: "00000", alpha: 0.54)!
     /// #999999
     static let tabbarSecond = Color(hex: "999999")!
+    /// 0088cc
+    static let tgColor = Color(hex: "0088cc")!
+    /// 9DA1AF
+    static let manColor = Color(hex: "FAFAFA")!
 }

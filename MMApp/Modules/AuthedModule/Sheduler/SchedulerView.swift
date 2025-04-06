@@ -9,24 +9,26 @@ struct SchedulerView: View {
             ScrollView {
                 VStack {
                     if viewModel.isLoading == false {
-                        if !viewModel.scheduleListItems.isEmpty {
-                            VStack(alignment: .leading) {
-                                CalendarViewUIKit(selectedDate: $selectedDate, events: viewModel.calendarComponetsItems)
-                                    .tint(Color.red)
-                                    .frame(height: 450)
-                                    .padding(.horizontal, 24)
-                                    .padding(.top, 24)
-                                eventList2()
-                                    .padding()
-                                Spacer()
-                                
-                            }
-                            .toolbar(content: {
-                                Button("За все время", action: {
-                                    selectedDate = nil
-                                })
-                                .foregroundStyle(Color.mainRed)
+                        VStack(alignment: .leading) {
+                            CalendarViewUIKit(selectedDate: $selectedDate, events: viewModel.calendarComponetsItems)
+                                .tint(Color.red)
+                                .frame(height: 450)
+                                .padding(.horizontal, 24)
+                                .padding(.top, 24)
+
+
+
+                        }
+                        .toolbar(content: {
+                            Button("За все время", action: {
+                                selectedDate = nil
                             })
+                            .foregroundStyle(Color.mainRed)
+                        })
+                        if !viewModel.scheduleListItems.isEmpty {
+                            eventList2()
+                                .padding()
+                            Spacer()
                         } else {
                             Spacer()
                             Text("У вас нет событий")

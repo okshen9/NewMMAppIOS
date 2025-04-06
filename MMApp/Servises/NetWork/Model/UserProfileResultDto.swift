@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct UserProfileResultDto: Codable, Equatable {
+struct UserProfileResultDto: Codable, Equatable, Hashable {
     let id: Int?
     let externalId: Int?
     let username: String?
@@ -25,13 +25,15 @@ struct UserProfileResultDto: Codable, Equatable {
     let activitySphere: String?
     let biography: String?
     let targetCalculationInfo: TargetCalculationInfoDto?
+    let comment: String?
+    let roles: [String]?
 
     static func == (lhs: UserProfileResultDto, rhs: UserProfileResultDto) -> Bool {
         return lhs.id == rhs.id
     }
 }
 
-struct UserGroupResultDto: Codable {
+struct UserGroupResultDto: Codable, Hashable {
     let id: Int?
     let title: String?
     let groupOwner: Int? //для получения владельца группы ищем группу (id)
@@ -43,7 +45,7 @@ struct UserGroupResultDto: Codable {
     let participants: [StreamUserProfileShortInfoDto]?
 }
 
-struct StreamResultDto: Codable {
+struct StreamResultDto: Codable, Hashable {
     let id: Int?
     let title: String?
     let description: String?
@@ -62,7 +64,7 @@ struct StreamResultDto: Codable {
     }
 }
 
-struct StreamUserProfileShortInfoDto: Codable, Identifiable {
+struct StreamUserProfileShortInfoDto: Codable, Identifiable, Hashable {
     var id: UUID = UUID()
     
     let externalId: Int?
@@ -91,7 +93,7 @@ struct StreamUserProfileShortInfoDto: Codable, Identifiable {
 
 // Модель TargetCalculationInfoDto
 
-struct TargetCalculationInfoDto: Codable {
+struct TargetCalculationInfoDto: Codable, Hashable {
     var categoryToInfoMapping: [String: TargetCategoryCalculationInfoDto]
     var allCategoriesDonePercentage: Double
     
@@ -104,7 +106,7 @@ struct TargetCalculationInfoDto: Codable {
 
 // Модель TargetCategoryCalculationInfoDto
 
-struct TargetCategoryCalculationInfoDto: Codable {
+struct TargetCategoryCalculationInfoDto: Codable, Hashable {
     var quantityForUserProfile: Int?
     var doneForUserProfile: Int?
     var percentageOfDoneAllCategoryForUserProfile: Double

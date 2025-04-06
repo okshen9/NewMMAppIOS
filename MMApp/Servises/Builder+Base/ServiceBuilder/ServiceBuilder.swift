@@ -22,16 +22,23 @@ import Foundation
 
 final class ServiceBuilder: AbstractService {
     private(set) var apiFactory: APIFactory //RequestCompositeProtocol
-    
+    private var appState: AppStateService?
+
     /// Инициализатор
     /// - Parameters:
     ///   - apiFactory: фабрика АПИ
     ///   - dataTaskBuilder: билдер дата тасок
-    init(
+    private init(
         apiFactory: APIFactory = APIFactory.global,
         dataTaskBuilder: APIDataTasksBuilder = APIDataTasksBuilder(apiFactory: APIFactory.global))
     {
         self.apiFactory = apiFactory
         super.init(dataTaskBuilder: dataTaskBuilder)
+    }
+
+    static let shared: ServiceBuilder = .init()
+
+    func setAppStateServise(_ appState: AppStateService) {
+        self.appState = appState
     }
 }

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct EmptyView: View {
     @StateObject private var viewModel = EmptyViewModel()
-    @State private var servise: EventsServiceProtocol = ServiceBuilder()
+    @State private var servise: EventsServiceProtocol = ServiceBuilder.shared
 
     var body: some View {
         VStack {

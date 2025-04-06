@@ -14,6 +14,9 @@ struct PayRequestView: View {
         NavigationView {
             VStack {
                 if let payRequest = viewModel.payRequest, !viewModel.isLoading {
+                    if payRequest.isEmpty {
+                        Text("У вас нет платежей - все ок!")
+                    }
                     List(payRequest, id: \.id) { payment in
                         PaymentRowView(payment: payment)
                     }

@@ -30,7 +30,7 @@ final class MapViewModel: ObservableObject {
         let geocoder = CLGeocoder()
         geocoder.geocodeAddressString(city ?? nameCity) { [weak self] (placemarks, error) in
             if let location = placemarks?.first?.location {
-                self?.coordinateRaw = CLLocationCoordinate2D(latitude: location.coordinate.latitude - 0.02, longitude: location.coordinate.longitude)
+                self?.coordinateRaw = CLLocationCoordinate2D(latitude: location.coordinate.latitude - 0.01, longitude: location.coordinate.longitude)
                 self?.coordinatePoint = location.coordinate
             } else {
                 self?.getCoordinates(for: "Москва")

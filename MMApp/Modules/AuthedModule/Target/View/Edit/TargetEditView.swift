@@ -43,6 +43,7 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                     .pickerStyle(.menu)
                     .tint(.mainRed)
                     DatePicker("Срок выполнения", selection: $newTarget.deadLineDateTime.asBindingDate, displayedComponents: .date)
+                        .tint(.mainRed)
                 }
                 
                 Text("Подцели")

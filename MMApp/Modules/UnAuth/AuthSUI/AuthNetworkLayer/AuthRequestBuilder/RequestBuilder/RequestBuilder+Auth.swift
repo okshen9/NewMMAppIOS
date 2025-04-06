@@ -59,7 +59,19 @@ extension APIFactory: AuthRequestProtocol {
             tokenNeccessity: .mandatory)
         return urlRequest
     }
-    
+
+    func patchMe(profileData: EditProfileBodyDTO) throws -> URLRequest {
+        let helper = AuthRequestHelper.patchMe
+        let url = try urlBuilder.buildURL(path: helper.path)
+        let urlRequest = try requestBuilder.buildJSONParamsRequest(
+            url: url,
+            bodyModel: profileData,
+            query: helper.query,
+            method: helper.method,
+            tokenNeccessity: .mandatory)
+        return urlRequest
+    }
+
     func getUserProfile(externalId: Int) throws -> URLRequest {
         let helper = AuthRequestHelper.getUserProfile(externalId)
         let url = try urlBuilder.buildURL(path: helper.path)
@@ -70,4 +82,6 @@ extension APIFactory: AuthRequestProtocol {
             tokenNeccessity: .mandatory)
         return urlRequest
     }
+
+    
 }

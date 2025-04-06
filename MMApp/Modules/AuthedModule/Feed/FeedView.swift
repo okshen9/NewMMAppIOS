@@ -19,7 +19,7 @@ struct FeedView: View {
                             shimerState()
                         } else {
 
-
+                            Text("У вас пока нет новостей")
                             ForEach(viewModel.feedEvents ?? []) { event in
 
                                 //                                let title = event.type

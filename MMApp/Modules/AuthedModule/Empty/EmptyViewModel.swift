@@ -7,7 +7,7 @@ class EmptyViewModel: ObservableObject {
         @State var title: String = Constants.title
     }
     
-    let servise: EventsServiceProtocol = ServiceBuilder()
+    let servise: EventsServiceProtocol = ServiceBuilder.shared
 
     // MARK: - Private properties
     private let apiFactory = APIFactory.global

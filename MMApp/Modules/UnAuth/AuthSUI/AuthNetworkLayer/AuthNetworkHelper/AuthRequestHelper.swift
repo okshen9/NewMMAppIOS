@@ -14,7 +14,10 @@ enum AuthRequestHelper {
     
     /// user-profile/me
     case createProfile
-    
+
+    /// user-profile/me
+    case patchMe
+
     /// /user/auth/refresh
     case authuserRefreshJWT
     
@@ -33,6 +36,8 @@ enum AuthRequestHelper {
             return nil
         case .getUserProfile(_):
             return nil
+        case .patchMe:
+            return nil
         }
     }
 
@@ -46,6 +51,8 @@ enum AuthRequestHelper {
             return RequestUrls.userProfileMe
         case .createProfile:
             return RequestUrls.userProfile
+        case .patchMe:
+            return RequestUrls.userProfileMe
         case .authuserRefreshJWT:
             return RequestUrls.authuserRefresh
         case .getUserProfile(let externalId):
@@ -60,6 +67,8 @@ enum AuthRequestHelper {
             return .get
         case .createProfile, .authuserRefreshJWT:
             return .post
+        case .patchMe:
+            return .patch
         }
     }
 }

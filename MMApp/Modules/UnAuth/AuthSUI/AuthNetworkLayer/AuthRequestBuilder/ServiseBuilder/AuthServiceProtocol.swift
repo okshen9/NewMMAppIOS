@@ -18,9 +18,12 @@ protocol AuthServiceProtocol {
     /// user-profile/me
     func refreshJWT(refreshModel: RefreshBodyModel) async throws -> AuthTGRequestModel?
     
-    /// /user-profile
+    /// POST/user-profile
     func createProfile(profileData: CreateUserProfileBodyModel) async throws -> UserProfileResultDto?
     
     /// GET /userprofile/{extId}
     func getUserProfile(externalId: Int) async throws -> UserProfileResultDto?
+
+    /// PATCH/user-profile
+    func patchMe(profileData: EditProfileBodyDTO) async throws -> UserProfileResultDto?
 }

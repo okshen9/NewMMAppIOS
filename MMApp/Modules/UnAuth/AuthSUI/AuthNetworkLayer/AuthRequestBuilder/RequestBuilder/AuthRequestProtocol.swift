@@ -17,9 +17,12 @@ protocol AuthRequestProtocol {
     /// user-profile/me
     func refreshJWTRequest(refreshModel: RefreshBodyModel) throws -> URLRequest
     
-    /// /user-profile
+    /// POAST/user-profile
     func createProfileRequest(profileData: CreateUserProfileBodyModel) throws -> URLRequest
     
     /// GET /userprofile/{extId}
     func getUserProfile(externalId: Int) throws -> URLRequest
+
+    /// PATCH/user-profile
+    func patchMe(profileData: EditProfileBodyDTO) throws -> URLRequest
 }

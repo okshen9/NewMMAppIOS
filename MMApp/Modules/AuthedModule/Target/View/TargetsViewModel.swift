@@ -19,7 +19,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
     
-    private let networkService = ServiceBuilder()
+    private let networkService = ServiceBuilder.shared
     
     
     @Published var groupedTargets: [TargetCategory: [UserTargetDtoModel]] = [:]
@@ -150,7 +150,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
                     }
                 }
             } catch {
-                print(error.localizedDescription)
+                print("Neshko карытие цели\(error.localizedDescription)")
             }
         }
     }

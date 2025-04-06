@@ -30,7 +30,7 @@ struct TestScreenVC: View {
                     }
                 },
                 label: {
-                    Text("Удалить jwt")
+                    Text("Очистить токен платформы (jwt)")
                         .foregroundStyle(.red)
                 })
             Button(
@@ -42,7 +42,7 @@ struct TestScreenVC: View {
                     }
                 },
                 label: {
-                    Text("Удалить TG")
+                    Text("Очистить авторизацию TG")
                         .foregroundStyle(.red)
                 })
         }
@@ -50,7 +50,7 @@ struct TestScreenVC: View {
     
     func testReq() async {
         do {
-            let me = try await ServiceBuilder().getProfileMe()
+            let me = try await ServiceBuilder.shared.getProfileMe()
             print("Это я = \(me)")
         }
         catch {

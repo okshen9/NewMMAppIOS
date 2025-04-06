@@ -14,7 +14,7 @@ final class PayRequestViewModel: ObservableObject {
     
     @Published var isLoading = true
     @Published var payRequest: [PaymentRequestResponseDto]?
-    private let serviceNetwork = ServiceBuilder()
+    private let serviceNetwork = ServiceBuilder.shared
     private let userRepository = UserRepository.shared
     
     // MARK: - Public Methods

@@ -3,7 +3,7 @@ import Combine
 
 // MARK: - ViewModel
 class TabBarViewModel: ObservableObject {
-    private let service = ServiceBuilder()
+    private let service = ServiceBuilder.shared
     private let userRepository = UserRepository.shared
     
     @Published var user: UserProfileResultDto?
