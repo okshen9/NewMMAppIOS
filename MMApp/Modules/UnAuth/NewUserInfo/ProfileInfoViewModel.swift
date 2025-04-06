@@ -22,8 +22,9 @@ class ProfileInfoViewModel: ObservableObject {
     private let profileModel: UserProfileResultDto?
     private let apiFactory = ServiceBuilder.shared
     private let isEditProfile: Bool
-    
-    init(profileModel: UserProfileResultDto?, authModel: AuthUserDtoResult?, isEditProfile: Bool = false) {
+    private var needUpdateAction: () -> Void
+
+    init(profileModel: UserProfileResultDto?, authModel: AuthUserDtoResult?, isEditProfile: Bool = false, needUpdateAction: @escaping () -> Void = {}) {
         self.authModel = authModel
         self.profileModel = profileModel
         userProfile = UserProfile(
@@ -36,13 +37,14 @@ class ProfileInfoViewModel: ObservableObject {
         )
         self.isEditProfile = isEditProfile
         self.isCanEditTelegramUsername = (profileModel?.username ?? (authModel?.username).orEmpty).isEmpty
+        self.needUpdateAction = needUpdateAction
     }
     
-    static func editProfileViewModel() -> ProfileInfoViewModel {
+    static func editProfileViewModel(needUpdateAction: @escaping () -> Void) -> ProfileInfoViewModel {
         let userRepository = UserRepository.shared
         let authModel = userRepository.authUser?.authUserDto
         let profileModel = userRepository.userProfile
-        return ProfileInfoViewModel(profileModel: profileModel, authModel: authModel, isEditProfile: true)
+        return ProfileInfoViewModel(profileModel: profileModel, authModel: authModel, isEditProfile: true, needUpdateAction: needUpdateAction)
     }
     
     // Валидация всех полей
@@ -75,7 +77,7 @@ class ProfileInfoViewModel: ObservableObject {
     func saveProfile() async {
         //        await navigateToMain()
         //        return
-        isLoaded = true
+        await setIsLoaded(true)
         do {
             if isEditProfile {
                 let updatedUser = try await apiFactory.patchMe(profileData:
@@ -96,7 +98,8 @@ class ProfileInfoViewModel: ObservableObject {
                                                                 )
                 )
                 UserRepository.shared.setRoles([(updatedUser?.userProfileStatus) ?? ""])
-                isLoaded = false
+                await setIsLoaded(false)
+                self.needUpdateAction()
                 await navigationTo(.dismiss)
             } else {
                 let finalUser = try await apiFactory.createProfile(profileData: CreateUserProfileBodyModel(
@@ -113,11 +116,11 @@ class ProfileInfoViewModel: ObservableObject {
                 ))
                 
                 UserRepository.shared.setRoles([(finalUser?.userProfileStatus) ?? ""])
-                isLoaded = false
+                await setIsLoaded(false)
                 await navigationTo(.toMinView)
             }
         } catch {
-            isLoaded = false
+            await setIsLoaded(false)
             print(error)
         }
     }
@@ -125,6 +128,11 @@ class ProfileInfoViewModel: ObservableObject {
     @MainActor
     func navigationTo(_ path: ProfileInfoViewModelPath) {
         navPath = path
+    }
+
+    @MainActor
+    func setIsLoaded(_ isActive: Bool) {
+        self.isLoaded = isActive
     }
 }
 

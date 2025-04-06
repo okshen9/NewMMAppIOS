@@ -107,7 +107,11 @@ struct ProfileView: View {
                 }
             }
             .sheet(isPresented: $showEditProfile) {
-                ProfileInfoView(viewModel: .editProfileViewModel())
+                ProfileInfoView(viewModel: .editProfileViewModel(needUpdateAction: {
+                    Task.detached(operation: {
+                        await viewModel.updateProfile()
+                    })
+                }))
             }
             .toolbar {
                 // Кнопка справа (trailing)
