@@ -1,6 +1,0 @@
-framework module Pods_MMApp {
-  umbrella header "Pods-MMApp-umbrella.h"
-
-  export *
-  module * { export * }
-}
