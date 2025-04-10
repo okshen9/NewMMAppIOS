@@ -92,7 +92,8 @@ struct ProfileInfoView: View {
                 }
             }
         }
-            
+            .scrollDismissesKeyboard(.interactively)
+
 
 
     }
