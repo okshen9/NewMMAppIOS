@@ -4,6 +4,7 @@ import Kingfisher
 
 struct ProfileView: View {
     @EnvironmentObject var appStateService: AppStateService
+    @EnvironmentObject var navigationManager: NavigationManager<AuthRoute>
     @StateObject var viewModel = ProfileViewModel()
     @State private var showMap = false
     @State private var showEditProfile = false
@@ -141,6 +142,7 @@ struct ProfileView: View {
                             })
                             Button("Выйти", action: {
                                 viewModel.logout()
+                                navigationManager.popToRoot()
                                 appStateService.setNewState(.unAuthorized)
                             })
                         } label: {

@@ -27,21 +27,6 @@ struct FeedView: View {
                         if let feedEvents = viewModel.feedEvents, !feedEvents.isEmpty {
 
                             ForEach(feedEvents) { event in
-                                //                                NavigationLink {
-                                //                                    FeedCell(
-                                //                                        type: .task,
-                                //                                        title: event.title.orEmpty,
-                                //                                        subtitle: event.description.orEmpty,
-                                //                                        date: event.displayDate ?? Date().toApiString,
-                                //                                        userProfile: event.userProfile,
-                                //                                        eventType: event.type)
-                                ////                                    .onTapGesture(perform: {
-                                ////                                        if let profile = event.userProfile {
-                                ////                                            path.append(FeedViewRoute.profile(profile))
-                                ////                                        }
-                                ////                                    })
-                                //                                    .padding(.horizontal, 16)
-                                //                                }
 
                                 NavigationLink(destination: {
                                     if let profileId = event.userProfile?.externalId {
@@ -55,11 +40,6 @@ struct FeedView: View {
                                         date: event.displayDate ?? Date().toApiString,
                                         userProfile: event.userProfile,
                                         eventType: event.type)
-                                    //                                    .onTapGesture(perform: {
-                                    //                                        if let profile = event.userProfile {
-                                    //                                            path.append(FeedViewRoute.profile(profile))
-                                    //                                        }
-                                    //                                    })
                                     .padding(.horizontal, 16)
                                 })
 

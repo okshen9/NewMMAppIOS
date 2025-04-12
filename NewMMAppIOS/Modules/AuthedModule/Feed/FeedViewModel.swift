@@ -9,17 +9,23 @@ import Foundation
 import Combine
 import SwiftUI
 
+protocol FeedViewModelProtocol: ObservableObject {
+    func onApper()
+    var isLoading: Bool { get set }
+    var feedEvents: [EventDTO]? { get set }
+}
+
 // MARK: - ViewModel
-final class FeedViewModel: ObservableObject {
+final class FeedViewModel: ObservableObject, FeedViewModelProtocol {
     @Published var isLoading = false
     @Published var myUpcomingEvent: UpcomingEvent?
     @Published var feedEvents: [EventDTO]?
     @Published var selectetTypeEvent: [EventType] = []//[.TARGET_DONE, .TARGET_EXPIRED, .TARGET_DONE_EXPIRED]
 
-    private var searchResponseDTO: SearchResponseDTO?
-    private let service = ServiceBuilder.shared
-    private let userRepository = UserRepository.shared
-    private var pagination = Pagination()
+    var searchResponseDTO: SearchResponseDTO?
+    let service = ServiceBuilder.shared
+    let userRepository = UserRepository.shared
+    var pagination = Pagination()
 
     // MARK: - Public Methods
     func onApper() {

@@ -25,6 +25,7 @@ struct NewMMAppIOSApp: App {
                 switch appStateService.state {
                 case .authorized:
                     TabBarView()
+                        .environmentObject(authNavigationManager)
                         .withToast()
 
                 case .unAuthorized:
@@ -52,7 +53,10 @@ struct NewMMAppIOSApp: App {
                 ServiceBuilder.shared.setAppStateServise(appStateService)
 
                 // Установка начального состояния
-                let newState: AppStateService.AppState = UserRepository.shared.userProfile.isNil ? .unAuthorized : .authorized 
+                let newState: AppStateService.AppState =
+                (UserRepository.shared.roles?.contains(Roles.user.rawValue)).orFalse ||
+                (UserRepository.shared.roles?.contains(Roles.admin.rawValue)).orFalse
+                ? .authorized : .unAuthorized
                 appStateService.setNewState(newState)
             }
             .onShakeGesture {

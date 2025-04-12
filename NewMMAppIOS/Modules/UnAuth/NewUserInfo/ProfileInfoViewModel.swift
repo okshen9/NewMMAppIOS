@@ -115,9 +115,13 @@ class ProfileInfoViewModel: ObservableObject {
                     biography: userProfile.about,
                     activitySphere: userProfile.occupation
                 ))
-                
+                guard let refreshJWT = UserRepository.shared.refreshJWT,
+                      let updatedAuthUser = try await apiFactory.refreshJWT(refreshModel: .init(refreshToken: refreshJWT)) else {
+                    await navigationTo(.toInfoView)
+                    return
+                }
+                UserRepository.shared.setAuthUser(updatedAuthUser)
                 UserRepository.shared.setUserProfile(finalUser)
-                //                UserRepository.shared.setRoles([(finalUser?.userProfileStatus) ?? ""])
                 await setIsLoaded(false)
                 await navigationTo(.toMinView)
             }

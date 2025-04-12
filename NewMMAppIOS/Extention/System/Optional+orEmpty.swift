@@ -49,3 +49,14 @@ extension Binding where Value == String? {
         )
     }
 }
+
+
+extension Bool? {
+    var orFalse: Bool {
+        self ?? false
+    }
+
+    var orTrue: Bool {
+        self ?? true
+    }
+}

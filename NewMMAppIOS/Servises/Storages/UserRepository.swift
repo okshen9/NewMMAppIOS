@@ -16,16 +16,9 @@ class UserRepository {
     private(set) var authUser: AuthTGRequestModel?
     func setAuthUser(_ newValue: AuthTGRequestModel?) {
         authUser = newValue
-        guard let newValue = newValue
-        else {
-            print("Neshko error setAuthUser")
-            return
-        }
-
-        let jwt = KeyChainStorage.jwtToken.save(value: newValue.jwt)
-        let ref = KeyChainStorage.refreshToken.save(value: newValue.refreshToken)
-        
-        print("Neshko Refresh jwt: \(jwt) Refresh ref: \(ref)")
+        setJWT(newValue?.jwt)
+        setRefreshJWT(newValue?.refreshToken)
+        setRoles(newValue?.authUserDto?.roles?.map({$0.rawValue}))
     }
     
     // MARK: - UserProfile
@@ -54,11 +47,10 @@ class UserRepository {
             KeyChainStorage.deleteAllKeychain()
         }
     }
-
     func getUrlPhotoFromTGData() -> String? {
         guard let tgData = tgData else { return nil }
         let tgJsonObject = tgData.dicFromData64() ?? [:]
-        let photoString = tgJsonObject.first(where: { $0.key == "photo_100" })?.value
+        let photoString = tgJsonObject.first(where: { $0.key == "photo_url" })?.value
         return photoString as? String
     }
 
@@ -82,7 +74,8 @@ class UserRepository {
             KeyChainStorage.deleteAllJWTKeychain()
         }
     }
-    
+
+    // MARK: - JWT Refresh
     private var _refreshJWT: String?
     var refreshJWT: String? {
         get {
@@ -102,21 +95,13 @@ class UserRepository {
             KeyChainStorage.deleteAllJWTKeychain()
         }
     }
-    
-    // MARK: - Token Refresh
+
     func makeRefreshToken() async throws -> String {
         let networkService = ServiceBuilder.shared
         print("Old JWT: \(String(describing: jwt))")
         guard let refreshToken = refreshJWT,
-//              let authUser = authUser?.authUserDto,
-//              let userProfile = userProfile,
-//              let refreshToken = self.authUser?.refreshToken,
-//              let userId = userProfile.externalId,
-//              let roles = authUser.roles,
               let authDTO = try await networkService.refreshJWT (
                 refreshModel: .init(
-//                    roles: roles,
-//                    authUserId: userId,
                     refreshToken: refreshToken
                 )
               )
@@ -172,7 +157,7 @@ class UserRepository {
     }
 
 
-    // MARK: - Clear
+    // MARK: - DELETE Repository
     func clearAll() {
         clearAuth()
         clearTGData()
