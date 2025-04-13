@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct EmptyView: View {
+struct TestScreen: View {
     @StateObject private var viewModel = EmptyViewModel()
     @State private var servise: EventsServiceProtocol = ServiceBuilder.shared
 
@@ -53,12 +53,12 @@ struct EmptyView: View {
 }
 
 // MARK: - Constants
-extension EmptyView {
+extension TestScreen {
     private enum Constants {
         static let title = "Выберите карту"
     }
 }
 
 #Preview {
-    EmptyView()
+    TestScreen()
 }

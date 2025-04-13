@@ -17,12 +17,6 @@ final class AuthSUIViewModel: NSObject, ObservableObject {
 
     @Published var navPath = AuthViewModelPath.authView
 
-    override init() {
-        super.init()
-        print("Neshko init AuthSUIViewModel")
-    }
-
-
     // MARK: - Methods
     /// проверяет есть ли ответ от телеги с данными в tgAuthResult
     func validateWebRequest(url: URL?) -> String? {

@@ -8,7 +8,7 @@
 import Foundation
 
 /// Модель результата для UserTargetDto
-struct UserTargetDtoModel: Codable, JSONRepresentable, Identifiable {
+struct UserTargetDtoModel: Codable, JSONRepresentable, Identifiable, Hashable {
     /// Уникальный идентификатор цели
     var id: Int?
     /// Наименование цели

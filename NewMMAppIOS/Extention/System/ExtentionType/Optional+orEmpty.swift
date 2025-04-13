@@ -60,3 +60,10 @@ extension Bool? {
         self ?? true
     }
 }
+
+
+extension Int? {
+    var orZero: Int {
+        self ?? 0
+    }
+}

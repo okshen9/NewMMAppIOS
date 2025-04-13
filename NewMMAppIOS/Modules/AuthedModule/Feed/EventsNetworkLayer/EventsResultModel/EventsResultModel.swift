@@ -25,7 +25,50 @@ struct EventDTO: Codable, JSONRepresentable, Identifiable {
 
     let userProfile: UserProfileResultDto?
 
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decodeIfPresent(Int.self, forKey: .id)
+        self.title = try container.decodeIfPresent(String.self, forKey: .title)
+        self.startDate = try container.decodeIfPresent(String.self, forKey: .startDate)
+        self.endDate = try container.decodeIfPresent(String.self, forKey: .endDate)
+        self.type = try container.decodeIfPresent(EventType.self, forKey: .type)
+        self.creatorExternalId = try container.decodeIfPresent(String.self, forKey: .creatorExternalId)
+        self.assigneeExternalIds = try container.decodeIfPresent([String].self, forKey: .assigneeExternalIds)
+        self.issueId = try container.decodeIfPresent(Int.self, forKey: .issueId)
+        self.description = try container.decodeIfPresent(String.self, forKey: .description)
+        self.displayDate = try container.decodeIfPresent(String.self, forKey: .displayDate)
+        self.userProfile = try container.decodeIfPresent(UserProfileResultDto.self, forKey: .userProfile)
+    }
 
+    init(id: Int?, title: String?, startDate: String?, endDate: String?, type: EventType?, creatorExternalId: String?, assigneeExternalIds: [String]?, issueId: Int?, description: String?, displayDate: String?, userProfile: UserProfileResultDto?) {
+        self.id = id
+        self.title = title
+        self.startDate = startDate
+        self.endDate = endDate
+        self.type = type
+        self.creatorExternalId = creatorExternalId
+        self.assigneeExternalIds = assigneeExternalIds
+        self.issueId = issueId
+        self.description = description
+        self.displayDate = displayDate
+        self.userProfile = userProfile
+    }
+}
 
+extension EventDTO {
+    static func getTextEvent(for type: EventType) -> EventDTO {
+        .init(
+            id: 1,
+            title: "Взял в аренду Porshe прокатился по Питеру и ещё +1 машину",
+            startDate: "2025-04-06T13:45:55.772694",
+            endDate: "2025-04-30T23:59:59.999",
+            type: type,
+            creatorExternalId: "1",
+            assigneeExternalIds: ["1"],
+            issueId: 1,
+            description: "3 тренировки в неделю в спортзале",
+            displayDate: "2025-04-06T13:45:55.772694",
+            userProfile: UserProfileResultDto.getTestUser())
+    }
 }
 

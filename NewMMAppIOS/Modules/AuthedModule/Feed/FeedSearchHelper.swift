@@ -8,53 +8,75 @@
 import Foundation
 
 extension FeedViewModel {
-    private func fetchInitData() async throws -> (events: [EventDTO]?, targets: [UserTargetDtoModel]?, payment: [PaymentRequestResponseDto]?) {
-        let searchEnets: [EventsQuery.QueryValue] = [.type([.TARGET_DONE, .TARGET_EXPIRED, .TARGET_DONE_EXPIRED])]
-        let externalId = userRepository.externalId ?? -1
+    func getNextEvents(resetSearch: Bool) async {
+        do {
+            guard !isLoading else { return }
+            // Включает в себя пагинацию и сортровку в базовой версии
+            var searchParams: [EventsQuery.QueryValue]
+            // если поиск пустой или с нуля
+            if feedEvents.isEmptyOrNil || resetSearch {
+                await self.setIsLoading(true)
 
-        return try await withThrowingTaskGroup(of: (String, Any).self) { [weak self] group in
-            // Запускаем все запросы параллельно
-            group.addTask { [weak self] in
-                let events = try await self?.service.searchEvents(searchParams: searchEnets)
-                return ("events", events)
+                await self.updateUI(events: nil, isLoading: true)
+                self.searchResponseDTO = nil
+
+                searchParams = Constants.baseEventSearch
+            } else {
+                await self.setIsPaginationLoding(true)
+                searchParams = getNextPaginationParams()
             }
 
-            group.addTask { [weak self] in
-                let targets = try await self?.service.getUserTargets(externalId: externalId).userTargets
-                return ("targets", targets as Any)
-            }
-
-            group.addTask { [weak self] in
-                let payment = try await self?.service.getPaymentPlan(id: externalId)
-                return ("payment", payment as Any)
-            }
-
-            // Собираем результаты
-            var events: [EventDTO]?
-            var targets: [UserTargetDtoModel]?
-            var payment: [PaymentRequestResponseDto]?
-
-            for try await (key, value) in group {
-                switch key {
-                case "events":
-                    events = value as? [EventDTO]
-                case "targets":
-                    targets = value as? [UserTargetDtoModel]
-                case "payment":
-                    payment = value as? [PaymentRequestResponseDto]
-                default:
-                    break
-                }
-            }
-
-            // Проверяем, что все данные получены
-            guard let events = events,
-                  let targets = targets,
-                  let payment = payment else {
-                throw NSError(domain: "DataError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to fetch all data"])
-            }
-
-            return (events, targets, payment)
+            // насыщение парметров типами поиска
+            enrichSearchParamsFromType(params: &searchParams)
+            let searchResponse = try await service.searchEvents(searchParams: searchParams)
+            await updateCurrentEvents(with: searchResponse)
+        } catch {
+            await setIsPaginationLoding(false)
+            await setIsLoading(false)
+            await ToastManager.shared.show(.baseError)
         }
+    }
+
+    /// Получить базовые параметры поиска следующей страницы (пагинация, сортировка)
+    private func getNextPaginationParams() -> [EventsQuery.QueryValue] {
+        guard let nextPagination = searchResponseDTO?.nextPagination else {
+            return Constants.baseEventSearch
+        }
+        var params = nextPagination.map {
+            switch $0.key {
+            case PaginationConstants.pageNumberKey:
+                return EventsQuery.QueryValue.pageNumberPagination($0.value)
+            case PaginationConstants.pageSizeKey:
+                return EventsQuery.QueryValue.pageNumberPagination($0.value)
+            default:
+                return EventsQuery.QueryValue.pageNumberPagination($0.value)
+            }
+        }
+        params.append(.sortDisplayDate())
+        return params
+    }
+
+    /// Обгощяем параметры поиска типом эвентов
+    private func enrichSearchParamsFromType(params: inout [EventsQuery.QueryValue]) {
+        if !selectedType.isEmpty {
+            params.append(EventsQuery.QueryValue.type(selectedType))
+        }
+    }
+
+    /// Обновить текущие значения новыми эвентами
+    private func updateCurrentEvents(with searchResponseDTO: SearchResponseDTO) async {
+        let newEvents = (searchResponseDTO.results) ?? []
+        self.searchResponseDTO?.results?.append(contentsOf: newEvents)
+        self.searchResponseDTO?.pageNumber = searchResponseDTO.pageNumber
+        self.searchResponseDTO?.pageSize = searchResponseDTO.pageSize
+        self.searchResponseDTO?.totalRecords = searchResponseDTO.totalRecords
+
+        await MainActor.run {
+            self.feedEvents?.append(contentsOf: newEvents)
+            self.isAll = searchResponseDTO.isAll
+            // отменяем шимеры загрузки
+        }
+        await self.setIsLoading(false)
+        await self.setIsPaginationLoding(false)
     }
 }

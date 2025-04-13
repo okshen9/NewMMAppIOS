@@ -23,6 +23,7 @@ class TabBarViewModel: ObservableObject {
     func fetchUserProfile() {
         Task { [weak self] in
             guard let userProfile = try? await self?.service.getProfileMe() else {
+                await ToastManager.shared.show(.baseError)
                 return print("Error fetching user profile Neshko")
                 
             }

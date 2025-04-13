@@ -39,9 +39,11 @@ struct ToastModifier: ViewModifier {
 
 #Preview {
     Button("Показать тост") {
-        ToastManager.shared.show(
-            ToastModel(message: "Цель закрыта 🎯", icon: "checkmark.circle", duration: 2)
-        )
+        Task {
+            await ToastManager.shared.show(
+                ToastModel(message: "Цель закрыта 🎯", icon: "xmark.app", duration: 2)
+            )
+        }
     }
     .withToast()
 }

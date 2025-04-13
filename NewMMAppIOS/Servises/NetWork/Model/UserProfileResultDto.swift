@@ -17,19 +17,67 @@ struct UserProfileResultDto: Codable, Equatable, Hashable {
     let isDeleted: Bool?
     let creationDateTime: String?
     let lastUpdatingDateTime: String?
-    let phoneNumber: String?
-    let location: String?
-    let userGroup: UserGroupResultDto?
+    let userGroups: UserGroupResultDto?
     let stream: StreamResultDto?
-    let photoUrl: String?
-    let activitySphere: String?
-    let biography: String?
-    let targetCalculationInfo: TargetCalculationInfoDto?
     let comment: String?
-    let roles: [String]?
+    let photoUrl: String?
+    let userTargets: [UserTargetDtoModel]?
+    let targetCalculationInfo: TargetCalculationInfoDto?
+    let location: String?
+    let phoneNumber: String?
+    let activitySphere: String?
+    let paymentCalculationInfo: PaymentCalculationInfoDto?
+    let biography: String?
 
     static func == (lhs: UserProfileResultDto, rhs: UserProfileResultDto) -> Bool {
         return lhs.id == rhs.id
+    }
+
+    init(id: Int?, externalId: Int?, username: String?, fullName: String?, userProfileStatus: String?, userPaymentStatus: String?, isDeleted: Bool?, creationDateTime: String?, lastUpdatingDateTime: String?, userGroups: UserGroupResultDto?, stream: StreamResultDto?, comment: String?, photoUrl: String?, userTargets: [UserTargetDtoModel]?, targetCalculationInfo: TargetCalculationInfoDto?, location: String?, phoneNumber: String?, activitySphere: String?, paymentCalculationInfo: PaymentCalculationInfoDto?, biography: String?) {
+        self.id = id
+        self.externalId = externalId
+        self.username = username
+        self.fullName = fullName
+        self.userProfileStatus = userProfileStatus
+        self.userPaymentStatus = userPaymentStatus
+        self.isDeleted = isDeleted
+        self.creationDateTime = creationDateTime
+        self.lastUpdatingDateTime = lastUpdatingDateTime
+        self.userGroups = userGroups
+        self.stream = stream
+        self.comment = comment
+        self.photoUrl = photoUrl
+        self.userTargets = userTargets
+        self.targetCalculationInfo = targetCalculationInfo
+        self.location = location
+        self.phoneNumber = phoneNumber
+        self.activitySphere = activitySphere
+        self.paymentCalculationInfo = paymentCalculationInfo
+        self.biography = biography
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decodeIfPresent(Int.self, forKey: .id)
+        self.externalId = try container.decodeIfPresent(Int.self, forKey: .externalId)
+        self.username = try container.decodeIfPresent(String.self, forKey: .username)
+        self.fullName = try container.decodeIfPresent(String.self, forKey: .fullName)
+        self.userProfileStatus = try container.decodeIfPresent(String.self, forKey: .userProfileStatus)
+        self.userPaymentStatus = try container.decodeIfPresent(String.self, forKey: .userPaymentStatus)
+        self.isDeleted = try container.decodeIfPresent(Bool.self, forKey: .isDeleted)
+        self.creationDateTime = try container.decodeIfPresent(String.self, forKey: .creationDateTime)
+        self.lastUpdatingDateTime = try container.decodeIfPresent(String.self, forKey: .lastUpdatingDateTime)
+        self.userGroups = try container.decodeIfPresent(UserGroupResultDto.self, forKey: .userGroups)
+        self.stream = try container.decodeIfPresent(StreamResultDto.self, forKey: .stream)
+        self.comment = try container.decodeIfPresent(String.self, forKey: .comment)
+        self.photoUrl = try container.decodeIfPresent(String.self, forKey: .photoUrl)
+        self.userTargets = try container.decodeIfPresent([UserTargetDtoModel].self, forKey: .userTargets)
+        self.targetCalculationInfo = try container.decodeIfPresent(TargetCalculationInfoDto.self, forKey: .targetCalculationInfo)
+        self.location = try container.decodeIfPresent(String.self, forKey: .location)
+        self.phoneNumber = try container.decodeIfPresent(String.self, forKey: .phoneNumber)
+        self.activitySphere = try container.decodeIfPresent(String.self, forKey: .activitySphere)
+        self.paymentCalculationInfo = try container.decodeIfPresent(PaymentCalculationInfoDto.self, forKey: .paymentCalculationInfo)
+        self.biography = try container.decodeIfPresent(String.self, forKey: .biography)
     }
 }
 
@@ -117,5 +165,33 @@ struct TargetCategoryCalculationInfoDto: Codable, Hashable {
         self.quantityForUserProfile = quantityForUserProfile
         self.doneForUserProfile = doneForUserProfile
         self.percentageOfDoneAllCategoryForUserProfile = percentageOfDoneAllCategoryForUserProfile
+    }
+}
+
+
+extension UserProfileResultDto {
+    static func getTestUser() -> UserProfileResultDto {
+        UserProfileResultDto.init(
+            id: 16,
+            externalId: 17,
+            username: "dashabebneva",
+            fullName: "Daria Bebneva",
+            userProfileStatus: "DRAFT",
+            userPaymentStatus: "DRAFT",
+            isDeleted: false,
+            creationDateTime: "2025-04-06T13:43:27.782416",
+            lastUpdatingDateTime: "2025-04-06T13:49:39.54274",
+            userGroups: nil,
+            stream: nil,
+            comment: "Тестовый пользователь!\nШтрафы можно назначить только для теста!",
+            photoUrl: "https://t.me/i/userpic/320/i6xQ9kQLTuX0pwKKHNHP9EPcZ9mtatdhZFdTCOQzWfo.jpg",
+            userTargets: nil,
+            targetCalculationInfo: nil,
+            location: "Саратов",
+            phoneNumber: "+79272243688",
+            activitySphere: "Психолог",
+            paymentCalculationInfo: nil,
+            biography: "Что-то о себе"
+        )
     }
 }

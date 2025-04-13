@@ -75,8 +75,28 @@ struct FeedCell: View {
 
 #Preview {
     FeedCell(type: .payment, title: "Петр закрыл цель", subtitle: "Цель Выпить пива", date: "\(Date().toApiString)",
-             userProfile: .init(id: nil, externalId: nil, username: nil, fullName: "BVz gjgjg", userProfileStatus: nil, userPaymentStatus: nil, isDeleted: nil, creationDateTime: nil, lastUpdatingDateTime: nil, phoneNumber: nil, location: nil, userGroup: nil, stream: nil,
-                                photoUrl: "https://t.me/i/userpic/320/JSquw0AMRhjD23aa7jeO88wyDYFr03Z4CeAktb-q7BM.jpg", activitySphere: nil, biography: nil, targetCalculationInfo: nil, comment: nil, roles: nil), eventType: .TARGET_DONE)
+             userProfile: .init(
+                id: nil,
+                externalId: nil,
+                username: nil,
+                fullName: "BVz gjgjg",
+                userProfileStatus: nil,
+                userPaymentStatus: nil,
+                isDeleted: nil,
+                creationDateTime: nil,
+                lastUpdatingDateTime: nil,
+                userGroups: nil,
+                stream: nil,
+                comment: nil,
+                photoUrl: "https://t.me/i/userpic/320/JSquw0AMRhjD23aa7jeO88wyDYFr03Z4CeAktb-q7BM.jpg",
+                userTargets: nil,
+                targetCalculationInfo: nil,
+                location: nil,
+                phoneNumber: nil,
+                activitySphere: nil,
+                paymentCalculationInfo: nil,
+                biography: nil),
+             eventType: .TARGET_DONE)
 }
 
 enum FeedCellType {

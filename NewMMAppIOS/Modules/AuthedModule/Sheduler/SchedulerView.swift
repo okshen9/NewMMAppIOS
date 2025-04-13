@@ -34,7 +34,7 @@ struct SchedulerView: View {
                             Text("У вас нет событий")
                                 .font(.headline)
                                 .foregroundColor(.headerText)
-                                .frame(width: .infinity, alignment: .center)
+//                                .frame(width: .infinity, alignment: .center)
                             Spacer()
                         }
                     } else {

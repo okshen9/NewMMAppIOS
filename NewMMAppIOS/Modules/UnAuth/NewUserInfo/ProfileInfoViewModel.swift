@@ -92,7 +92,6 @@ class ProfileInfoViewModel: ObservableObject {
                                                                     photoUrl: profileModel?.photoUrl,
                                                                     location: userProfile.city,
                                                                     phoneNumber: userProfile.phoneNumber,
-                                                                    roles: profileModel?.roles,
                                                                     activitySphere: userProfile.occupation,
                                                                     authUserDto: authModel,
                                                                     biography: userProfile.about
@@ -130,17 +129,17 @@ class ProfileInfoViewModel: ObservableObject {
             if let error = error as? ResponseError {
                 switch error {
                 case let .responseBase(response: baseError, statusCode: code):
-                    ToastManager.shared.show(
-                        ToastModel(message: baseError.errorMessage.orEmpty, icon: "xmark", duration: 2)
+                    await ToastManager.shared.show(
+                        ToastModel(message: baseError.errorMessage.orEmpty, icon: "xmark.app", duration: 2)
                     )
                 default:
-                    ToastManager.shared.show(
-                        ToastModel(message: "Что-то пошло не так", icon: "xmark", duration: 2)
+                    await ToastManager.shared.show(
+                        ToastModel(message: "Что-то пошло не так", icon: "xmark.app", duration: 2)
                     )
                 }
             } else {
-                ToastManager.shared.show(
-                    ToastModel(message: "Что-то пошло не так", icon: "xmark", duration: 2)
+                await ToastManager.shared.show(
+                    ToastModel(message: "Что-то пошло не так", icon: "xmark.app", duration: 2)
                 )
             }
             print(error)

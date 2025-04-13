@@ -13,11 +13,14 @@ struct ProfileView: View {
         NavigationStack {
 
             VStack {
-                if viewModel.profile == nil || $viewModel.isLoading.wrappedValue  {
-                    shimerState()
+                if let profile = viewModel.profile, !viewModel.isLoading  {
+                    contentState(profile: profile)
                 } else {
-                    contentState()
-
+                    if viewModel.isLoading {
+                        shimerState()
+                    } else {
+                        Text("Не удалось загрузить профиль")
+                    }
                 }
             }
             .toolbarBackground(.hidden, for: .navigationBar)
@@ -30,8 +33,7 @@ struct ProfileView: View {
 
 
     @ViewBuilder
-    func contentState() -> some View {
-        if let profile = viewModel.profile {
+    func contentState(profile: UserProfileResultDto) -> some View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     MapView(viewModel:
@@ -153,12 +155,6 @@ struct ProfileView: View {
                 }
             }
             Spacer()
-        } else {
-            ShimmeringRectangle()
-                .frame(width: 88, height: 88)
-                .cornerRadius(44)
-            Spacer()
-        }
     }
 
     @ViewBuilder
@@ -226,7 +222,7 @@ struct ProfileView: View {
                     action: {})
             }
 
-            if let userGroup = profile.userGroup,
+            if let userGroup = profile.userGroups,
                let stream = profile.stream,
                let owners = userGroup.owners,
                let participants = userGroup.participants
@@ -240,13 +236,13 @@ struct ProfileView: View {
                         dateStart: (profile.stream?.dateFrom?.dateFromStringISO8601) ?? Date.init(timeIntervalSince1970: 232),
                         dateEnd: (profile.stream?.dateTo?.dateFromStringISO8601) ?? Date.now
                     )}, label: {
-                        GroupButton(title: profile.userGroup?.title ?? "Подгруппа",
-                                    subTitle: (profile.userGroup?.title).isNil ? "Не названчена" : nil,
+                        GroupButton(title: profile.userGroups?.title ?? "Подгруппа",
+                                    subTitle: (profile.userGroups?.title).isNil ? "Не названчена" : nil,
                                     action: {})
                     })
             } else {
-                GroupButton(title: profile.userGroup?.title ?? "Подгруппа",
-                            subTitle: (profile.userGroup?.title).isNil ? "Не названчена" : nil,
+                GroupButton(title: profile.userGroups?.title ?? "Подгруппа",
+                            subTitle: (profile.userGroups?.title).isNil ? "Не названчена" : nil,
                             action: {})
             }
 
@@ -294,12 +290,31 @@ extension ProfileView {
 }
 
 #Preview {
-    ProfileView(viewModel: ProfileViewModel(profile:.init(
-        id: nil, externalId: nil, username: nil, fullName: "Artem Neshko Sergeevich", userProfileStatus: nil, userPaymentStatus: nil, isDeleted: nil, creationDateTime: nil, lastUpdatingDateTime: nil, phoneNumber: nil, location: "Saratov", userGroup: nil, stream: nil, photoUrl: nil, activitySphere: nil,
-        biography: nil,
-        targetCalculationInfo: nil, comment: nil,
-        roles: nil))
-    )
+    ProfileView(viewModel: ProfileViewModel(profile:
+            .getTestUser()
+                                            //            .init(
+                                            //        id: nil,
+                                            //        externalId: nil,
+                                            //        username: nil,
+                                            //        fullName: "BVz gjgjg",
+                                            //        userProfileStatus: nil,
+                                            //        userPaymentStatus: nil,
+                                            //        isDeleted: nil,
+                                            //        creationDateTime: nil,
+                                            //        lastUpdatingDateTime: nil,
+                                            //        userGroups: nil,
+                                            //        stream: nil,
+                                            //        comment: nil,
+                                            //        photoUrl: "https://t.me/i/userpic/320/JSquw0AMRhjD23aa7jeO88wyDYFr03Z4CeAktb-q7BM.jpg",
+                                            //        userTargets: nil,
+                                            //        targetCalculationInfo: nil,
+                                            //        location: nil,
+                                            //        phoneNumber: nil,
+                                            //        activitySphere: nil,
+                                            //        paymentCalculationInfo: nil,
+                                            //        biography: nil))
+                                            //    )
+    ))
 }
 
 

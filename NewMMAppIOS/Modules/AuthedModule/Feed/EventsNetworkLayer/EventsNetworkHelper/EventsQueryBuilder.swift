@@ -48,6 +48,12 @@ enum EventsQueryBuilder: QueryItemsRepresentable {
                     items.append(URLQueryItem(name: searchParam.rawValue, value: isdStr))
                 case .issueId(let val):
                     items.append(URLQueryItem(name: searchParam.rawValue, value: val))
+                case .pageNumberPagination(let pageNumber):
+                    items.append(URLQueryItem(name: searchParam.rawValue, value: pageNumber))
+                case .pageSizePagination(let pageSize):
+                    items.append(URLQueryItem(name: searchParam.rawValue, value: pageSize))
+                case .sortDisplayDate(let typeSort):
+                    items.append(URLQueryItem(name: searchParam.rawValue, value: typeSort.rawValue))
                 }
             }
             return items
@@ -75,7 +81,13 @@ struct EventsQuery {
         case assigneeExternalIds([String])
         /// id сущности, к которой привязан эвент
         case issueId(String)
-        
+        /// номер страницы пагинации
+        case pageNumberPagination(String)
+        /// размер страницы
+        case pageSizePagination(String)
+        /// сортировка
+        case sortDisplayDate(SortType = .DESC)
+
         
         var rawValue: String {
             switch self {
@@ -95,61 +107,23 @@ struct EventsQuery {
             case .assigneeExternalIds(let externalIds): return "assigneeExternalIds"
                 /// id сущности, к которой привязан эвент
             case .issueId: return "issueId"
+                /// номер страницы пагианации
+            case .pageNumberPagination(let page):
+                return "pageNumber"
+                /// количество элементов в странице
+            case .pageSizePagination(let size):
+                return "pageSize"
+                /// сортировка по отображемой дате
+            case .sortDisplayDate:
+                return "sort_displayDate"
             }
         }
     }
-    
-//    enum EventsType: Hashable {
-//        case targetExpired
-//        case targetExpiredDone
-//        case targetDone
-//        case targetInProgress
-//        case anyValue(String)
-//
-//        var name: String {
-//            switch self {
-//            case .targetExpired: return Costants.Name.TARGET_EXPIRED.rawValue
-//            case .targetExpiredDone: return Costants.Name.TARGET_EXPIRED_DONE.rawValue
-//            case .targetDone: return Costants.Name.TARGET_DONE.rawValue
-//            case .targetInProgress: return Costants.Name.TARGET_IN_PROGRESS.rawValue
-//            case .anyValue(let value): return value
-//            }
-//        }
-//
-//        init (rawValue: String) {
-//            switch rawValue {
-//            case Costants.Key.TARGET_EXPIRED: self = .targetExpired
-//            case Costants.Key.TARGET_EXPIRED_DONE: self = .targetExpiredDone
-//            case Costants.Key.TARGET_DONE: self = .targetDone
-//            case Costants.Key.TARGET_IN_PROGRESS: self = .targetInProgress
-//            default: self = .anyValue(rawValue)
-//            }
-//        }
-//
-//        var rawValue: String {
-//            switch self {
-//            case .targetExpired: return Costants.Key.TARGET_EXPIRED
-//            case .targetExpiredDone: return Costants.Key.TARGET_EXPIRED_DONE
-//            case .targetDone: return Costants.Key.TARGET_DONE
-//            case .targetInProgress: return Costants.Key.TARGET_IN_PROGRESS
-//            case .anyValue(let value): return value
-//            }
-//        }
-//
-//        enum Costants {
-//            enum Key {
-//                static let TARGET_EXPIRED = "TARGET_EXPIRED"
-//                static let TARGET_EXPIRED_DONE = "TARGET_EXPIRED_DONE"
-//                static let TARGET_DONE = "TARGET_DONE"
-//                static let TARGET_IN_PROGRESS = "TARGET_IN_PROGRESS"
-//            }
-//
-//            enum Name: String {
-//                case TARGET_EXPIRED = "Цель просрочена"
-//                case TARGET_EXPIRED_DONE = "Цель завершена с просрочкой"
-//                case TARGET_DONE = "Цель завершена"
-//                case TARGET_IN_PROGRESS = "Цель в работе"
-//            }
-//        }
-//    }
+}
+
+enum SortType: String, CaseIterable {
+    /// по возврастания
+    case ASK = "ASK"
+    /// по убыванию
+    case DESC = "DESC"
 }

@@ -120,13 +120,13 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                         if await viewModelEnvironment.saveTarget(newTarget, isCreateTarget: isCreateTarget) != nil {
                             
                             isLoading = false
-                            ToastManager.shared.show(
+                            await ToastManager.shared.show(
                                 //                                🎯
                                 ToastModel(message: "Цель успешно отправлена на рассмотерение", icon: "checkmark.circle", duration: 2)
                             )
                             dismiss()
                         } else {
-                            ToastManager.shared.show(
+                            await ToastManager.shared.show(
                                 ToastModel(message: "Ошибка изменения цели", icon: "xmark", duration: 2)
                             )
                             isLoading = false

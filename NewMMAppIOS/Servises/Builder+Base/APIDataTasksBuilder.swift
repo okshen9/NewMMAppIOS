@@ -165,7 +165,7 @@ extension APIDataTasksBuilder {
             let responseObject = try decoder.decode(T.self, from: data)
             return (responseObject, httpResponse.allHeaderFields)
         } catch {
-            print("Neshko responseObject Error: \(error)")
+            print("Neshko responseObject Error: \(error) ")
             throw APIError.responseObject
             //            let mapError = ResponseError.mapping(
             //                response: httpResponse,
@@ -224,6 +224,7 @@ extension URLSession {
         }
 
         let onCancel = {
+            print("onCancel")
             dataTask?.cancel()
         }
 
@@ -233,8 +234,9 @@ extension URLSession {
                     guard let data = data, let response = response else {
                         let error = error ?? URLError.cannotBeFormed
                         onError(error)
+                        print("Neshko withCheckedThrowingContinuation Error")
                         return continuation.resume(throwing: error)
-//                        print("Neshko cannotBeFormed Error")
+
 //                        return continuation.resume(throwing: error ?? URLError.cannotBeFormed)
                     }
                     onSuccess(data, response)

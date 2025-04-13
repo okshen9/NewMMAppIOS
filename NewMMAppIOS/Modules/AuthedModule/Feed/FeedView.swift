@@ -19,8 +19,7 @@ struct FeedView: View {
     var body: some View {
         NavigationStack(path: $path) {
             ScrollView {
-
-                VStack {
+                LazyVStack(spacing: 8) {
                     if viewModel.isLoading {
                         shimerState()
                     } else {
@@ -33,28 +32,31 @@ struct FeedView: View {
                                         ProfileView(viewModel: .init(externalId: profileId))
                                     }
                                 }, label: {
-                                    FeedCell(
-                                        type: .task,
-                                        title: event.title.orEmpty,
-                                        subtitle: event.description.orEmpty,
-                                        date: event.displayDate ?? Date().toApiString,
-                                        userProfile: event.userProfile,
-                                        eventType: event.type)
-                                    .padding(.horizontal, 16)
+                                    NewFeedCell(event: event)
                                 })
 
                             }
-
+                            if !viewModel.isAll {
+                                ActivityCell()
+                                    .onAppear {
+                                        Task.detached {
+                                            await viewModel.getNextEvents(resetSearch: false)
+                                        }
+                                    }
+                            }
                         } else {
                             Text("У вас пока нет новостей")
                         }
 
                     }
                 }
-
-
+                .padding(.horizontal, 8)
+                .padding(.top, 8)
             }
-
+            .navigationTitle("События")
+            .refreshable {
+                await viewModel.getNextEvents(resetSearch: true)
+            }
             .onAppear {
                 viewModel.onApper()
             }
@@ -65,10 +67,10 @@ struct FeedView: View {
 
                 }
             }
-            .navigationTitle("Новости")
+
         }
     }
-    
+
     // MARK: - ViewBuilder
     @ViewBuilder
     func shimerState() -> some View {

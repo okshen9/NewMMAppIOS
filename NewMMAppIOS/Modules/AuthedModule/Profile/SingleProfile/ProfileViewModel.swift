@@ -62,6 +62,8 @@ final class ProfileViewModel: ObservableObject {
                 await updateUI(profile: updatetedProfile)
             }
         } catch {
+            await ToastManager.shared.show(.baseError)
+            await updateUI(profile: nil)
             print("Neshko updateProfile \(error) - Ошибка загрзуки профиля на странице профиля")
         }
     }

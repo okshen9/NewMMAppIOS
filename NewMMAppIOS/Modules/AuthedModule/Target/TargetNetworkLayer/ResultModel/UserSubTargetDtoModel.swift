@@ -7,7 +7,7 @@
 import Foundation
 
 /// Модель результата для UserSubTargetDto
-struct UserSubTargetDtoModel: Codable, JSONRepresentable, Identifiable {
+struct UserSubTargetDtoModel: Codable, JSONRepresentable, Identifiable, Hashable {
     /// Идентификатор подцели
     var id: Int?
     /// Название подцели

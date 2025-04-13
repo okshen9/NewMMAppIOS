@@ -74,10 +74,10 @@ struct TestScreenVC: View {
         do {
             UIPasteboard.general.string = ToastManager.shared.analyticStack.joined(separator: "\n")
 
-            ToastManager.shared.show(.init(message: "Успешно скопировано", icon: "checkmark.circle", duration: 2))
+            await ToastManager.shared.show(.init(message: "Успешно скопировано", icon: "checkmark.circle", duration: 2))
         }
         catch {
-            ToastManager.shared.show(.init(message: "ошибка копирования", icon: "xmark", duration: 2))
+            await ToastManager.shared.show(.init(message: "ошибка копирования", icon: "xmark", duration: 2))
             print("Ошибка testReq: \(error)")
         }
     }

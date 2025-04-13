@@ -22,9 +22,11 @@ final class ToastManager: ObservableObject {
         NotificationCenter.default.addObserver(self, selector: #selector(notifificationReceived), name: testNotification, object: nil)
     }
 
-    func show(_ toast: ToastModel) {
-        self.toast = toast
-        
+    func show(_ toast: ToastModel) async {
+        await MainActor.run {
+            self.toast = toast
+        }
+
         DispatchQueue.main.asyncAfter(deadline: .now() + toast.duration) {
             withAnimation {
                 self.toast = nil
