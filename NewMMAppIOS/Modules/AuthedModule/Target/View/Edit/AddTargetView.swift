@@ -90,7 +90,7 @@ struct AddTargetView: View {
             id: subTargets.count + 1, // Временный ID (в реальном приложении это должно генерироваться на сервере)
             title: newSubTargetTitle,
             description: newSubTargetDescription,
-            subTargetPercentage: 0, // Начальный прогресс
+            subTargetPercentage: 100.0/Double(subTargets.count + 1), // значение размера таргета
             targetSubStatus: .notDone, // Статус по умолчанию
             rootTargetId: 0, // Временное значение (будет обновлено после сохранения основной цели)
             isDeleted: false,
@@ -108,6 +108,9 @@ struct AddTargetView: View {
     
     // Сохранение основной цели
     private func saveTarget() {
+        for (index, _) in subTargets.enumerated() {
+            subTargets[index].subTargetPercentage = 100.0/Double(subTargets.count)
+        }
         let newTarget = UserTargetDtoModel(
             id: 0, // Временный ID (в реальном приложении это должно генерироваться на сервере)
             title: title,

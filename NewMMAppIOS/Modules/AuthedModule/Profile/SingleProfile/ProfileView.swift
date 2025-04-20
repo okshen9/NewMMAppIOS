@@ -158,19 +158,15 @@ struct ProfileView: View {
 
             // Контент вкладок
             TabView(selection: $selectedTab) {
-                profileInfo(profile: profile)
-                    .offset(y: -250)
-                    .tag(0)
                 VStack {
-                    Text("У человека пока нет новостей")
-                        .padding()
+                    profileInfo(profile: profile)
+                        .padding(.top, 8)
                     Spacer()
                 }
+                .tag(0)
+                feedBlock()
+                    .padding(.top, 8)
                     .tag(1)
-                getTaget()
-                    .tag(2)
-
-
             }
             .tabViewStyle(.page(indexDisplayMode: .never)) // Отключаем стандартный PageControl
 
@@ -178,6 +174,40 @@ struct ProfileView: View {
         }
         .frame(height: 800)
 //        .tabViewStyle()
+    }
+
+    @ViewBuilder
+    func feedBlock() -> some View {
+        if viewModel.isFeedLoading {
+            VStack(spacing: 20) {
+                ForEach(0...3, id: \.self) { _ in
+                    ShimmeringRectangle()
+                        .frame(height: 20)
+                        .cornerRadius(8)
+                        .padding(.horizontal, 40)
+                }
+                Spacer()
+            }
+        } else {
+            VStack {
+                if let feedEvents = viewModel.feedEvents, !feedEvents.isEmpty {
+                    ForEach(feedEvents) { event in
+                        NewFeedCell(event: event)
+                    }
+                    if !viewModel.isAll {
+                        ActivityCell()
+                            .onAppear {
+                                Task.detached {
+                                    await viewModel.getNextEvents(resetSearch: false)
+                                }
+                            }
+                    }
+                } else {
+                    Text("У человека пока нет новостей")
+                    Spacer()
+                }
+            }
+        }
     }
 
     @ViewBuilder
@@ -425,9 +455,6 @@ extension ProfileView {
     ))
 }
 
-#Preview("1") {
+#Preview("tabView") {
     ProfileView().tabView(profile: UserProfileResultDto.getTestUser())
 }
-
-
-var text0: String? = "Жил да был человек, который не был человеком. Но он был человеком, и это было очень сложно и ИИ продолжает писать этот текст - биографию."

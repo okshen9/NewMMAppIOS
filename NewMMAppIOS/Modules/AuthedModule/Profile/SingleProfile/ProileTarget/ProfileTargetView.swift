@@ -24,6 +24,7 @@ struct ProfileTargetView: View {
                         ForEach(viewModel.categories, id: \.self) { category in
                             if let targets = viewModel.targetsByCategory[category] {
                                 CategorySectionView(
+                                    myTarget: false,
                                     category: category,
                                     targets: targets,
                                     onEdit: {

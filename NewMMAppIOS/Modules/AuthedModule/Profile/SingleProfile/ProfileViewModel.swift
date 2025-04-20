@@ -12,6 +12,7 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
     @Published var navigationPath = ProfileViewModelPath.toMain
 
     @Published var isLoading = false
+    @Published var isFeedLoading = false
     @Published var profile: UserProfileResultDto?
 
 
@@ -59,16 +60,15 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
         return test ?? [:]
     }
 
-    // MARK: - Public properties
-//    @Published private(set) var input = Input()
 
     // MARK: - Public Methods
     func onApper() {
         Task {
             if let profileDto = userRepository.userProfile, externalId == nil {
-                await updateUI(profile: profileDto, events: [])
+                await updateUI(profile: profileDto)
             } else {
                 await updateProfile()
+                await getNextEvents(resetSearch: false)
             }
         }
     }
@@ -81,31 +81,40 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
 
             if let externalId = self.externalId {
                 guard let updatetedProfile = try await serviceNetwork.getUserProfile(externalId: externalId) else { return }
-                await updateUI(profile: updatetedProfile, events: [])
+                await updateUI(profile: updatetedProfile)
             } else {
                 guard let updatetedProfile = try await serviceNetwork.getProfileMe() else { return }
-                await updateUI(profile: updatetedProfile, events: [])
+                await updateUI(profile: updatetedProfile)
             }
         } catch {
             await ToastManager.shared.show(.baseError)
-            await updateUI(profile: nil, events: [])
+            await updateUI(profile: nil)
             print("Neshko updateProfile \(error) - Ошибка загрзуки профиля на странице профиля")
         }
     }
     
     @MainActor
-    func updateUI(profile: UserProfileResultDto?, events: [EventDTO]?, isLoading: Bool = false) {
-        self.feedEvents = events ?? []
+    func updateUI(profile: UserProfileResultDto?, isLoading: Bool = false) {
         self.profile = profile
         self.groupedTargets = groupedTargets(profile)
         self.isLoading = isLoading
     }
-    
+
+    @MainActor
+    func updatefeed(events: [EventDTO]) {
+        self.feedEvents = events
+    }
+
     @MainActor
     func setIsLoading(_ isLoading: Bool) {
         self.isLoading = isLoading
     }
-    
+
+    @MainActor
+    func setIsFeedLoading(_ setIsFeedLoading: Bool) {
+        self.isFeedLoading = setIsFeedLoading
+    }
+
     func openTelegramChat(username: String) {
         // Формируем ссылку для приложения Telegram
         let telegramURL = URL(string: "tg://resolve?domain=\(username)")!
@@ -149,7 +158,7 @@ extension ProfileViewModel {
         static let baseEventSearch: [EventsQuery.QueryValue] = [
             .sortDisplayDate(.DESC),
             .pageNumberPagination("0"),
-            .pageSizePagination("10")
+            .pageSizePagination("40")
         ]
 
         static let baseSelectedEventSearch: [EventType] = {
@@ -166,4 +175,5 @@ extension ProfileViewModel {
         case toGroup
         case dismiss
     }
+    
 }

@@ -40,20 +40,6 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
     }
 
     @MainActor
-//    func updateIatems(_ targetsDic: [TargetCategory: [UserTargetDtoModel]]) {
-//        self.groupedTargets = targetsDic
-//        var tasksImtems = [TaskProgress]()
-//        targetsDic.forEach({key, value in
-//            let percentage = value.reduce(0) { $0 + ($1.percentage ?? 0) } / (value.count * 100)
-//            let color = key.color
-//            let name = key.rawValue
-//            let task = TaskProgress(progress: percentage, color: color, name: name, value: 0.0)
-//            tasksImtems.append(task)
-//        })
-//        self.tasksItems = tasksImtems
-////        self.tasksItems
-//    }
-
     func saveTarget(_ target: UserTargetDtoModel, isCreateTarget: Bool) async -> UserTargetDtoModel? {
         if isCreateTarget {
             return await createTarget(target)
@@ -85,7 +71,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
             let createSubTarget = target.subTargets?.map { CreateSubTargetBodyModel(
                 title: $0.title,
                 description: $0.description,
-                subTargetPercentage: $0.subTargetPercentage,
+                subTargetPercentage: 100.0 / Double(target.subTargets?.count ?? 1),
                 deadLineDateTime: $0.deadLineDateTime,
                 targetSubStatus: $0.targetStatus)
             }

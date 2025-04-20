@@ -11,14 +11,13 @@ import Foundation
 extension ProfileViewModel {
     func getNextEvents(resetSearch: Bool) async {
         do {
-            guard !isLoading else { return }
             // Включает в себя пагинацию и сортровку в базовой версии
             var searchParams: [EventsQuery.QueryValue]
             // если поиск пустой или с нуля
             if feedEvents.isEmptyOrNil || resetSearch {
-                await self.setIsLoading(true)
+                await self.setIsFeedLoading(true)
 
-                await self.updateUI(profile: nil, events: nil, isLoading: true)
+                await self.updatefeed(events: [])
                 self.searchResponseDTO = nil
 
                 searchParams = Constants.baseEventSearch
@@ -33,7 +32,7 @@ extension ProfileViewModel {
             await updateCurrentEvents(with: searchResponse)
         } catch {
             await setIsPaginationLoding(false)
-            await setIsLoading(false)
+            await setIsFeedLoading(false)
             await ToastManager.shared.show(.baseError)
         }
     }
@@ -78,7 +77,7 @@ extension ProfileViewModel {
             self.isAll = searchResponseDTO.isAll
             // отменяем шимеры загрузки
         }
-        await self.setIsLoading(false)
+        await self.setIsFeedLoading(false)
         await self.setIsPaginationLoding(false)
     }
 }

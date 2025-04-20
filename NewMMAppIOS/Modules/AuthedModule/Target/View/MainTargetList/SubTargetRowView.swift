@@ -14,7 +14,8 @@ protocol SubTargetRowViewModelProtocol: ObservableObject {
 
 struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
     @EnvironmentObject var viewModelEnvironment: ViewModel
-    
+    var myTarget = true
+
     @State private var showConfirmationDialog = false
     @State private var isLoading = false
     
@@ -50,7 +51,9 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
     @ViewBuilder
     func closeButton() -> some View {
         Button(action: {
+            if myTarget {
                 showConfirmationDialog = true
+            }
         }) {
             Image(systemName: subTarget.targetStatus == .done ? "checkmark.circle.fill" : "circle")
                 .foregroundColor(subTarget.targetStatus == .done ? .green : .gray)

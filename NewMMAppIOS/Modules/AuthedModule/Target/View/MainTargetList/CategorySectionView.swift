@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CategorySectionView: View {
-    let myTarget = true
+    var myTarget = true
     var category: TargetCategory
     var targets: [UserTargetDtoModel] // Список целей для выбранной категории
     @State var onEdit: () -> Void // Замыкание для редактирования категории
@@ -24,7 +24,8 @@ struct CategorySectionView: View {
             }
         ) {
             ForEach(targets) { target in
-                TargetRowView<TargetsViewModel>(target: target)
+                TargetRowView<TargetsViewModel>(myTarget: myTarget,
+                                                target: target)
             }
             .onChange(of: targets, {
                 print("Изменилась CategorySectionView")

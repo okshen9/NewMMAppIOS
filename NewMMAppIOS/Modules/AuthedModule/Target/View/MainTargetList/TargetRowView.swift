@@ -15,8 +15,9 @@ protocol TargetRowViewModelProtocol: ObservableObject {
 }
 
 struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
-    @EnvironmentObject var viewModelEnvironment: ViewModel
+    @EnvironmentObject private var viewModelEnvironment: ViewModel
 
+    var myTarget = true
     /// Отображаемый таргет
     var target: UserTargetDtoModel
     
@@ -38,12 +39,12 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             headerView()
-            
             // Подцели
             if isExpanded,
                let subTargets = target.subTargets {
                 ForEach(subTargets) { subTarget in
-                    SubTargetRowView<TargetsViewModel>(subTarget: subTarget)
+                    SubTargetRowView<TargetsViewModel>(myTarget: myTarget,
+                                                       subTarget: subTarget)
                 }
             }
             let targetButtonStatus = targetButtonStatus(target: target)
@@ -63,34 +64,37 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
         .scaleEffect(isPressed ? 1.05 : 1.0)
         // Анимация
         .animation(.easeInOut(duration: 0.3), value: isPressed)
-        
         .onLongPressGesture(
             // Минимальная длительность нажатия
             minimumDuration: 0.5,
             // Обновляем состояние нажатия
             pressing: { isPressing in
-                withAnimation { isPressed = isPressing }
+                if myTarget {
+                    withAnimation { isPressed = isPressing }
+                }
             },
             perform: {
-                showLongTapDialog = true
+                if myTarget {
+                    showLongTapDialog = true
+                }
             }
         )
         .actionSheet(isPresented: $showLongTapDialog) {
-            ActionSheet(
-                title: Text("Действия с целью"),
-                buttons: [
-                    .default(Text("Изменить цель")) {
-                        isEditing = true
-                    },
-                    .destructive(Text("Удалить цель")) {
-                        viewModelEnvironment.deleteTarget(target: target)
-                        
-                    },
-                    .cancel(Text("Отмена")) {
-                        //                        selection = "Blue"
-                    },
-                ]
-            )
+                ActionSheet(
+                    title: Text("Действия с целью"),
+                    buttons: [
+                        .default(Text("Изменить цель")) {
+                            isEditing = true
+                        },
+                        .destructive(Text("Удалить цель")) {
+                            viewModelEnvironment.deleteTarget(target: target)
+
+                        },
+                        .cancel(Text("Отмена")) {
+                            //                        selection = "Blue"
+                        },
+                    ]
+                )
         }
     }
     
