@@ -42,16 +42,6 @@ struct PaymentRequestResponseDto: Codable {
         self.paymentRequestStatus = paymentRequestStatus ?? PaymentRequestStatus.overdue
         self.userProfilePreview = userProfilePreview ?? UserRepository.shared.userProfile
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 }
 
 enum PaymentRequestStatus: String, Codable, UnknownCasedEnum {

@@ -9,16 +9,16 @@ import SwiftUI
 
 struct ImageSheduler: View {
     let event: CalendatItem
+    var font: Font = .system(size: 16)
+    
     var body: some View {
         switch event.type {
         case .target:
             getTargetImage()
         case .payment:
             getPaymentImage()
-        case .anyEvent(_):
-            Constants.checkmarkImageEmpty
-                .renderingMode(.template)
-                .foregroundStyle(.gray)
+        case .anyEvent:
+            getDefaultEventImage()
         }
     }
 
@@ -27,14 +27,36 @@ struct ImageSheduler: View {
         if let status = event.target?.targetStatus {
             switch status {
             case .inProgress:
-                Constants.checkmarkImage
+                Constants.targetInProgressImage
                     .renderingMode(.template)
                     .foregroundStyle(.green)
+                    .font(font)
+                    .symbolRenderingMode(.hierarchical)
+            case .done:
+                Constants.targetDoneImage
+                    .renderingMode(.template)
+                    .foregroundStyle(.green)
+                    .font(font)
+                    .symbolRenderingMode(.hierarchical)
+            case .expired:
+                Constants.targetExpiredImage
+                    .renderingMode(.template)
+                    .foregroundStyle(.orange)
+                    .font(font)
+                    .symbolRenderingMode(.hierarchical)
             default:
-                Constants.checkmarkImage
+                Constants.targetDefaultImage
                     .renderingMode(.template)
                     .foregroundStyle(.green)
+                    .font(font)
+                    .symbolRenderingMode(.hierarchical)
             }
+        } else {
+            Constants.targetDefaultImage
+                .renderingMode(.template)
+                .foregroundStyle(.green)
+                .font(font)
+                .symbolRenderingMode(.hierarchical)
         }
     }
 
@@ -43,22 +65,61 @@ struct ImageSheduler: View {
         if let status = event.payment?.paymentRequestStatus {
             switch status {
             case .wait:
-                Constants.moneyImage
+                Constants.paymentWaitingImage
                     .renderingMode(.template)
                     .foregroundStyle(.red)
+                    .font(font)
+                    .symbolRenderingMode(.hierarchical)
+            case .canceled:
+                Constants.paymentCancelledImage
+                    .renderingMode(.template)
+                    .foregroundStyle(.red)
+                    .font(font)
+                    .symbolRenderingMode(.hierarchical)
             default:
-                Constants.moneyImage
+                Constants.paymentDefaultImage
                     .renderingMode(.template)
                     .foregroundStyle(.red)
+                    .font(font)
+                    .symbolRenderingMode(.hierarchical)
             }
         } else {
-            Image(systemName: "")
+            Constants.paymentDefaultImage
+                .renderingMode(.template)
+                .foregroundStyle(.red)
+                .font(font)
+                .symbolRenderingMode(.hierarchical)
         }
+    }
+    
+    @ViewBuilder
+    func getDefaultEventImage() -> some View {
+        Constants.defaultEventImage
+            .renderingMode(.template)
+            .foregroundStyle(.blue)
+            .font(font)
+            .symbolRenderingMode(.hierarchical)
     }
 }
 
 extension ImageSheduler {
     enum Constants {
+        // Целевые иконки
+        static let targetDefaultImage = Image(systemName: "star.fill")
+        static let targetInProgressImage = Image(systemName: "star.fill")
+        static let targetDoneImage = Image(systemName: "star.fill.checkmark")
+        static let targetExpiredImage = Image(systemName: "star.exclamationmark.fill")
+        
+        // Иконки платежей
+        static let paymentDefaultImage = Image(systemName: "creditcard.fill")
+        static let paymentWaitingImage = Image(systemName: "creditcard.fill")
+        static let paymentCompletedImage = Image(systemName: "creditcard.fill.checkmark")
+        static let paymentCancelledImage = Image(systemName: "creditcard.fill.slash")
+        
+        // Остальные иконки
+        static let defaultEventImage = Image(systemName: "calendar.badge")
+        
+        // Устаревшие иконки (оставлены для обратной совместимости)
         static let xmarkImage = Image(systemName: "xmark.seal.fill")
         static let checkmarkImageEmpty = Image(systemName: "checkmark.seal")
         static let checkmarkImage = Image(systemName: "checkmark.seal.fill")
@@ -67,26 +128,54 @@ extension ImageSheduler {
         static let moneyImage = Image(systemName: "dollarsign.circle.fill")
         static let refreshImage = Image(systemName: "arrow.clockwise.circle.fill")
         static let dollarsignImage = Image(systemName: "dollarsign")
-
     }
 }
 
 #Preview {
-    let item = CalendatItem(
-        payment: .init(
-            id: 12,
-            externalId: 11,
-            amount: 100.0,
-            dueDate: Date().toApiString,
-            comment: "надо оплатить",
-            paymentRequestStatus: PaymentRequestStatus.wait,
-            userProfilePreview: UserProfileResultDto.getTestUser()
-        ),
-        target: .getBaseTarget(),
-        user: .getTestUser(),
-        title: "Что-то",
-        type: .target,
-        date: Date()
-    )
-    ImageSheduler(event: item)
+    VStack(spacing: 20) {
+        HStack(spacing: 30) {
+            // Цели
+            VStack {
+                Text("Цели").font(.caption)
+                ZStack {
+                    Circle()
+                        .fill(Color.green.opacity(0.15))
+                        .frame(width: 40, height: 40)
+                    ImageSheduler(
+                        event: CalendatItem(
+                            payment: nil,
+                            target: UserTargetDtoModel(targetStatus: .inProgress),
+                            user: .getTestUser(),
+                            title: "Цель в процессе",
+                            type: .target,
+                            date: Date()
+                        ),
+                        font: .system(size: 18)
+                    )
+                }
+            }
+            
+            // Платежи
+            VStack {
+                Text("Платежи").font(.caption)
+                ZStack {
+                    Circle()
+                        .fill(Color.red.opacity(0.15))
+                        .frame(width: 40, height: 40)
+                    ImageSheduler(
+                        event: CalendatItem(
+                            payment: PaymentRequestResponseDto(paymentRequestStatus: .wait),
+                            target: nil,
+                            user: .getTestUser(),
+                            title: "Платеж ожидает",
+                            type: .payment,
+                            date: Date()
+                        ),
+                        font: .system(size: 18)
+                    )
+                }
+            }
+        }
+    }
+    .padding()
 }

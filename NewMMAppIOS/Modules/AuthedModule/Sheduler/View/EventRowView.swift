@@ -9,25 +9,117 @@ import SwiftUI
 
 struct EventRowView: View {
     let event: CalendatItem
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
+        HStack(spacing: 12) {
+            // Иконка события
+            eventIconView
+            
+            // Данные события
+            VStack(alignment: .leading, spacing: 6) {
                 Text(event.title)
-                    .font(.headline)
-                    .foregroundColor(.headerText)
-                Text(event.type.name)
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundColor(.primary)
+                    .lineLimit(2)
+                
+                HStack(spacing: 8) {
+                    Text(event.type.name)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    if let amount = event.payment?.amount, event.type == .payment {
+                        Text("•")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Text("\(Int(amount)) ₽")
+                            .font(.caption.weight(.semibold))
+                            .foregroundColor(Color.mainRed)
+                    }
+                }
             }
+            
             Spacer()
-            ImageSheduler(event: event)
-                .frame(width: 16, height: 16)
-//            Circle()
-//                .fill(Color(event.type.color))
-//                .frame(width: 16, height: 16)
+            
+            // Статус события
+//            if let date = event.date {
+                dateStatusView(event.date)
+//            }
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, 12)
+    }
+    
+    // MARK: - Event Icon
+    private var eventIconView: some View {
+        ZStack {
+            Circle()
+                .fill(eventColor.opacity(0.15))
+                .frame(width: 40, height: 40)
+            
+            ImageSheduler(event: event)
+                .font(.system(size: 18))
+        }
+    }
+    
+    // MARK: - Date Status
+    private func dateStatusView(_ date: Date) -> some View {
+        VStack(spacing: 2) {
+            Text(relativeDateString(date))
+                .font(.caption)
+                .foregroundColor(isOverdue(date) ? .red : .secondary)
+            
+            Text(dateString(date))
+                .font(.caption2)
+                .foregroundColor(.secondary)
+        }
+    }
+    
+    // MARK: - Helper Methods
+    private var eventColor: Color {
+        switch event.type {
+        case .payment:
+            return Color.mainRed
+        case .target:
+            return Color.green
+        case .anyEvent:
+            return Color.blue
+        }
+    }
+    
+    private func dateString(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.dateFormat = "d MMM"
+        return formatter.string(from: date)
+    }
+    
+    private func relativeDateString(_ date: Date) -> String {
+        let today = Calendar.current.startOfDay(for: Date())
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today)!
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: today)!
+        
+        if Calendar.current.isDate(date, inSameDayAs: today) {
+            return "Сегодня"
+        } else if Calendar.current.isDate(date, inSameDayAs: tomorrow) {
+            return "Завтра"
+        } else if Calendar.current.isDate(date, inSameDayAs: yesterday) {
+            return "Вчера"
+        } else {
+            return "\(daysDifference(from: today, to: date)) дн."
+        }
+    }
+    
+    private func isOverdue(_ date: Date) -> Bool {
+        let today = Calendar.current.startOfDay(for: Date())
+        return date < today
+    }
+    
+    private func daysDifference(from date1: Date, to date2: Date) -> Int {
+        let days = Calendar.current.dateComponents([.day], from: date1, to: date2).day ?? 0
+        if days < 0 {
+            return days
+        } else {
+            return days + 1 // +1 because we count inclusively (tomorrow = 2 days)
+        }
     }
 }
 
@@ -44,9 +136,28 @@ struct EventRowView: View {
         ),
         target: .getBaseTarget(),
         user: .getTestUser(),
-        title: "Что-то",
-        type: .target,
+        title: "Оплата курса наставничества",
+        type: .payment,
         date: Date()
     )
-    EventRowView(event: item)
+    
+    return VStack {
+        EventRowView(event: item)
+            .padding()
+            .background(Color.white)
+            .cornerRadius(8)
+        
+        EventRowView(event: CalendatItem(
+            payment: nil,
+            target: .getBaseTarget(),
+            user: .getTestUser(),
+            title: "Закрыть цель: Прочитать книгу по SwiftUI",
+            type: .target,
+            date: Date().addingTimeInterval(86400) // Tomorrow
+        ))
+        .padding()
+        .background(Color.white)
+        .cornerRadius(8)
+    }
+    .padding()
 }

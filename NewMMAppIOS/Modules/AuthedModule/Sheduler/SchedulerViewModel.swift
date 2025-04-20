@@ -68,49 +68,51 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
         
         var rawTempScheduleListItems = [Date: [CalendatItem]]()
         
+        // Обработка платежей
         paymant.forEach({ payMent in
             guard let dateOfPay = payMent.dueDate?.dateFromStringISO8601,
                   var user = userRepository.userProfile
             else { return }
-            let componentOfPay = dateOfPay.dateComponentsFor()
             
-            let name = "Запланировал платеж \(payMent.amount ?? 0.0)"
+            // Используем startOfDay для группировки по дням
+            let startOfDay = Calendar.current.startOfDay(for: dateOfPay)
+            let componentOfPay = startOfDay.dateComponentsFor()
             
-            var currentScheduleListItems = rawTempScheduleListItems[dateOfPay] ?? []
+            let name = "Оплата \(payMent.amount ?? 0.0) ₽"
+            
+            var currentScheduleListItems = rawTempScheduleListItems[startOfDay] ?? []
             currentScheduleListItems.append(.init(payment: payMent, target: nil, user: user, title: name, type: .payment, date: dateOfPay))
-            rawTempScheduleListItems[dateOfPay] = currentScheduleListItems
+            rawTempScheduleListItems[startOfDay] = currentScheduleListItems
         })
         
+        // Обработка целей
         targets.forEach({ target in
             guard let component = target.deadLineDateTime?.dateFromStringISO8601,
                   var user = userRepository.userProfile
             else { return }
             
+            // Используем startOfDay для группировки по дням
+            let startOfDay = Calendar.current.startOfDay(for: component)
+            
             let name = "Крайний срок цели: \(target.title ?? "Цель без названия")"
-            var enetsCurrent = rawTempScheduleListItems[component] ?? []
+            var enetsCurrent = rawTempScheduleListItems[startOfDay] ?? []
             enetsCurrent.append(.init(payment: nil, target: target, user: user, title: name, type: .target, date: component))
-            rawTempScheduleListItems[component] = enetsCurrent
+            rawTempScheduleListItems[startOfDay] = enetsCurrent
         })
         
+        // Уже сгруппировали по дням, поэтому дополнительная группировка не нужна
+        let tempScheduleListItems = rawTempScheduleListItems
         
-        var tempScheduleListItems = rawTempScheduleListItems.reduce(into: [Date: [CalendatItem]]()) { result, entry in
-            let startOfDay = Calendar.current.startOfDay(for: entry.key)
-            result[startOfDay, default: []].append(contentsOf: entry.value)
+        // Создаем данные для отметок в календаре
+        var tempCalendar = [DateComponents: [UIColor]]()
+        let calendarItemsByDay = rawTempScheduleListItems.mapValues { events in
+            events.map { $0.type.color }
         }
         
-        
-        var tempCalendar = [DateComponents: [UIColor]]()
-        let rawCalendarItems = rawTempScheduleListItems.map({ key, value in
-            return (key.dateComponentsFor(), value.map { $0.type.color })
-        })
-        
-        for item in rawCalendarItems {
-            let keyComponet = item.0
-            let colors = rawCalendarItems
-                .filter{$0.0 == keyComponet}
-                .map{$0.1}
-                .flatMap{$0}
-            tempCalendar[keyComponet] = colors
+        // Преобразуем даты в компоненты для календаря
+        for (date, colors) in calendarItemsByDay {
+            let dateComponents = date.dateComponentsFor([.year, .month, .day])
+            tempCalendar[dateComponents] = colors
         }
         
         return (tempScheduleListItems, tempCalendar)

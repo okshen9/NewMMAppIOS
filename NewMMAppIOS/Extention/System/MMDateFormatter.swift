@@ -467,13 +467,23 @@ extension String {
     }
     
     var dateFromStringISO8601: Date? {
+        // Обрезаем часть с миллисекундами, если она есть
         let pref = String(self.prefix(while: {$0 != "."}))
-        print("Neshko Date \(pref)")
-        return MMDateFormatter.date(from: pref,
-                                    withConfigurator: .init(dateFormat: .apiFullShortDateFormat,
-                                                            locale: .rus,
-                                                            timeZone: .init(identifier: "Europe/Moscow")))
         
+        // Создаем форматтер для ISO8601 строки
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        
+        // Пробуем стандартный парсинг ISO8601
+        if let date = formatter.date(from: pref) {
+            return date
+        }
+        
+        // Для обратной совместимости используем старый метод
+        return MMDateFormatter.date(from: pref,
+                                withConfigurator: .init(dateFormat: .apiFullShortDateFormat,
+                                                        locale: .rus,
+                                                        timeZone: .init(identifier: "Europe/Moscow")))
     }
     
 }
@@ -509,10 +519,23 @@ extension Date {
 extension DateComponents {
     /// Проверка совпадения по [.year, .month, .day] или кастомниму
     func equalDate(_ toComponents: DateComponents, _ forComponents: Set<Calendar.Component> = [.year, .month, .day]) -> Bool {
+        // Создаем массив для хранения результатов сравнения компонентов
         var isEquals: [Bool] = []
+        
+        // Сравниваем каждый компонент
         for component in forComponents {
-            isEquals.append(self.value(for: component) ?? -1 == toComponents.value(for: component) ?? -1)
+            let selfValue = self.value(for: component) ?? -1
+            let toValue = toComponents.value(for: component) ?? -1
+            
+            // Если компонент - месяц, и он равен 0, считаем его равным 1 (особенность календаря)
+            let normalizedSelfValue = component == .month && selfValue == 0 ? 1 : selfValue
+            let normalizedToValue = component == .month && toValue == 0 ? 1 : toValue
+            
+            // Добавляем результат сравнения в массив
+            isEquals.append(normalizedSelfValue == normalizedToValue)
         }
-        return isEquals.allSatisfy({$0})
+        
+        // Проверяем, что все компоненты совпали
+        return isEquals.allSatisfy { $0 }
     }
 }

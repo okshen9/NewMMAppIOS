@@ -24,7 +24,7 @@ struct CalendatItem: Identifiable, Equatable {
     let type: CalendatItemType
     let date: Date
     
-    enum CalendatItemType {
+    enum CalendatItemType: Equatable {
         case payment
         case target
         case anyEvent(String?)
@@ -43,11 +43,11 @@ struct CalendatItem: Identifiable, Equatable {
         var color: UIColor {
             switch self {
             case .payment:
-                return .systemBlue
+                return UIColor(Color.mainRed)
             case .target:
-                return .green
+                return UIColor.systemGreen
             case .anyEvent:
-                return .systemIndigo
+                return UIColor.systemIndigo
             }
         }
         

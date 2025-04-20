@@ -45,13 +45,37 @@ struct CalendarViewUIKit: UIViewRepresentable {
 
         func calendarView(_ calendarView: UICalendarView, decorationFor dateComponents: DateComponents) -> UICalendarView.Decoration? {
             let calendar = Calendar.current
-            guard let colors = parent.events.first(where: {$0.key.equalDate(dateComponents)})?.value else {
+            
+            // Ищем совпадающие метки событий для текущего дня
+            guard let colors = findEventColors(for: dateComponents) else {
                 return nil
             }
 
             // Генерация иконки с цветными точками
             let image = generateMultiStripeImage(colors: colors)
             return .image(image)
+        }
+        
+        /// Находит цвета событий для указанной даты
+        private func findEventColors(for dateComponents: DateComponents) -> [UIColor]? {
+            // Ищем прямое совпадение
+            for (key, value) in parent.events {
+                if key.equalDate(dateComponents) {
+                    return value
+                }
+            }
+            
+            // Если прямое совпадение не найдено, проверяем по году, месяцу и дню
+            // Это нужно, так как DateComponents могут иметь разные компоненты
+            for (key, value) in parent.events {
+                if key.year == dateComponents.year && 
+                   key.month == dateComponents.month && 
+                   key.day == dateComponents.day {
+                    return value
+                }
+            }
+            
+            return nil
         }
 
         func dateSelection(_ selection: UICalendarSelectionSingleDate,

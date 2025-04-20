@@ -106,51 +106,128 @@ struct SchedulerView: View {
             }
         }
 
-        // Фильтруем события по выбранной дате (дню)
-        let filteredEvents = viewModel.scheduleListItems.filter { selectedDate == nil || Calendar.current.isDate($0.key, inSameDayAs: selectedDate!) }
-
-        
-        
-        if filteredEvents.isEmpty {
-                Text("У вас нет событий запланированных на выбранную дату")
-                    .font(.headline)
-                    .foregroundColor(.headerText)
-                    .padding(.horizontal, 16)
-                Spacer()
-        } else {
-            //        ScrollView {
-            LazyVStack(alignment: .leading) {
-                // Преобразуем отфильтрованный словарь в массив кортежей и сортируем по дате
-                ForEach(filteredEvents.sorted(by: { $0.key < $1.key }), id: \.key) { date, events in
-                    VStack {
-                        Section(header: Text("События за \(date.toDisplayString):")
-                            .foregroundColor(.headerText)
-                            .font(.title))
-                        {
-                            ForEach(events) { event in
-                                EventRowView(event: event)
-                            }
-                        }
-                        .id(date.hashValue)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 8)
-                    }
-                    .background(.white)
-                    .cornerRadius(16)
-
-                    .shadow(radius: 6)
-                }
+        // MARK: - Events List
+        let filteredEvents = viewModel.scheduleListItems.filter { dateAndEvents in
+            if selectedDate == nil {
+                // Если нет выбранной даты, показываем все события
+                return true
+            } else {
+                // Используем startOfDay для сравнения только по дате, без учета времени
+                let selectedStartOfDay = Calendar.current.startOfDay(for: selectedDate!)
+                let entryStartOfDay = Calendar.current.startOfDay(for: dateAndEvents.key)
+                
+                // Сравниваем даты
+                return selectedStartOfDay == entryStartOfDay
             }
-
-            .listStyle(.grouped)
-            //        }
-            
-            
-            .scrollDisabled(false)
-            .padding()
         }
         
+        return Group {
+            if filteredEvents.isEmpty {
+                noEventsForSelectedDate
+            } else {
+                eventsListContent(filteredEvents)
+            }
+        }
+    }
+    
+    // MARK: - No Events View
+    private var noEventsForSelectedDate: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "calendar.badge.exclamationmark")
+                .font(.system(size: 40))
+                .foregroundStyle(Color.secondary)
+            
+            Text("Нет событий на выбранную дату")
+                .font(.headline)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(Color.secondary)
+            
+            Button {
+                selectedDate = nil
+            } label: {
+                Text("Показать все события")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(Color.mainRed)
+            }
+            .buttonStyle(.borderless)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 40)
+    }
+    
+    // MARK: - Events List Content
+    private func eventsListContent(_ events: [Date: [CalendatItem]]) -> some View {
+        LazyVStack(spacing: 16) {
+            ForEach(events.sorted(by: { $0.key < $1.key }), id: \.key) { date, items in
+                eventCard(date: date, events: items)
+                    .id(date.hashValue)
+            }
+        }
+        .padding(.bottom, 24)
+    }
+    
+    // MARK: - Event Card
+    private func eventCard(date: Date, events: [CalendatItem]) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Заголовок с датой
+            HStack {
+                Text(formattedDateHeader(date))
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(Color.primary)
+                
+                Spacer()
+                
+                Text(dateString(date))
+                    .font(.subheadline)
+                    .foregroundStyle(Color.secondary)
+            }
+            .padding(.horizontal)
+            
+            Divider()
+                .padding(.horizontal)
+            
+            // Список событий
+            VStack(spacing: 4) {
+                ForEach(events) { event in
+                    EventRowView(event: event)
+                        .padding(.horizontal)
+                }
+            }
+            .padding(.vertical, 8)
+        }
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(UIColor.secondarySystemBackground))
+                .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
+        )
+    }
+    
+    // MARK: - Helper Methods
+    private func formattedDateHeader(_ date: Date) -> String {
+        let today = Calendar.current.startOfDay(for: Date())
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today)!
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: today)!
         
+        if Calendar.current.isDate(date, inSameDayAs: today) {
+            return "Сегодня"
+        } else if Calendar.current.isDate(date, inSameDayAs: tomorrow) {
+            return "Завтра"
+        } else if Calendar.current.isDate(date, inSameDayAs: yesterday) {
+            return "Вчера"
+        } else {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "ru_RU")
+            formatter.dateFormat = "d MMMM"
+            return formatter.string(from: date)
+        }
+    }
+    
+    private func dateString(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.dateFormat = "E, d MMM"
+        return formatter.string(from: date)
     }
 }
 
