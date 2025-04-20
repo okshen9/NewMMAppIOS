@@ -13,7 +13,7 @@ class ProfileInfoViewModel: ObservableObject {
     @Published var errors: [String: String] = [:]
     @Published var isValid = false
     @Published var shouldNavigateToMain = false
-    @Published var navPath = ProfileInfoViewModelPath.toInfoView
+    @Published var navPath = UserInfoViewModelPath.toInfoView
     @Published var isLoaded = false
     @Published var hasError = false
 
@@ -147,7 +147,7 @@ class ProfileInfoViewModel: ObservableObject {
     }
     
     @MainActor
-    func navigationTo(_ path: ProfileInfoViewModelPath) {
+    func navigationTo(_ path: UserInfoViewModelPath) {
         navPath = path
     }
 
@@ -158,7 +158,7 @@ class ProfileInfoViewModel: ObservableObject {
 }
 
 extension ProfileInfoViewModel {
-    enum ProfileInfoViewModelPath {
+    enum UserInfoViewModelPath {
         //        case authView
         case toInfoView
         case toMinView

@@ -11,7 +11,7 @@ struct ProfileStatsView: View {
     let progress: Double
     var lineWidth: CGFloat = 3
     
-    var title: String = "Цели"
+    var title: String = "Название"
     
     var body: some View {
         VStack(spacing: 8) {

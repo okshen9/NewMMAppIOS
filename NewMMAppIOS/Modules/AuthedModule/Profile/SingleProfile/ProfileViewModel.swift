@@ -4,21 +4,34 @@ import CoreLocation
 
 enum Destination: Hashable {
     case userDetail(userId: Int)
+    case goToUserTarget(userId: Int)
 }
 
 // MARK: - ViewModel
-final class ProfileViewModel: ObservableObject {
-    @Published var navigationPath = NavigationPath()
-    
+final class ProfileViewModel: ObservableObject, SubscriptionStore {
+    @Published var navigationPath = ProfileViewModelPath.toMain
+
     @Published var isLoading = false
     @Published var profile: UserProfileResultDto?
+
+
+    @Published var groupedTargets: [TargetCategory: [UserTargetDtoModel]] = [:]
+
+    @Published var feedEvents: [EventDTO]? = []
+    @Published var paginatingLoading = false
+    @Published var isAll = false
+
+
+    var searchResponseDTO: SearchResponseDTO?
+    @Published var selectedType: [EventType: Bool] = Dictionary(uniqueKeysWithValues: Constants.baseSelectedEventSearch.map { ($0, false) })
+
 
     var isMyProfile: Bool {
         profile == userRepository.userProfile
     }
 
     // MARK: - Private properties
-    private let serviceNetwork = ServiceBuilder.shared
+    let serviceNetwork = ServiceBuilder.shared
     private let userRepository = UserRepository.shared
     private var externalId: Int?
 
@@ -32,8 +45,20 @@ final class ProfileViewModel: ObservableObject {
     convenience init(profile: UserProfileResultDto) {
         self.init()
         self.profile = profile
+        self.groupedTargets = groupedTargets(profile)
     }
-    
+
+    func groupedTargets(_ profile: UserProfileResultDto?) -> [TargetCategory: [UserTargetDtoModel]] {
+        let test = profile?.userTargets
+            .flatMap({$0})
+        .map { targets in
+            Dictionary(grouping: targets, by: { $0.category ?? .unknown })
+                .mapValues { $0.sorted { ($0.id ?? 0 < $1.id  ?? 1) }}
+        }
+
+        return test ?? [:]
+    }
+
     // MARK: - Public properties
 //    @Published private(set) var input = Input()
 
@@ -41,7 +66,7 @@ final class ProfileViewModel: ObservableObject {
     func onApper() {
         Task {
             if let profileDto = userRepository.userProfile, externalId == nil {
-                await updateUI(profile: profileDto)
+                await updateUI(profile: profileDto, events: [])
             } else {
                 await updateProfile()
             }
@@ -56,26 +81,28 @@ final class ProfileViewModel: ObservableObject {
 
             if let externalId = self.externalId {
                 guard let updatetedProfile = try await serviceNetwork.getUserProfile(externalId: externalId) else { return }
-                await updateUI(profile: updatetedProfile)
+                await updateUI(profile: updatetedProfile, events: [])
             } else {
                 guard let updatetedProfile = try await serviceNetwork.getProfileMe() else { return }
-                await updateUI(profile: updatetedProfile)
+                await updateUI(profile: updatetedProfile, events: [])
             }
         } catch {
             await ToastManager.shared.show(.baseError)
-            await updateUI(profile: nil)
+            await updateUI(profile: nil, events: [])
             print("Neshko updateProfile \(error) - Ошибка загрзуки профиля на странице профиля")
         }
     }
     
     @MainActor
-    private func updateUI(profile: UserProfileResultDto?, isLoading: Bool = false) {
+    func updateUI(profile: UserProfileResultDto?, events: [EventDTO]?, isLoading: Bool = false) {
+        self.feedEvents = events ?? []
         self.profile = profile
+        self.groupedTargets = groupedTargets(profile)
         self.isLoading = isLoading
     }
     
     @MainActor
-    private func setIsLoading(_ isLoading: Bool) {
+    func setIsLoading(_ isLoading: Bool) {
         self.isLoading = isLoading
     }
     
@@ -99,14 +126,44 @@ final class ProfileViewModel: ObservableObject {
     }
 
     // MARK: - Navigation
-    func goToStream() {
-        navigationPath.append(Destination.userDetail(userId: 1))
+//    func goToStream() {
+//        navigationPath.append(Destination.userDetail(userId: 1))
+//    }
+
+//    func goToTarget() {
+//        navigationPath.append(Destination.userDetail(userId: 1))
+//    }
+
+
+    @MainActor
+    func setIsPaginationLoding(_ isPaginationLoding: Bool) {
+        self.paginatingLoading = isPaginationLoding
     }
 }
 
 // MARK: - Constants
 extension ProfileViewModel {
-    private enum Constants {
+    enum Constants {
         static let title = "Выберите карту"
+
+        static let baseEventSearch: [EventsQuery.QueryValue] = [
+            .sortDisplayDate(.DESC),
+            .pageNumberPagination("0"),
+            .pageSizePagination("10")
+        ]
+
+        static let baseSelectedEventSearch: [EventType] = {
+            var type = EventType.allPaymentType
+//            type.append(.PAYMENT_FULL_PAID)
+            return type
+        }()
+    }
+
+    enum ProfileViewModelPath {
+        case toMain
+        case toTarget
+        case toStream
+        case toGroup
+        case dismiss
     }
 }

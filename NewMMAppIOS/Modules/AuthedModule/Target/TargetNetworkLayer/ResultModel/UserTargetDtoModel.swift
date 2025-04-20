@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUICore
 
 /// Модель результата для UserTargetDto
 struct UserTargetDtoModel: Codable, JSONRepresentable, Identifiable, Hashable {
@@ -51,8 +52,6 @@ struct UserTargetDtoModel: Codable, JSONRepresentable, Identifiable, Hashable {
     }
     
     init(id: Int? = nil, title: String? = nil, description: String? = nil, userExternalId: Int? = nil, percentage: Double? = nil, deadLineDateTime: String? = nil, streamId: Int? = nil, targetStatus: TargetStatus? = nil, subTargets: [UserSubTargetDtoModel]? = nil, isDeleted: Bool? = nil, creationDateTime: String? = nil, lastUpdatingDateTime: String? = nil, category: TargetCategory? = nil) {
-        Date()
-        
         self.id = id
         self.title = title.orEmpty
         self.description = description.orEmpty
@@ -118,5 +117,53 @@ extension UserTargetDtoModel: Equatable {
         lhs.creationDateTime == rhs.creationDateTime &&
         lhs.lastUpdatingDateTime == rhs.lastUpdatingDateTime &&
         lhs.category == rhs.category
+    }
+}
+
+
+extension UserTargetDtoModel {
+    static func getBaseTarget() -> UserTargetDtoModel {
+        let subTargets = [
+            UserSubTargetDtoModel(
+                id: 32,
+                title: "sfdsfsdf",
+                description: nil,
+                subTargetPercentage: 50,
+                targetSubStatus: .notDone,
+                rootTargetId: 45,
+                isDeleted: false,
+                creationDateTime: "2025-03-29T16:45:24.752615",
+                lastUpdatingDateTime: nil,
+                deadLineDateTime: "2025-03-31T23:59:59.999"
+            ),
+            UserSubTargetDtoModel(
+                id: 33,
+                title: "sddfsdfdsf",
+                description: nil,
+                subTargetPercentage: 50,
+                targetSubStatus: .notDone,
+                rootTargetId: 45,
+                isDeleted: false,
+                creationDateTime: "2025-03-29T16:45:24.753233",
+                lastUpdatingDateTime: nil,
+                deadLineDateTime: "2025-03-31T23:59:59.999"
+            )
+        ]
+
+        return UserTargetDtoModel(
+            id: 45,
+            title: "sfsdfsdfsdf",
+            description: "sdfsdfsdf",
+            userExternalId: 11,
+            percentage: 0,
+            deadLineDateTime: "2025-03-31T23:59:59.999",
+            streamId: nil,
+            targetStatus: .inProgress,
+            subTargets: subTargets,
+            isDeleted: false,
+            creationDateTime: "2025-03-29T16:45:24.752155",
+            lastUpdatingDateTime: nil,
+            category: .money
+        )
     }
 }

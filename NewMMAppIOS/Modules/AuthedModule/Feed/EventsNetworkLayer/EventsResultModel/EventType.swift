@@ -27,6 +27,14 @@ enum EventType: String, Codable, JSONRepresentable, UnknownCasedEnum {
     case TARGET_FAILED = "TARGET_FAILED"
     case TARGET_EXPIRED = "TARGET_EXPIRED"
 
+    static var allTargetsType: [EventType] {
+        return [ .TARGET_DRAFT, .TARGET_IN_PROGRESS, .TARGET_DONE, .TARGET_DONE_EXPIRED, .TARGET_CANCELLED, .TARGET_FAILED, .TARGET_EXPIRED]
+    }
+
+    static var allPaymentType: [EventType] {
+        return [ .PAYMENT_FULL_PAID, .PAYMENT_WAIT, .PAYMENT_CANCELED, .PAYMENT_OVERDUE]
+    }
+
     var name: String {
         switch self {
         case .PAYMENT_FULL_PAID: return "Полностью оплачено"

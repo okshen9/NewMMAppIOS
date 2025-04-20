@@ -25,7 +25,6 @@ struct NewMMAppIOSApp: App {
                 switch appStateService.state {
                 case .authorized:
                     TabBarView()
-                        .environmentObject(authNavigationManager)
                         .withToast()
 
                 case .unAuthorized:

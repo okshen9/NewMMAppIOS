@@ -14,7 +14,7 @@ struct UserSubTargetDtoModel: Codable, JSONRepresentable, Identifiable, Hashable
     var title: String?
     /// Описание подцели
     var description: String?
-    /// Процент выполнения подцели
+    /// Процент ценности подцели
     var subTargetPercentage: Double?
     /// Статус подцели
     var targetStatus: TargetSubStatus?

@@ -15,7 +15,10 @@ struct CalendatItem: Identifiable, Equatable {
     }
     
     var id = UUID()
-    
+
+    let payment: PaymentRequestResponseDto?
+    let target: UserTargetDtoModel?
+
     let user: UserProfileResultDto
     let title: String
     let type: CalendatItemType
@@ -42,7 +45,7 @@ struct CalendatItem: Identifiable, Equatable {
             case .payment:
                 return .systemBlue
             case .target:
-                return .mainRed
+                return .green
             case .anyEvent:
                 return .systemIndigo
             }

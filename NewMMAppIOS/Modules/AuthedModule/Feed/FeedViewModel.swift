@@ -24,7 +24,7 @@ final class FeedViewModel: ObservableObject, FeedViewModelProtocol {
 
     @Published var feedEvents: [EventDTO]?
     @Published var currentEventSearch: [EventsQuery.QueryValue] = Constants.baseEventSearch
-    @Published var selectedType: [EventType] = []//[.TARGET_DONE, .TARGET_EXPIRED, .TARGET_DONE_EXPIRED]
+    @Published var selectedType: [EventType: Bool] = Dictionary(uniqueKeysWithValues: Constants.baseSelectedEventSearch.map { ($0, false) })
 
     var searchResponseDTO: SearchResponseDTO?
     let service = ServiceBuilder.shared
@@ -75,5 +75,11 @@ extension FeedViewModel {
             .pageNumberPagination("0"),
             .pageSizePagination("10")
         ]
+
+        static let baseSelectedEventSearch: [EventType] = {
+            var type = EventType.allPaymentType
+//            type.append(.PAYMENT_FULL_PAID)
+            return type
+        }()
     }
 }

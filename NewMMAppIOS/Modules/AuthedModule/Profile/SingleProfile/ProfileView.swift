@@ -9,9 +9,10 @@ struct ProfileView: View {
     @State private var showMap = false
     @State private var showEditProfile = false
 
+    @State private var selectedTab = 0 // Индекс текущей выбранной вкладки
+
     var body: some View {
         NavigationStack {
-
             VStack {
                 if let profile = viewModel.profile, !viewModel.isLoading  {
                     contentState(profile: profile)
@@ -27,6 +28,21 @@ struct ProfileView: View {
             .onAppear {
                 viewModel.onApper()
             }
+//            .onChange(of: viewModel.navigationPath) { navPathOld, navPathNew in
+//                switch navPathNew {
+//                case .toTarget:
+//                    
+//                }
+////                switch navPathNew {
+////                case .authView:
+////                    break
+////                case .toInfoView:
+////                    let authUser = UserRepository.shared.authUser?.authUserDto
+////                    navigationManager.navigate(to: .signup(profileModel: nil, authModel: authUser))
+////                case .toMinView:
+////                    appStateServise.setNewState(.authorized)
+////                }
+//            }
             .ignoresSafeArea(edges: .top)
         }
     }
@@ -49,7 +65,6 @@ struct ProfileView: View {
 
                     // Аватарка
                     HStack(alignment: .bottom) {
-
                         Spacer()
                         VStack(spacing: 10) {
                             HStack(spacing: 10) {
@@ -64,8 +79,17 @@ struct ProfileView: View {
                                         .font(.title)
                                         .foregroundColor(.headerText)
                                 }
-                                ProfileStatsView(progress: (profile.targetCalculationInfo?.allCategoriesDonePercentage ?? 0.0) / 100.0)
-                                    .padding(.bottom, -130)
+
+                                NavigationLink(destination: {
+                                    if let externalId = viewModel.profile?.externalId {
+                                        ProfileTargetView(externalId: externalId)
+                                    }
+                                }, label: {
+                                    ProfileStatsView(progress: (profile.targetCalculationInfo?.allCategoriesDonePercentage ?? 0.0) / 100.0,
+                                                     title: "Цели2")
+
+                                })
+                                .padding(.bottom, -130)
                             }
 
                             HStack(alignment:.center) {
@@ -85,27 +109,7 @@ struct ProfileView: View {
                     groupeButton(profile)
                         .padding(.horizontal, 16)
 
-                    VStack(alignment: .leading, spacing: 20) {
-                        let activitySphere = (profile.activitySphere ?? Constants.activitySphereText).lowercased()
-                        Text("Род деятельности: ")
-                            .font(.title3.weight(.medium))
-                            .foregroundColor(.headerText) +
-                        Text(activitySphere)
-                            .font(.title3.bold())
-                            .foregroundColor(.headerText)
-
-                        Divider().background(Color.black)
-                        let biography = profile.biography ?? Constants.biographyText
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("О себе:")
-                                .font(.title3.bold())
-                                .foregroundColor(.headerText)
-                            Text(biography)
-                                .font(.title3.weight(.medium))
-                                .foregroundColor(.headerText)
-                        }
-                    }
-                    .padding(.horizontal, 16)
+                    tabView(profile: profile)
 
                 }
             }
@@ -130,35 +134,115 @@ struct ProfileView: View {
 //                    }
 
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        Menu {
-
-                            Button(action: {
-                                print("Кнопка справа нажата")
-                                showEditProfile = true
-                            }, label: {
-                                HStack {
-                                    Text("Редактировать")
-                                    Image(systemName: "square.and.pencil")
-                                        .foregroundStyle(Color.mainRed)
-                                }
-                            })
-                            Button("Выйти", action: {
-                                viewModel.logout()
-                                navigationManager.popToRoot()
-                                appStateService.setNewState(.unAuthorized)
-                            })
-                        } label: {
-                            Image(systemName: "ellipsis.circle")
-                                .foregroundStyle(Color.mainRed)
-                        }
+                        toolBarMenu()
                     }
                 }
             }
             Spacer()
     }
 
+    /// Таббар
     @ViewBuilder
-    func tgView(_ profile: UserProfileResultDto) -> some View{
+    func tabView(profile: UserProfileResultDto) -> some View {
+        let tabs = ["О себе", "Новости"]
+        VStack() {
+            // Сегментированный контрол
+//            Picker("Tabs", selection: $selectedTab) {
+//                ForEach(0..<tabs.count, id: \.self) { index in
+//                    Text(tabs[index]).tag(index)
+//                }
+//            }
+//            .pickerStyle(.segmented)
+            SegmentedView(segments: tabs, selected: $selectedTab)
+            .padding(.horizontal)
+
+            // Контент вкладок
+            TabView(selection: $selectedTab) {
+                profileInfo(profile: profile)
+                    .offset(y: -250)
+                    .tag(0)
+                VStack {
+                    Text("У человека пока нет новостей")
+                        .padding()
+                    Spacer()
+                }
+                    .tag(1)
+                getTaget()
+                    .tag(2)
+
+
+            }
+            .tabViewStyle(.page(indexDisplayMode: .never)) // Отключаем стандартный PageControl
+
+
+        }
+        .frame(height: 800)
+//        .tabViewStyle()
+    }
+
+    @ViewBuilder
+    func profileInfo(profile: UserProfileResultDto) -> some View {
+        VStack(alignment: .leading, spacing: 20) {
+            let activitySphere = (profile.activitySphere ?? Constants.activitySphereText).lowercased()
+            Text("Род деятельности: ")
+                .font(.title3.weight(.medium))
+                .foregroundColor(.headerText) +
+            Text(activitySphere)
+                .font(.title3.bold())
+                .foregroundColor(.headerText)
+
+            Divider().background(Color.black)
+            let biography = profile.biography ?? Constants.biographyText
+            VStack(alignment: .leading, spacing: 8) {
+                Text("О себе:")
+                    .font(.title3.bold())
+                    .foregroundColor(.headerText)
+                Text(biography)
+                    .font(.title3.weight(.medium))
+                    .foregroundColor(.headerText)
+            }
+        }
+        .padding(.horizontal, 16)
+    }
+
+    @ViewBuilder
+    func getTaget() -> some View {
+        ScrollView {
+            LazyVStack {
+                ForEach(TargetCategory.allCases, id: \.self) { category in
+                    categorySectionView(for: category)
+                }
+            }
+            .padding()
+        }
+        .scrollBounceBehavior(.basedOnSize)
+//        .refreshable {
+//            withAnimation {
+//                viewModel.loadTargets()
+//            }
+//        }
+    }
+
+    @ViewBuilder
+    private func categorySectionView(for category: TargetCategory) -> some View {
+        if let filtredTarget = $viewModel.groupedTargets[category].wrappedValue,
+           !filtredTarget.isEmpty {
+            CategorySectionView(
+                category: category,
+                targets: filtredTarget,
+                onEdit: {
+//                    selectedCategory = category
+//                    isEditingCategory = true
+                }
+            )
+            .onChange(of: (viewModel.profile?.userTargets) ?? [], {
+                print("Изменилась TargetsView categorySectionView")
+            })
+        }
+    }
+
+    @ViewBuilder
+    func tgView(_ profile: UserProfileResultDto) -> some View {
         HStack {
             //            Text("Telegram:")
             Button (action: {
@@ -177,6 +261,30 @@ struct ProfileView: View {
         }
     }
 
+    @ViewBuilder
+    func toolBarMenu() -> some View {
+        Menu {
+            Button(action: {
+                print("Кнопка справа нажата")
+                showEditProfile = true
+            }, label: {
+                HStack {
+                    Text("Редактировать")
+                    Image(systemName: "square.and.pencil")
+                        .foregroundStyle(Color.mainRed)
+                }
+            })
+            Button("Выйти", action: {
+                viewModel.logout()
+                navigationManager.popToRoot()
+                appStateService.setNewState(.unAuthorized)
+            })
+        } label: {
+            Image(systemName: "ellipsis.circle")
+                .foregroundStyle(Color.mainRed)
+        }
+    }
+
     /// Описания человека
     @ViewBuilder
     func descriptionView(_ key: String, _ value: String) -> some View {
@@ -191,7 +299,7 @@ struct ProfileView: View {
     /// Кнопки груп и подгрупп
     @ViewBuilder
     func groupeButton(_ profile: UserProfileResultDto) -> some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 10) {
             let streamStatus = profile.stream?.title != nil ?
             profile.stream?.isActive ?? false ? "Текущий" : "Завершен" :
             nil
@@ -315,6 +423,10 @@ extension ProfileView {
                                             //        biography: nil))
                                             //    )
     ))
+}
+
+#Preview("1") {
+    ProfileView().tabView(profile: UserProfileResultDto.getTestUser())
 }
 
 

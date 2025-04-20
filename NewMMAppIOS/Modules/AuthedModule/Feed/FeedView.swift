@@ -54,6 +54,9 @@ struct FeedView: View {
                 .padding(.top, 8)
             }
             .navigationTitle("События")
+            .toolbar(content: {
+
+            })
             .refreshable {
                 await viewModel.getNextEvents(resetSearch: true)
             }
@@ -69,6 +72,11 @@ struct FeedView: View {
             }
 
         }
+    }
+
+    @ViewBuilder
+    func getMenu() -> some View {
+
     }
 
     // MARK: - ViewBuilder

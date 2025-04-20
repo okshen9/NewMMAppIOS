@@ -1,13 +1,14 @@
 //
-//  FeedSearchHelper.swift
+//  ProfileViewModel.swift
 //  NewMMAppIOS
 //
-//  Created by artem on 11.04.2025.
+//  Created by artem on 16.04.2025.
 //
+
 
 import Foundation
 
-extension FeedViewModel {
+extension ProfileViewModel {
     func getNextEvents(resetSearch: Bool) async {
         do {
             guard !isLoading else { return }
@@ -17,7 +18,7 @@ extension FeedViewModel {
             if feedEvents.isEmptyOrNil || resetSearch {
                 await self.setIsLoading(true)
 
-                await self.updateUI(events: nil, isLoading: true)
+                await self.updateUI(profile: nil, events: nil, isLoading: true)
                 self.searchResponseDTO = nil
 
                 searchParams = Constants.baseEventSearch
@@ -28,7 +29,7 @@ extension FeedViewModel {
 
             // насыщение парметров типами поиска
             enrichSearchParamsFromType(params: &searchParams)
-            let searchResponse = try await service.searchEvents(searchParams: searchParams)
+            let searchResponse = try await serviceNetwork.searchEvents(searchParams: searchParams)
             await updateCurrentEvents(with: searchResponse)
         } catch {
             await setIsPaginationLoding(false)

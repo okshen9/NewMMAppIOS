@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct CategorySectionView: View {
+    let myTarget = true
     var category: TargetCategory
     var targets: [UserTargetDtoModel] // Список целей для выбранной категории
     @State var onEdit: () -> Void // Замыкание для редактирования категории

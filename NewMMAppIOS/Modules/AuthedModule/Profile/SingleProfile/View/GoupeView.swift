@@ -31,13 +31,16 @@ struct GroupButton: View {
                 }
                 .frame(width: geometry.size.width,
                        height: 46)
-                .background(Color.gray.opacity(0.5))
+                .background(Color(hex: "F9F9F9"))
+//                .background(Color.mainRed)
+
                 .cornerRadius(16)
                 
 //            })
             
         }
-        .shadow(radius: 8)
+        .shadow(color: .gray,
+                radius: 4)
     }
 }
 

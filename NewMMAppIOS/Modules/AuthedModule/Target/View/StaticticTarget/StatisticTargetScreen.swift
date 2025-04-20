@@ -9,6 +9,15 @@ import SwiftUI
 import Foundation
 
 struct StatisticTargetScreen: View {
+
+    @State private var tasks = [
+        TaskProgress(progress: 0.75, color: .blue, name: "Бизнес", value: 0.25),
+        TaskProgress(progress: 0.5, color: .green, name: "Семья", value: 0.25),
+        TaskProgress(progress: 0.9, color: .orange, name: "Личное", value: 0.25),
+        TaskProgress(progress: 0.9, color: .red, name: "Здоровье", value: 0.0)
+    ]
+
+
     @EnvironmentObject var viewModelEnvironment: TargetsViewModel
     
     @ObservedObject var viewModel: TargetsViewModel
@@ -23,8 +32,9 @@ struct StatisticTargetScreen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                PiaView(piaMdels: mapTargetsToFractal(viewModel.targets),
-                        selectedFract: $selectedFractal)
+                MultiProgressRingView(selectedCategory: $selectedCategory, tasks: tasks)
+//                PiaView(piaMdels: mapTargetsToFractal(viewModel.targets),
+//                        selectedFract: $selectedFractal)
                 .frame(width: UIScreen.main.bounds.width - 32,
                        height: UIScreen.main.bounds.width - 32
                 )
@@ -95,6 +105,8 @@ struct StatisticTargetScreen: View {
             .onChange(of: viewModel.targets, {
                 print("Изменилась TargetsView categorySectionView")
             })
+        } else {
+            Text("")
         }
     }
     

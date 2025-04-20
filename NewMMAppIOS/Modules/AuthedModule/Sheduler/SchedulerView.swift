@@ -7,7 +7,7 @@ struct SchedulerView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack {
+                VStack(alignment: .leading) {
                     if viewModel.isLoading == false {
                         VStack(alignment: .leading) {
                             CalendarViewUIKit(selectedDate: $selectedDate, events: viewModel.calendarComponetsItems)
@@ -91,6 +91,21 @@ struct SchedulerView: View {
     
     @ViewBuilder
     private func eventList2() -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Text("Срок закрытия цели")
+                Circle()
+                    .foregroundStyle(.green)
+                    .frame(width: 16, height: 16)
+            }
+            HStack(spacing: 6) {
+                Text("Срок закрытия платежа")
+                Circle()
+                    .foregroundStyle(Color.mainRed)
+                    .frame(width: 16, height: 16)
+            }
+        }
+
         // Фильтруем события по выбранной дате (дню)
         let filteredEvents = viewModel.scheduleListItems.filter { selectedDate == nil || Calendar.current.isDate($0.key, inSameDayAs: selectedDate!) }
 
@@ -104,21 +119,29 @@ struct SchedulerView: View {
                 Spacer()
         } else {
             //        ScrollView {
-            LazyVStack {
+            LazyVStack(alignment: .leading) {
                 // Преобразуем отфильтрованный словарь в массив кортежей и сортируем по дате
                 ForEach(filteredEvents.sorted(by: { $0.key < $1.key }), id: \.key) { date, events in
-                    
-                    Section(header: Text("События за \(date.toDisplayString):")
-                        .foregroundColor(.headerText)
-                        .font(.headline)) {
+                    VStack {
+                        Section(header: Text("События за \(date.toDisplayString):")
+                            .foregroundColor(.headerText)
+                            .font(.title))
+                        {
                             ForEach(events) { event in
                                 EventRowView(event: event)
                             }
                         }
                         .id(date.hashValue)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 8)
+                    }
+                    .background(.white)
+                    .cornerRadius(16)
+
+                    .shadow(radius: 6)
                 }
             }
-            
+
             .listStyle(.grouped)
             //        }
             

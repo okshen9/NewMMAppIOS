@@ -18,12 +18,12 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
     
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
-    
+    @Published var tasksItems: [TaskProgress] = []
+
     private let networkService = ServiceBuilder.shared
     
     
     @Published var groupedTargets: [TargetCategory: [UserTargetDtoModel]] = [:]
-    
     
     init(targets: [UserTargetDtoModel] = [], isLoading: Bool = false, errorMessage: String? = nil) {
         self.targets = targets.sorted { ($0.id ?? 0 < $1.id  ?? 1) }
@@ -34,11 +34,26 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
                     .mapValues { $0.sorted { ($0.id ?? 0 < $1.id  ?? 1) }}
             }
             .sink { [weak self] targetsDic in
-                self?.groupedTargets = targetsDic
+                    self?.groupedTargets = targetsDic
             }
             .store(in: &subscriptions)
     }
-    
+
+    @MainActor
+//    func updateIatems(_ targetsDic: [TargetCategory: [UserTargetDtoModel]]) {
+//        self.groupedTargets = targetsDic
+//        var tasksImtems = [TaskProgress]()
+//        targetsDic.forEach({key, value in
+//            let percentage = value.reduce(0) { $0 + ($1.percentage ?? 0) } / (value.count * 100)
+//            let color = key.color
+//            let name = key.rawValue
+//            let task = TaskProgress(progress: percentage, color: color, name: name, value: 0.0)
+//            tasksImtems.append(task)
+//        })
+//        self.tasksItems = tasksImtems
+////        self.tasksItems
+//    }
+
     func saveTarget(_ target: UserTargetDtoModel, isCreateTarget: Bool) async -> UserTargetDtoModel? {
         if isCreateTarget {
             return await createTarget(target)
