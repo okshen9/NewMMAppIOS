@@ -12,22 +12,32 @@ import UIKit
 struct CalendarViewUIKit: UIViewRepresentable {
     @Binding var selectedDate: Date?
     var events: [DateComponents: [UIColor]] // Несколько событий на одну дату
+    var canDeselectSameDate: Bool = true // Можно ли отменить выбор, нажав на ту же дату
 
     func makeUIView(context: Context) -> UICalendarView {
         let calendarView = UICalendarView()
         calendarView.locale = Locale(identifier: "ru_RU")
         calendarView.delegate = context.coordinator
-        calendarView.selectionBehavior = UICalendarSelectionSingleDate(delegate: context.coordinator)
+        
+        // Создаем и настраиваем поведение выбора даты
+        let selectionBehavior = UICalendarSelectionSingleDate(delegate: context.coordinator)
+        selectionBehavior.setSelected(nil, animated: false)
+        
+        // Устанавливаем поведение
+        calendarView.selectionBehavior = selectionBehavior
+        
         return calendarView
     }
 
     func updateUIView(_ uiView: UICalendarView, context: Context) {
         // Синхронизация выбранной даты в UICalendarView с selectedDate
         if let selectedDate = selectedDate {
+            print("⬆️ CalendarViewUIKit.updateUIView: установка даты \(selectedDate)")
             let dateComponents = Calendar.current.dateComponents([.year, .month, .day], from: selectedDate)
             (uiView.selectionBehavior as? UICalendarSelectionSingleDate)?.setSelected(dateComponents, animated: true)
         } else {
             // Если selectedDate стало nil, сбрасываем выбор даты
+            print("⬇️ CalendarViewUIKit.updateUIView: сброс даты")
             (uiView.selectionBehavior as? UICalendarSelectionSingleDate)?.setSelected(nil, animated: true)
         }
     }
@@ -80,13 +90,53 @@ struct CalendarViewUIKit: UIViewRepresentable {
 
         func dateSelection(_ selection: UICalendarSelectionSingleDate,
                            didSelectDate dateComponents: DateComponents?) {
-            guard let dateComponents = dateComponents,
-                  let date = Calendar.current.date(from: dateComponents) else {
+            print("🔍 CalendarViewUIKit.didSelectDate: \(String(describing: dateComponents))")
+            
+            // Если dateComponents == nil, это означает отмену выбора
+            if dateComponents == nil {
+                DispatchQueue.main.async {
+                    print("🔄 CalendarViewUIKit: отмена выбора даты")
+                    self.parent.selectedDate = nil
+                }
                 return
             }
-            DispatchQueue.main.async {
-                self.parent.selectedDate = date
+            
+            guard let date = Calendar.current.date(from: dateComponents!) else {
+                print("❌ CalendarViewUIKit: не удалось создать дату из компонентов")
+                return
             }
+            
+            DispatchQueue.main.async {
+                // Если пользователь нажал на уже выбранную дату и разрешена отмена выбора
+                if self.parent.canDeselectSameDate,
+                   let currentSelectedDate = self.parent.selectedDate,
+                   Calendar.current.isDate(currentSelectedDate, inSameDayAs: date) {
+                    print("🔄 CalendarViewUIKit: отмена выбора даты \(date)")
+                    // Сбрасываем выбор в UI компоненте
+                    selection.setSelected(nil, animated: true)
+                    // Сбрасываем значение биндинга
+                    self.parent.selectedDate = nil
+                } else {
+                    print("✅ CalendarViewUIKit: выбор новой даты \(date)")
+                    // Устанавливаем новую дату
+                    self.parent.selectedDate = date
+                }
+            }
+        }
+        
+        // Метод для контроля возможности выбора даты
+        func dateSelection(_ selection: UICalendarSelectionSingleDate,
+                          canSelectDate dateComponents: DateComponents?) -> Bool {
+            // Всегда разрешаем выбор даты
+            return true
+        }
+
+        // Метод для контроля возможности отмены выбора даты
+        func dateSelection(_ selection: UICalendarSelectionSingleDate,
+                          canDeselectDate dateComponents: DateComponents?) -> Bool {
+            // Всегда разрешаем отмену выбора даты
+            print("⚡️ CalendarViewUIKit: запрос на canDeselectDate, разрешаем")
+            return true
         }
 
         /// Создает изображение с цветными точками

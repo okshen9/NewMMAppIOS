@@ -81,7 +81,7 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
             let name = "Оплата \(payMent.amount ?? 0.0) ₽"
             
             var currentScheduleListItems = rawTempScheduleListItems[startOfDay] ?? []
-            currentScheduleListItems.append(.init(payment: payMent, target: nil, user: user, title: name, type: .payment, date: dateOfPay))
+            currentScheduleListItems.append(.init(payment: payMent, target: nil, user: user, title: name, type: .payment, date: dateOfPay, category: nil))
             rawTempScheduleListItems[startOfDay] = currentScheduleListItems
         })
         
@@ -96,7 +96,7 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
             
             let name = "Крайний срок цели: \(target.title ?? "Цель без названия")"
             var enetsCurrent = rawTempScheduleListItems[startOfDay] ?? []
-            enetsCurrent.append(.init(payment: nil, target: target, user: user, title: name, type: .target, date: component))
+            enetsCurrent.append(.init(payment: nil, target: target, user: user, title: name, type: .target, date: component, category: target.category))
             rawTempScheduleListItems[startOfDay] = enetsCurrent
         })
         

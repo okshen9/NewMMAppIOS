@@ -23,6 +23,7 @@ struct CalendatItem: Identifiable, Equatable {
     let title: String
     let type: CalendatItemType
     let date: Date
+    let category: TargetCategory?
     
     enum CalendatItemType: Equatable {
         case payment

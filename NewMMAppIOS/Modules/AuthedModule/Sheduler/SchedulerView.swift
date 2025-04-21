@@ -4,28 +4,122 @@ struct SchedulerView: View {
     @StateObject var viewModel = SchedulerViewModel()
     @State private var selectedDate: Date?
     @State private var hashebleDate: Int? = Date().hashValue
+    @State private var isDateSelected = false
+    
+    // Категории для карусели
+    private let categories: [TargetCategory] = [
+        .money,
+        .personal,
+        .family,
+        .health,
+        .other
+    ]
+    
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading) {
                     if viewModel.isLoading == false {
                         VStack(alignment: .leading) {
-                            CalendarViewUIKit(selectedDate: $selectedDate, events: viewModel.calendarComponetsItems)
-                                .tint(Color.red)
-                                .frame(height: 450)
-                                .padding(.horizontal, 24)
-                                .padding(.top, 24)
-
-
-
+                            // Календарь с возможностью снятия выбора
+                            ZStack {
+                                CalendarViewUIKit(
+                                    selectedDate: $selectedDate, 
+                                    events: viewModel.calendarComponetsItems,
+                                    canDeselectSameDate: true
+                                )
+                                    .tint(Color.red)
+                                    .frame(height: 450)
+                                    .padding(.horizontal, 24)
+                                    .padding(.top, 24)
+                            }
+                            
+                            // Легенда категорий
+                            VStack(alignment: .leading, spacing: 18) {
+                                // Типы событий и категории в одном блоке
+                                VStack(alignment: .leading, spacing: 12) {
+                                    Text("События и категории")
+                                        .font(.headline)
+                                        .foregroundColor(.primary)
+                                        .padding(.horizontal, 24)
+                                    
+                                    // Типы событий - компактно в одной строке
+                                    HStack(spacing: 16) {
+                                        HStack(spacing: 8) {
+                                            Circle()
+                                                .foregroundStyle(.green)
+                                                .frame(width: 12, height: 12)
+                                            Text("Цели")
+                                                .font(.subheadline)
+                                        }
+                                        
+                                        HStack(spacing: 8) {
+                                            Circle()
+                                                .foregroundStyle(Color.mainRed)
+                                                .frame(width: 12, height: 12)
+                                            Text("Платежи")
+                                                .font(.subheadline)
+                                        }
+                                    }
+                                    .padding(.horizontal, 24)
+                                }
+                                
+                                // Категории целей
+//                                if !viewModel.scheduleListItems.isEmpty {
+//                                    ScrollView(.horizontal, showsIndicators: false) {
+//                                        HStack(spacing: 8) {
+//                                            ForEach(categories, id: \.self) { category in
+//                                                Button(action: {
+//                                                    // Здесь можно добавить действие для фильтрации по категории
+//                                                }) {
+//                                                    HStack(spacing: 6) {
+//                                                        Circle()
+//                                                            .fill(category.color)
+//                                                            .frame(width: 10, height: 10)
+//                                                        Text(category.rawValue)
+//                                                            .font(.footnote)
+//                                                            .foregroundColor(.primary)
+//                                                    }
+//                                                    .padding(.vertical, 8)
+//                                                    .padding(.horizontal, 12)
+//                                                    .background(
+//                                                        RoundedRectangle(cornerRadius: 16)
+//                                                            .fill(Color(UIColor.secondarySystemBackground))
+//                                                    )
+//                                                }
+//                                                .buttonStyle(PlainButtonStyle())
+//                                            }
+//                                        }
+//                                        .padding(.horizontal, 24)
+//                                    }
+//                                    .padding(.top, 4)
+//                                }
+                            }
+                            .padding(.vertical, 12)
                         }
-                        .toolbar(content: {
-                            Button("За все время", action: {
-                                selectedDate = nil
-                            })
-                            .foregroundStyle(Color.mainRed)
-                        })
+//                        .toolbar(content: {
+//                            Button(action: {
+//                                withAnimation {
+//                                    selectedDate = nil
+//                                    isDateSelected = false
+//                                }
+//                            }) {
+//                                HStack(spacing: 4) {
+//                                    Image(systemName: "calendar")
+//                                    Text("Все события")
+//                                }
+//                                .foregroundStyle(Color.mainRed)
+//                            }
+//                            .opacity(selectedDate == nil ? 0.5 : 1)
+//                            .disabled(selectedDate == nil)
+//                        })
                         if !viewModel.scheduleListItems.isEmpty {
+                            Text("События")
+                                .font(.headline)
+                                .foregroundColor(.primary)
+                                .padding(.horizontal, 24)
+                                .padding(.top, 8)
+                            
                             eventList2()
                                 .padding()
                             Spacer()
@@ -34,7 +128,6 @@ struct SchedulerView: View {
                             Text("У вас нет событий")
                                 .font(.headline)
                                 .foregroundColor(.headerText)
-//                                .frame(width: .infinity, alignment: .center)
                             Spacer()
                         }
                     } else {
@@ -58,12 +151,13 @@ struct SchedulerView: View {
                 }
                 .padding(.horizontal)
             }
-            .navigationTitle(Text("Рассписание"))
+            .navigationTitle(Text("Расписание"))
             .scrollPosition(id: $hashebleDate, anchor: .top)
         }
         .onChange(of: selectedDate) { oldState, newState in
             print("change eventsCalendar: \(newState)")
-            hashebleDate = newState.hashValue
+            hashebleDate = newState?.hashValue
+            isDateSelected = newState != nil
         }
         .onAppear {
             viewModel.onApper()
@@ -76,9 +170,17 @@ struct SchedulerView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(event.title)
                     .font(.headline)
-                Text(event.type.name)
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
+                HStack(spacing: 8) {
+                    Text(event.type.name)
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                    
+                    if let category = event.category {
+                        Text("• \(category.rawValue)")
+                            .font(.subheadline)
+                            .foregroundColor(category.color)
+                    }
+                }
             }
             Spacer()
             Circle()
@@ -91,21 +193,6 @@ struct SchedulerView: View {
     
     @ViewBuilder
     private func eventList2() -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 6) {
-                Text("Срок закрытия цели")
-                Circle()
-                    .foregroundStyle(.green)
-                    .frame(width: 16, height: 16)
-            }
-            HStack(spacing: 6) {
-                Text("Срок закрытия платежа")
-                Circle()
-                    .foregroundStyle(Color.mainRed)
-                    .frame(width: 16, height: 16)
-            }
-        }
-
         // MARK: - Events List
         let filteredEvents = viewModel.scheduleListItems.filter { dateAndEvents in
             if selectedDate == nil {
@@ -137,19 +224,31 @@ struct SchedulerView: View {
                 .font(.system(size: 40))
                 .foregroundStyle(Color.secondary)
             
-            Text("Нет событий на выбранную дату")
-                .font(.headline)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Color.secondary)
-            
-            Button {
-                selectedDate = nil
-            } label: {
-                Text("Показать все события")
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(Color.mainRed)
+            if let date = selectedDate {
+                Text("Нет событий на \(formattedDateHeader(date).lowercased())")
+                    .font(.headline)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(Color.secondary)
+            } else {
+                Text("Нет событий в календаре")
+                    .font(.headline)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(Color.secondary)
             }
-            .buttonStyle(.borderless)
+            
+            if selectedDate != nil {
+                Button {
+                    withAnimation {
+                        selectedDate = nil
+                        isDateSelected = false
+                    }
+                } label: {
+                    Text("Показать все события")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(Color.mainRed)
+                }
+                .buttonStyle(.borderless)
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 40)
@@ -249,12 +348,9 @@ extension SchedulerView {
         targets: [
             UserTargetDtoModel(deadLineDateTime: Date.nowWith(plus: 1).toApiString),
             UserTargetDtoModel(deadLineDateTime: Date.nowWith(plus: 2).toApiString),
-            UserTargetDtoModel(deadLineDateTime: Date.nowWith(plus: 3).toApiString),
-            UserTargetDtoModel(deadLineDateTime: Date.nowWith(plus: 4).toApiString),
-            UserTargetDtoModel(deadLineDateTime: Date.nowWith(plus: 6).toApiString)
+            UserTargetDtoModel(deadLineDateTime: Date.nowWith(plus: 3).toApiString)
         ]
-    )
-    )
+    ))
 }
 
 let markedDates: [Date: [UIColor]] = [

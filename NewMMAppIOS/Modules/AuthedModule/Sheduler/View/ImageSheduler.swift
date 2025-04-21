@@ -107,24 +107,25 @@ extension ImageSheduler {
         // Целевые иконки
         static let targetDefaultImage = Image(systemName: "star.fill")
         static let targetInProgressImage = Image(systemName: "star.fill")
-        static let targetDoneImage = Image(systemName: "star.fill.checkmark")
-        static let targetExpiredImage = Image(systemName: "star.exclamationmark.fill")
+        static let targetDoneImage = Image(systemName: "checkmark.circle.fill")
+        static let targetExpiredImage = Image(systemName: "exclamationmark.circle.fill")
         
+
         // Иконки платежей
         static let paymentDefaultImage = Image(systemName: "creditcard.fill")
         static let paymentWaitingImage = Image(systemName: "creditcard.fill")
-        static let paymentCompletedImage = Image(systemName: "creditcard.fill.checkmark")
-        static let paymentCancelledImage = Image(systemName: "creditcard.fill.slash")
+        static let paymentCompletedImage = Image(systemName: "checkmark.circle.fill")
+        static let paymentCancelledImage = Image(systemName: "xmark.circle.fill")
         
         // Остальные иконки
         static let defaultEventImage = Image(systemName: "calendar.badge")
         
         // Устаревшие иконки (оставлены для обратной совместимости)
-        static let xmarkImage = Image(systemName: "xmark.seal.fill")
-        static let checkmarkImageEmpty = Image(systemName: "checkmark.seal")
-        static let checkmarkImage = Image(systemName: "checkmark.seal.fill")
-        static let expaiderImage = Image(systemName: "clock.badge.checkmark.fill")
-        static let waitImage = Image(systemName: "airplane.departure")
+        static let xmarkImage = Image(systemName: "xmark.circle.fill")
+        static let checkmarkImageEmpty = Image(systemName: "circle")
+        static let checkmarkImage = Image(systemName: "checkmark.circle.fill")
+        static let expaiderImage = Image(systemName: "clock.fill")
+        static let waitImage = Image(systemName: "hourglass")
         static let moneyImage = Image(systemName: "dollarsign.circle.fill")
         static let refreshImage = Image(systemName: "arrow.clockwise.circle.fill")
         static let dollarsignImage = Image(systemName: "dollarsign")
@@ -148,7 +149,8 @@ extension ImageSheduler {
                             user: .getTestUser(),
                             title: "Цель в процессе",
                             type: .target,
-                            date: Date()
+                            date: Date(),
+                            category: .family
                         ),
                         font: .system(size: 18)
                     )
@@ -169,7 +171,8 @@ extension ImageSheduler {
                             user: .getTestUser(),
                             title: "Платеж ожидает",
                             type: .payment,
-                            date: Date()
+                            date: Date(),
+                            category: nil
                         ),
                         font: .system(size: 18)
                     )

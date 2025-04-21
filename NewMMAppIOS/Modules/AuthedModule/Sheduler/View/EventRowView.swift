@@ -35,6 +35,15 @@ struct EventRowView: View {
                             .font(.caption.weight(.semibold))
                             .foregroundColor(Color.mainRed)
                     }
+                    
+                    if let category = event.category {
+                        Text("•")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Text(category.rawValue)
+                            .font(.caption)
+                            .foregroundColor(category.color)
+                    }
                 }
             }
             
@@ -138,10 +147,11 @@ struct EventRowView: View {
         user: .getTestUser(),
         title: "Оплата курса наставничества",
         type: .payment,
-        date: Date()
+        date: Date(),
+        category: nil
     )
     
-    return VStack {
+    VStack {
         EventRowView(event: item)
             .padding()
             .background(Color.white)
@@ -153,7 +163,21 @@ struct EventRowView: View {
             user: .getTestUser(),
             title: "Закрыть цель: Прочитать книгу по SwiftUI",
             type: .target,
-            date: Date().addingTimeInterval(86400) // Tomorrow
+            date: Date().addingTimeInterval(86400), // Tomorrow
+            category: .money
+        ))
+        .padding()
+        .background(Color.white)
+        .cornerRadius(8)
+        
+        EventRowView(event: CalendatItem(
+            payment: nil,
+            target: .getBaseTarget(),
+            user: .getTestUser(),
+            title: "Закрыть цель: Пробежать 5 км",
+            type: .target,
+            date: Date().addingTimeInterval(172800), // Day after tomorrow
+            category: .health
         ))
         .padding()
         .background(Color.white)
