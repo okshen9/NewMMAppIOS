@@ -77,7 +77,7 @@ extension FeedViewModel {
         ]
 
         static let baseSelectedEventSearch: [EventType] = {
-            var type = EventType.allPaymentType
+            var type = EventType.allTargetsType
 //            type.append(.PAYMENT_FULL_PAID)
             return type
         }()

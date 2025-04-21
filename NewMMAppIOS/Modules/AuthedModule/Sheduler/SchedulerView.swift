@@ -56,7 +56,7 @@ struct SchedulerView: View {
                         Spacer()
                     }
                 }
-                
+                .padding(.horizontal)
             }
             .navigationTitle(Text("Рассписание"))
             .scrollPosition(id: $hashebleDate, anchor: .top)
