@@ -12,6 +12,7 @@ struct CategorySectionView: View {
     var category: TargetCategory
     var targets: [UserTargetDtoModel] // Список целей для выбранной категории
     @State var onEdit: () -> Void // Замыкание для редактирования категории
+    @EnvironmentObject var viewModel: TargetsViewModel
 
     var body: some View {
         Section(header:
@@ -26,12 +27,19 @@ struct CategorySectionView: View {
             ForEach(targets) { target in
                 TargetRowView<TargetsViewModel>(myTarget: myTarget,
                                                 target: target)
+                    .swipeActions(edge: .trailing) {
+                        if myTarget {
+                            Button(role: .destructive) {
+                                viewModel.deleteTarget(target: target)
+                            } label: {
+                                Label("Удалить", systemImage: "trash")
+                            }
+                        }
+                    }
             }
             .onChange(of: targets, {
                 print("Изменилась CategorySectionView")
             })
         }
-
     }
-
 }

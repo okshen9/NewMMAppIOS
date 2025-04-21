@@ -66,7 +66,6 @@ struct NewMMAppIOSApp: App {
                 TestScreenVC()
             }
             .environmentObject(appStateService)
-
         }
     }
 }

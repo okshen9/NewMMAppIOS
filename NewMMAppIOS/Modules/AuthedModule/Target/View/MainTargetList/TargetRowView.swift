@@ -22,7 +22,11 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
     var target: UserTargetDtoModel
     
     /// Показать диалоговое окошко закрытии/открытие задачи
-    @State private var showCloseTaskDialog = false
+    @State private var showCloseTaskDialog = false {
+        didSet {
+            print("showCloseTaskDialog изменился на: \(showCloseTaskDialog)")
+        }
+    }
     /// Показать модалку по лонгтапу
     @State private var showLongTapDialog = false
     
@@ -43,8 +47,11 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
             if isExpanded,
                let subTargets = target.subTargets {
                 ForEach(subTargets) { subTarget in
-                    SubTargetRowView<TargetsViewModel>(myTarget: myTarget,
-                                                       subTarget: subTarget)
+                    SubTargetRowView<TargetsViewModel>(
+                        myTarget: myTarget,
+                        subTarget: subTarget,
+                        parentTarget: target
+                    )
                 }
             }
             let targetButtonStatus = targetButtonStatus(target: target)
@@ -95,6 +102,19 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
                         },
                     ]
                 )
+        }
+        .alert(
+            (target.targetStatus?.isDone) ?? false ? "Вы хотите открыть эту цель?" : "Вы закрыли эту цель?",
+            isPresented: $showCloseTaskDialog
+        ) {
+            Button("Да") {
+                isLoading = true
+                viewModelEnvironment.closedTarget(target: target)
+                print("Цель изменена")
+            }
+            Button("Нет", role: .cancel) {
+                print("Отмена операции")
+            }
         }
     }
     
@@ -152,6 +172,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
                 case .turn, .expand:
                     isExpanded.toggle()
                 case .toDone, .toInProgress:
+                    print("Показываем диалог закрытия задачи")
                     showCloseTaskDialog = true
                 }
             }
@@ -167,22 +188,6 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle())
             }
-        })
-        .alert(isPresented: $showCloseTaskDialog,
-               content: {
-            let title = (target.targetStatus?.isDone) ?? false ? "Вы хотите открыть цель?" : "Вы закрыли цель?"
-            return Alert(title: Text(title),
-                         primaryButton:
-                    .default(Text("Да"), action: {
-                        isLoading = true
-                        viewModelEnvironment.closedTarget(target: target)
-                        print("Done")
-                    }),
-                         secondaryButton:
-                    .destructive(Text("Нет"), action: {
-                        print("Not Done")
-                    })
-            )
         })
     }
     

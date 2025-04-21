@@ -9,94 +9,118 @@
 import Foundation
 import SwiftUI
 
-struct TaskProgress: Identifiable {
-    let id = UUID()
-    var progress: Double
-    var color: Color
-    var name: String
-    var value: Double
-}
-
 struct MultiProgressRingView: View {
-    @State var selectetedTask: String = "Не выбранно"
+    let tasks: [TaskProgress]
     @Binding var selectedCategory: TargetCategory?
-
-    var tasks: [TaskProgress]
-    var lineWidth: CGFloat = 15
-    var spacing: CGFloat = 3
-    var initialDiameter: CGFloat = 200
-
+    @State private var selectedTask: TaskProgress?
+    @State private var animatedProgress: [CGFloat] = []
+    
     var body: some View {
-        VStack {
-            HStack(spacing: 20) {
-                // Кольца прогресса
+        VStack(spacing: 20) {
+            if tasks.isEmpty {
+                Text("Нет целей для отображения")
+                    .font(.system(size: 16))
+                    .foregroundColor(.secondary)
+                    .frame(height: 200)
+            } else {
                 ZStack {
-                    ForEach(Array(tasks.enumerated().reversed()), id: \.element.id) { index, task in
-                        ZStack {
-                            let diameter = initialDiameter - (lineWidth + spacing) * 2 * CGFloat(index)
-
-                            // Фоновое кольцо
+                    ForEach(tasks.indices, id: \.self) { index in
+                        let task = tasks[index]
+                        let scale = 1.0 - CGFloat(index) * 0.15
+                        
+                        Circle()
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [task.color.opacity(0.2), task.color.opacity(0.1)]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 12
+                            )
+                            .scaleEffect(scale)
+                        
+                        if index < animatedProgress.count {
                             Circle()
+                                .trim(from: 0, to: animatedProgress[index])
                                 .stroke(
-                                    task.color.opacity(0.2),
-                                    lineWidth: lineWidth
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [task.color, task.color.opacity(0.8)]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    style: StrokeStyle(lineWidth: 12, lineCap: .round)
                                 )
-                                .frame(width: diameter, height: diameter)
-
-                            // Кольцо прогресса
-                            Circle()
-                                .trim(from: 0, to: task.progress)
-                                .stroke(
-                                    task.color,
-                                    style: StrokeStyle(
-                                        lineWidth: lineWidth,
-                                        lineCap: .round
-                                    )
-                                )
+                                .scaleEffect(scale)
                                 .rotationEffect(.degrees(-90))
-                                .animation(.easeOut, value: task.progress)
-                                .frame(width: diameter, height: diameter)
-
+                                .animation(.spring(response: 1.0, dampingFraction: 0.8), value: animatedProgress[index])
                         }
-                        .onTapGesture(perform: {
-                            selectedCategory = TargetCategory(rawValue: task.name)
-                            selectetedTask = task.name
-                        })
+                        
+                        Circle()
+                            .fill(Color.clear)
+                            .frame(width: 200 * scale, height: 200 * scale)
+                            .contentShape(Circle())
+                            .onTapGesture {
+                                withAnimation {
+                                    selectedTask = task
+                                    selectedCategory = TargetCategory(rawValue: task.name)
+                                }
+                            }
                     }
-                    centrlView()
+                    
+                    if let selected = selectedTask {
+                        VStack {
+                            Text(selected.name)
+                                .font(.system(size: 16, weight: .semibold))
+                            Text("\(Int(selected.progress * 100))%")
+                                .font(.system(size: 24, weight: .bold))
+                                .foregroundColor(selected.color)
+                        }
+                        .transition(.scale.combined(with: .opacity))
+                    }
                 }
-
-                // Легенда
-                VStack(alignment: .leading, spacing: 10) {
+                .frame(height: 200)
+            }
+            
+            if !tasks.isEmpty {
+                VStack(spacing: 12) {
                     ForEach(tasks) { task in
                         HStack {
                             Circle()
                                 .fill(task.color)
-                                .frame(width: 16, height: 16)
+                                .frame(width: 12, height: 12)
+                            
                             Text(task.name)
+                                .font(.system(size: 14))
+                            
                             Spacer()
+                            
                             Text("\(Int(task.progress * 100))%")
-                                .bold()
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(task.color)
                         }
-                        .font(.subheadline)
+                        .padding(.horizontal)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            withAnimation {
+                                selectedTask = task
+                                selectedCategory = TargetCategory(rawValue: task.name)
+                            }
+                        }
                     }
                 }
             }
-            .padding(.horizontal, 16)
-//            Text(selectetedTask)
         }
-    }
-
-    @ViewBuilder
-    func centrlView() -> some View {
-        let diameter = initialDiameter - (lineWidth + spacing) * 2 * CGFloat(tasks.count)
-        Color.white
-            .frame(width: diameter, height: diameter)
-            .cornerRadius(diameter / 2)
-            .onTapGesture(perform: {
-                selectedCategory = nil
-                selectetedTask = "Не выбранно"
-            })
+        .onAppear {
+            // Инициализируем animatedProgress с нулевыми значениями
+            animatedProgress = Array(repeating: 0, count: tasks.count)
+            
+            // Анимируем прогресс после небольшой задержки
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                withAnimation(.spring(response: 1.0, dampingFraction: 0.8)) {
+                    animatedProgress = tasks.map { CGFloat($0.progress) }
+                }
+            }
+        }
     }
 }
 
@@ -112,7 +136,7 @@ struct PreviewView: View {
 
     var body: some View {
         VStack {
-            MultiProgressRingView(selectedCategory: $selectedCategory, tasks: tasks)
+            MultiProgressRingView(tasks: tasks, selectedCategory: $selectedCategory)
 
             HStack(spacing: 20) {
                 Button("Обновить") {

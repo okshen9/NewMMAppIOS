@@ -137,7 +137,7 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                         Text("Готово")
                             .font(.caption.weight(.medium))
                             .foregroundColor(isActive ? .mainRed : .gray)
-                        Image.init(systemName: "checkmark")
+                        Image(systemName: "checkmark")
                             .resizable()
                             .foregroundColor(isActive ? .mainRed : .gray)
                             .frame(width: 16,

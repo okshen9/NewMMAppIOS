@@ -67,10 +67,15 @@ extension FeedViewModel {
     /// Обновить текущие значения новыми эвентами
     private func updateCurrentEvents(with searchResponseDTO: SearchResponseDTO) async {
         let newEvents = (searchResponseDTO.results) ?? []
-        self.searchResponseDTO?.results?.append(contentsOf: newEvents)
-        self.searchResponseDTO?.pageNumber = searchResponseDTO.pageNumber
-        self.searchResponseDTO?.pageSize = searchResponseDTO.pageSize
-        self.searchResponseDTO?.totalRecords = searchResponseDTO.totalRecords
+        if self.searchResponseDTO == nil {
+            self.searchResponseDTO = searchResponseDTO
+        } else {
+            self.searchResponseDTO?.results?.append(contentsOf: newEvents)
+            self.searchResponseDTO?.pageNumber = searchResponseDTO.pageNumber
+            self.searchResponseDTO?.pageSize = searchResponseDTO.pageSize
+            self.searchResponseDTO?.totalRecords = searchResponseDTO.totalRecords
+        }
+
 
         await MainActor.run {
             self.feedEvents?.append(contentsOf: newEvents)

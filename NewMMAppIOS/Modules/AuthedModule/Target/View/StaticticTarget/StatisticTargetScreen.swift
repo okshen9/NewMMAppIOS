@@ -32,7 +32,7 @@ struct StatisticTargetScreen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                MultiProgressRingView(selectedCategory: $selectedCategory, tasks: tasks)
+                MultiProgressRingView(tasks: tasks, selectedCategory: $selectedCategory)
 //                PiaView(piaMdels: mapTargetsToFractal(viewModel.targets),
 //                        selectedFract: $selectedFractal)
                 .frame(width: UIScreen.main.bounds.width - 32,

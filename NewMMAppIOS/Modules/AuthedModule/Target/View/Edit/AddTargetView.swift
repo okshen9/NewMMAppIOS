@@ -9,124 +9,213 @@ import Foundation
 import SwiftUI
 
 struct AddTargetView: View {
-    let category: TargetCategory // Категория, переданная из CategoryEditView
+    // Опциональная категория с дефолтным значением
+    var category: TargetCategory? = nil
     var onSave: (UserTargetDtoModel) -> Void // Замыкание для сохранения новой цели
     @Environment(\.dismiss) private var dismiss
     
     // Состояние для основной цели
     @State private var title: String = ""
     @State private var description: String = ""
-    @State private var deadLineDateTime: Date = Date()
+    @State private var deadLineDateTime: Date = Date().addingTimeInterval(86400 * 7) // Дедлайн через неделю по умолчанию
+    @State private var selectedCategory: TargetCategory = .personal
     
     // Состояние для подцелей
     @State private var subTargets: [UserSubTargetDtoModel] = []
+    @State private var showAddSubtarget: Bool = false
     @State private var newSubTargetTitle: String = ""
     @State private var newSubTargetDescription: String = ""
-    @State private var newSubTargetDeadline: Date = Date()
+    @State private var newSubTargetDeadline: Date = Date().addingTimeInterval(86400 * 7)
+    
+    // Валидация
+    @State private var showValidationAlert: Bool = false
+    @State private var validationMessage: String = ""
+    
+    // Отслеживание изменений для кнопки сохранения
+    private var isFormValid: Bool {
+        !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
     
     var body: some View {
-        // Neshko TODO
         NavigationView {
             Form {
                 // Секция для основной цели
                 Section(header: Text("Основная цель")) {
                     TextField("Название цели", text: $title)
-                    TextField("Описание цели", text: $description)
-                    DatePicker("Срок выполнения", selection: $deadLineDateTime, displayedComponents: [.date, .hourAndMinute])
-                }
-                
-                // Секция для добавления подцелей
-                Section(header: Text("Подцели")) {
-                    ForEach($subTargets.indices, id: \.self) { index in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text($subTargets[index].title.wrappedValue.orEmpty)
-                                .font(.headline)
-                            Text($subTargets[index].description.wrappedValue.orEmpty)
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                            let date = $subTargets[index].deadLineDateTime.wrappedValue?.dateFromString ?? Date.now
-                            let text = "Дедлайн: \((date).formatted(date: .abbreviated, time: .shortened))"
-                            Text(text) // Используем wrappedValue
-                                .font(.caption)
-                                .foregroundColor(.gray)
+                        .submitLabel(.next)
+                    TextField("Описание цели", text: $description, axis: .vertical)
+                        .submitLabel(.next)
+                        .lineLimit(3...6)
+                    
+                    Picker("Категория", selection: $selectedCategory) {
+                        ForEach(TargetCategory.allCases.filter { $0 != .unknown }, id: \.self) { category in
+                            Text(category.rawValue)
+                                .tag(category)
                         }
                     }
                     
-//                    // Форма для добавления новой подцели
-                    Group {
-                        TextField("Название подцели", text: $newSubTargetTitle)
-                        TextField("Описание подцели", text: $newSubTargetDescription)
-                        DatePicker("Срок выполнения подцели", selection: $newSubTargetDeadline, displayedComponents: [.date, .hourAndMinute])
-                        
-                        Button(action: addSubTarget) {
-                            Text("Добавить подцель")
-                                .frame(maxWidth: .infinity, alignment: .center)
+                    DatePicker("Срок выполнения", selection: $deadLineDateTime, in: Date()..., displayedComponents: [.date])
+                }
+                
+                // Секция для подцелей
+                Section(header: Text("Подцели")) {
+                    ForEach(subTargets.indices, id: \.self) { index in
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(subTargets[index].title.orEmpty)
+                                .font(.subheadline.bold())
+                            
+                            if let desc = subTargets[index].description, !desc.isEmpty {
+                                Text(desc)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            
+                            let date = subTargets[index].deadLineDateTime?.dateFromString ?? deadLineDateTime
+                            Text("Срок: \(date.formatted(date: .abbreviated, time: .omitted))")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         }
-                        .disabled(newSubTargetTitle.isEmpty || newSubTargetDescription.isEmpty) // Кнопка неактивна, если поля пустые
+                        .swipeActions {
+                            Button(role: .destructive) {
+                                subTargets.remove(at: index)
+                            } label: {
+                                Label("Удалить", systemImage: "trash")
+                            }
+                        }
+                    }
+                    
+                    Button(action: {
+                        showAddSubtarget = true
+                    }) {
+                        Label("Добавить подцель", systemImage: "plus.circle")
                     }
                 }
             }
-            .navigationTitle("Новая цель")
+            .navigationTitle("Создание цели")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .cancellationAction) {
                     Button("Отмена") {
                         dismiss()
                     }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Готово") {
-                        saveTarget()
-                        dismiss()
+                
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Сохранить") {
+                        if validateForm() {
+                            saveTarget()
+                        } else {
+                            showValidationAlert = true
+                        }
                     }
-                    .disabled(title.isEmpty || description.isEmpty) // Кнопка "Готово" неактивна, если поля пустые
+                    .disabled(!isFormValid)
+                }
+            }
+            .sheet(isPresented: $showAddSubtarget) {
+                addSubtargetView()
+            }
+            .alert("Ошибка", isPresented: $showValidationAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(validationMessage)
+            }
+        }
+    }
+    
+    // MARK: - Подцель
+    @ViewBuilder
+    private func addSubtargetView() -> some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Информация о подцели")) {
+                    TextField("Название", text: $newSubTargetTitle)
+                    
+                    TextField("Описание", text: $newSubTargetDescription, axis: .vertical)
+                        .lineLimit(3...6)
+                    
+                    DatePicker("Срок выполнения", selection: $newSubTargetDeadline, in: Date()..., displayedComponents: [.date])
+                }
+            }
+            .navigationTitle("Новая подцель")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Отмена") {
+                        resetSubtargetForm()
+                        showAddSubtarget = false
+                    }
+                }
+                
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Добавить") {
+                        if !newSubTargetTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            addSubtarget()
+                            showAddSubtarget = false
+                        }
+                    }
+                    .disabled(newSubTargetTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
         }
     }
     
-    // Добавление подцели
-    private func addSubTarget() {
-        let newSubTarget = UserSubTargetDtoModel(
-            id: subTargets.count + 1, // Временный ID (в реальном приложении это должно генерироваться на сервере)
-            title: newSubTargetTitle,
-            description: newSubTargetDescription,
-            subTargetPercentage: 100.0/Double(subTargets.count + 1), // значение размера таргета
-            targetSubStatus: .notDone, // Статус по умолчанию
-            rootTargetId: 0, // Временное значение (будет обновлено после сохранения основной цели)
-            isDeleted: false,
-            creationDateTime: Date().toApiString,
-            lastUpdatingDateTime: Date().toApiString,
+    // MARK: - Вспомогательные методы
+    private func addSubtarget() {
+        let newSubtarget = UserSubTargetDtoModel(
+            title: newSubTargetTitle.trimmingCharacters(in: .whitespacesAndNewlines),
+            description: newSubTargetDescription.trimmingCharacters(in: .whitespacesAndNewlines),
+            subTargetPercentage: 0.0,
+            targetSubStatus: .notDone,
             deadLineDateTime: newSubTargetDeadline.toApiString
         )
-        subTargets.append(newSubTarget)
         
-        // Очищаем поля после добавления
-        newSubTargetTitle = ""
-        newSubTargetDescription = ""
-        newSubTargetDeadline = Date()
+        subTargets.append(newSubtarget)
+        resetSubtargetForm()
     }
     
-    // Сохранение основной цели
-    private func saveTarget() {
-        for (index, _) in subTargets.enumerated() {
-            subTargets[index].subTargetPercentage = 100.0/Double(subTargets.count)
+    private func resetSubtargetForm() {
+        newSubTargetTitle = ""
+        newSubTargetDescription = ""
+        newSubTargetDeadline = Date().addingTimeInterval(86400 * 7)
+    }
+    
+    private func validateForm() -> Bool {
+        if title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            validationMessage = "Название цели не может быть пустым"
+            return false
         }
+        
+        if deadLineDateTime < Date() {
+            validationMessage = "Срок выполнения не может быть раньше текущей даты"
+            return false
+        }
+        
+        return true
+    }
+    
+    private func saveTarget() {
+        // Нормализация данных перед сохранением
+        let normalizedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let normalizedDescription = description.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Равномерное распределение процентов между подцелями
+        for (index, _) in subTargets.enumerated() {
+            subTargets[index].subTargetPercentage = subTargets.isEmpty ? 0 : 100.0 / Double(subTargets.count)
+        }
+        
         let newTarget = UserTargetDtoModel(
-            id: 0, // Временный ID (в реальном приложении это должно генерироваться на сервере)
-            title: title,
-            description: description,
-            userExternalId: 1, // Временное значение (должно быть передано из контекста пользователя)
-            percentage: 0, // Начальный прогресс
+            title: normalizedTitle,
+            description: normalizedDescription,
+            userExternalId: UserRepository.shared.externalId,
+            percentage: 0,
             deadLineDateTime: deadLineDateTime.toApiString,
-            streamId: 1, // Временное значение (должно быть передано из контекста)
-            targetStatus: .draft, // Статус по умолчанию
-            subTargets: subTargets,
-            isDeleted: false,
-            creationDateTime: Date().toApiString,
-            lastUpdatingDateTime: Date().toApiString,
-            category: category
+            targetStatus: .draft,
+            subTargets: subTargets.isEmpty ? nil : subTargets,
+            category: selectedCategory
         )
+        
         onSave(newTarget)
+        dismiss()
     }
 }
 
