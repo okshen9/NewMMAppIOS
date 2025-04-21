@@ -26,6 +26,7 @@ struct PayRequestView: View {
                     shimerState()
                 }
             }
+            .padding(.top, 6)
             .onAppear {
                 viewModel.onApper()
             }

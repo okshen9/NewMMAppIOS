@@ -11,6 +11,7 @@ import Foundation
 extension ProfileViewModel {
     func getNextEvents(resetSearch: Bool) async {
         do {
+            guard let externalId = self.externalId else { return }
             // Включает в себя пагинацию и сортровку в базовой версии
             var searchParams: [EventsQuery.QueryValue]
             // если поиск пустой или с нуля
@@ -21,6 +22,7 @@ extension ProfileViewModel {
                 self.searchResponseDTO = nil
 
                 searchParams = Constants.baseEventSearch
+                searchParams.append(.assigneeExternalIds([String(externalId)]))
             } else {
                 await self.setIsPaginationLoding(true)
                 searchParams = getNextPaginationParams()

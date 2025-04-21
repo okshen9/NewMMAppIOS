@@ -34,7 +34,7 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
     // MARK: - Private properties
     let serviceNetwork = ServiceBuilder.shared
     private let userRepository = UserRepository.shared
-    private var externalId: Int?
+    private(set) var externalId: Int?
 
     convenience init(externalId: Int? = nil) {
         self.init()
@@ -45,6 +45,7 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
     /// Only Debug
     convenience init(profile: UserProfileResultDto) {
         self.init()
+        self.externalId = profile.externalId
         self.profile = profile
         self.groupedTargets = groupedTargets(profile)
     }

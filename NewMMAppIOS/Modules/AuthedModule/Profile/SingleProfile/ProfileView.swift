@@ -50,130 +50,105 @@ struct ProfileView: View {
 
     @ViewBuilder
     func contentState(profile: UserProfileResultDto) -> some View {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    MapView(viewModel:
-                            .init(nameCity: viewModel.profile?.location ?? "Москва",
-                                  nameUser: viewModel.profile?.fullName ?? "Пользователь без имени"))
-                    .padding(.horizontal, -16)
-                    .frame(height: showMap ? 800 : 240)
-                    .cornerRadius(20)
-                    .onTapGesture {
-                        /// TODO - добавить интерактивность карты
-                        //                        showMap.toggle()
-                    }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                MapView(viewModel:
+                        .init(nameCity: viewModel.profile?.location ?? "Москва",
+                              nameUser: viewModel.profile?.fullName ?? "Пользователь без имени"))
+                .padding(.horizontal, -16)
+                .frame(height: showMap ? 800 : 240)
+                .cornerRadius(20)
+                .onTapGesture {
+                    /// TODO - добавить интерактивность карты
+                    //                        showMap.toggle()
+                }
 
-                    // Аватарка
-                    HStack(alignment: .bottom) {
-                        Spacer()
-                        VStack(spacing: 10) {
-                            HStack(spacing: 10) {
-                                ProfileStatsView(progress: 0.5, title: "Вовлек: 2/4 \n#Testing")
-                                    .padding(.bottom, -130)
+                // Аватарка
+                HStack(alignment: .bottom) {
+                    Spacer()
+                    VStack(spacing: 10) {
+                        HStack(spacing: 10) {
+                            ProfileStatsView(progress: 0.5, title: "Вовлек: 2/4 \n#Testing")
+                                .padding(.bottom, -130)
                                 //TODO
                                     .opacity(/*profile.inVited != nil ? 1.0 :*/ 1.0)
-                                VStack {
-                                    CircleImagView(photoUrl: URL(string: profile.photoUrl.orEmpty))
-                                    Text(profile.fullName ?? "Имя не указано")
-                                        .multilineTextAlignment(.center)
-                                        .font(.title)
-                                        .foregroundColor(.headerText)
+                            VStack {
+                                CircleImagView(photoUrl: URL(string: profile.photoUrl.orEmpty))
+                                Text(profile.fullName ?? "Имя не указано")
+                                    .multilineTextAlignment(.center)
+                                    .font(.title)
+                                    .foregroundColor(.headerText)
+                            }
+
+                            NavigationLink(destination: {
+                                if let externalId = viewModel.profile?.externalId {
+                                    ProfileTargetView(externalId: externalId)
                                 }
+                            }, label: {
+                                ProfileStatsView(progress: (profile.targetCalculationInfo?.allCategoriesDonePercentage ?? 0.0) / 100.0,
+                                                 title: "Цели2")
 
-                                NavigationLink(destination: {
-                                    if let externalId = viewModel.profile?.externalId {
-                                        ProfileTargetView(externalId: externalId)
-                                    }
-                                }, label: {
-                                    ProfileStatsView(progress: (profile.targetCalculationInfo?.allCategoriesDonePercentage ?? 0.0) / 100.0,
-                                                     title: "Цели2")
-
-                                })
-                                .padding(.bottom, -130)
-                            }
-
-                            HStack(alignment:.center) {
-                                Spacer()
-                                Image(systemName: "mappin.and.ellipse")
-                                Text(profile.location ?? "Не указано")
-                                    .font(.subheadline)
-                                tgView(profile)
-                                Spacer()
-                            }
+                            })
+                            .padding(.bottom, -130)
                         }
-                        Spacer()
+
+                        HStack(alignment:.center) {
+                            Spacer()
+                            Image(systemName: "mappin.and.ellipse")
+                            Text(profile.location ?? "Не указано")
+                                .font(.subheadline)
+                            tgView(profile)
+                            Spacer()
+                        }
                     }
-                    .offset(y: -80)
-                    .padding(.bottom, -80)
+                    Spacer()
+                }
+                .offset(y: -80)
+                .padding(.bottom, -80)
 
-                    groupeButton(profile)
-                        .padding(.horizontal, 16)
+                groupeButton(profile)
+                    .padding(.horizontal, 16)
 
-                    tabView(profile: profile)
+                // Сегментированный контрол
+                let tabs = ["О себе", "Новости"]
+                SegmentedView(segments: tabs, selected: $selectedTab)
+                    .padding(.horizontal)
 
+                // Контент вкладок
+                if selectedTab == 0 {
+                    // Вкладка "О себе"
+                    profileInfo(profile: profile)
+                        .padding(.top, 8)
+                } else {
+                    // Вкладка "Новости"
+                    feedBlock()
+                        .padding(.horizontal)
+                        .padding(.bottom, 8)
                 }
             }
-            .sheet(isPresented: $showEditProfile) {
-                ProfileInfoView(viewModel: .editProfileViewModel(needUpdateAction: {
-                    Task.detached(operation: {
-                        await viewModel.updateProfile()
-                    })
-                }))
-            }
-            .toolbar {
-                // Кнопка справа (trailing)
-                if viewModel.isMyProfile {
-//                    ToolbarItem(placement: .navigationBarTrailing) {
-//                        Button(action: {
-//                            print("Кнопка справа нажата")
-//                            showEditProfile = true
-//                        }) {
-//                            Image(systemName: "square.and.pencil")
-//                                .foregroundStyle(Color.mainRed)
-//                        }
-//                    }
-
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        toolBarMenu()
-                    }
+        }
+        .sheet(isPresented: $showEditProfile) {
+            ProfileInfoView(viewModel: .editProfileViewModel(needUpdateAction: {
+                Task.detached(operation: {
+                    await viewModel.updateProfile()
+                })
+            }))
+        }
+        .toolbar {
+            // Кнопка справа (trailing)
+            if viewModel.isMyProfile {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    toolBarMenu()
                 }
             }
-            Spacer()
+        }
     }
 
     /// Таббар
     @ViewBuilder
-    func tabView(profile: UserProfileResultDto) -> some View {
-        let tabs = ["О себе", "Новости"]
-        VStack() {
-            // Сегментированный контрол
-//            Picker("Tabs", selection: $selectedTab) {
-//                ForEach(0..<tabs.count, id: \.self) { index in
-//                    Text(tabs[index]).tag(index)
-//                }
-//            }
-//            .pickerStyle(.segmented)
-            SegmentedView(segments: tabs, selected: $selectedTab)
-            .padding(.horizontal)
-
-            // Контент вкладок
-            TabView(selection: $selectedTab) {
-                VStack {
-                    profileInfo(profile: profile)
-                        .padding(.top, 8)
-                    Spacer()
-                }
-                .tag(0)
-                feedBlock()
-                    .padding(.top, 8)
-                    .tag(1)
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never)) // Отключаем стандартный PageControl
-
-
-        }
-        .frame(height: 800)
-//        .tabViewStyle()
+    func profileTabs(profile: UserProfileResultDto) -> some View {
+        // Эта функция больше не используется, так как мы перенесли её содержимое в contentState
+        EmptyView()
     }
 
     @ViewBuilder
@@ -186,10 +161,9 @@ struct ProfileView: View {
                         .cornerRadius(8)
                         .padding(.horizontal, 40)
                 }
-                Spacer()
             }
         } else {
-            VStack {
+            VStack(spacing: 16) {
                 if let feedEvents = viewModel.feedEvents, !feedEvents.isEmpty {
                     ForEach(feedEvents) { event in
                         NewFeedCell(event: event)
@@ -204,7 +178,8 @@ struct ProfileView: View {
                     }
                 } else {
                     Text("У человека пока нет новостей")
-                    Spacer()
+                        .foregroundColor(.secondary)
+                        .padding(.top, 6)
                 }
             }
         }
@@ -456,5 +431,5 @@ extension ProfileView {
 }
 
 #Preview("tabView") {
-    ProfileView().tabView(profile: UserProfileResultDto.getTestUser())
+    ProfileView().profileTabs(profile: UserProfileResultDto.getTestUser())
 }

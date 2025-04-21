@@ -51,10 +51,12 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
                         .progressViewStyle(CircularProgressViewStyle())
                 } else {
                     Button(action: {
-                        if isLastUnclosedSubtarget {
-                            showCustomAlert = true
-                        } else {
-                            showConfirmationDialog = true
+                        if myTarget {
+                            if isLastUnclosedSubtarget {
+                                showCustomAlert = true
+                            } else {
+                                showConfirmationDialog = true
+                            }
                         }
                     }) {
                         Image(systemName: subTarget.targetStatus == .done ? "checkmark.circle.fill" : "circle")

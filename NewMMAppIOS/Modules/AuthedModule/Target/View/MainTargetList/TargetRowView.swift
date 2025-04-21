@@ -166,31 +166,39 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
     /// Кнопка "Развернуть/Свернуть" Открыть / Закрыть задачу
     @ViewBuilder
     func targetButtonView(_ targetButtonStatus: TargetButtonStatus) -> some View {
-        Button(action: {
-            withAnimation {
-                switch targetButtonStatus {
-                case .turn, .expand:
-                    isExpanded.toggle()
-                case .toDone, .toInProgress:
-                    print("Показываем диалог закрытия задачи")
-                    showCloseTaskDialog = true
+        if (targetButtonStatus == .toDone ||
+               targetButtonStatus == .toInProgress),
+           !myTarget {
+            EmptyView()
+        } else {
+            Button(action: {
+                withAnimation {
+                    switch targetButtonStatus {
+                    case .turn, .expand:
+                        isExpanded.toggle()
+                    case .toDone, .toInProgress:
+                        print("Показываем диалог закрытия задачи")
+                        if myTarget {
+                            showCloseTaskDialog = true
+                        }
+                    }
                 }
+            }) {
+                Text(targetButtonStatus.name)
+                    .font(.caption)
+                    .foregroundColor(isLoading ? .gray.opacity(0.5) : .mainRed)
+                    .frame(alignment: .leading)
             }
-        }) {
-            Text(targetButtonStatus.name)
-                .font(.caption)
-                .foregroundColor(isLoading ? .gray.opacity(0.5) : .mainRed)
-                .frame(alignment: .leading)
+            .contentShape(Rectangle())
+            .overlay(content: {
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle())
+                }
+            })
         }
-        .contentShape(Rectangle())
-        .overlay(content: {
-            if isLoading {
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle())
-            }
-        })
     }
-    
+
     // MARK: - Private method
     /// Возврашщает статус кнопки цели (сервенуть/развернуть/закрыть цель/открыть цель)
     private func targetButtonStatus(target: UserTargetDtoModel) -> TargetButtonStatus {
