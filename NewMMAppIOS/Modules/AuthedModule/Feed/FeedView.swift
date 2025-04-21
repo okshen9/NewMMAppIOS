@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftUICore
 
 enum FeedViewRoute: Hashable {
     case profile(UserProfileResultDto)
@@ -15,7 +16,8 @@ enum FeedViewRoute: Hashable {
 struct FeedView: View {
     @StateObject private var viewModel = FeedViewModel()
     @State private var path = NavigationPath()
-
+    @State private var showEventTypeMenu = false
+    
     var body: some View {
         NavigationStack(path: $path) {
             ScrollView {
@@ -50,12 +52,42 @@ struct FeedView: View {
 
                     }
                 }
-                .padding(.horizontal, 8)
+                .padding(.horizontal)
                 .padding(.top, 8)
             }
             .navigationTitle("События")
             .toolbar(content: {
-
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        showEventTypeMenu = true
+                    }) {
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                            .foregroundColor(.accentColor)
+                    }
+                    .popover(isPresented: $showEventTypeMenu) {
+                        MultiSelectMenu(
+                            isPresented: $showEventTypeMenu,
+                            options: EventType.allTargetsType.map { $0.name },
+                            originalSelection: Binding(
+                                get: { 
+                                    Set(viewModel.selectedType.filter { $0.value }.keys.map { $0.name })
+                                },
+                                set: { newSelection in
+                                    // Обновляем выбранные типы
+                                    for type in EventType.allTargetsType {
+                                        viewModel.selectedType[type] = newSelection.contains(type.name)
+                                    }
+                                }
+                            )
+                        ) {
+                            // Перезапрашиваем данные
+                            Task.detached {
+                                await viewModel.getNextEvents(resetSearch: true)
+                            }
+                        }
+                        .presentationCompactAdaptation(.popover)
+                    }
+                }
             })
             .refreshable {
                 await viewModel.getNextEvents(resetSearch: true)
@@ -70,7 +102,6 @@ struct FeedView: View {
 
                 }
             }
-
         }
     }
 

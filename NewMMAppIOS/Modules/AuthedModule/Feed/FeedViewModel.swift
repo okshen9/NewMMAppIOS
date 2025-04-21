@@ -24,7 +24,7 @@ final class FeedViewModel: ObservableObject, FeedViewModelProtocol {
 
     @Published var feedEvents: [EventDTO]?
     @Published var currentEventSearch: [EventsQuery.QueryValue] = Constants.baseEventSearch
-    @Published var selectedType: [EventType: Bool] = Dictionary(uniqueKeysWithValues: Constants.baseSelectedEventSearch.map { ($0, false) })
+    @Published var selectedType: [EventType: Bool] = Dictionary(uniqueKeysWithValues: Constants.baseSelectedEventSearch.map { ($0, true) })
 
     var searchResponseDTO: SearchResponseDTO?
     let service = ServiceBuilder.shared

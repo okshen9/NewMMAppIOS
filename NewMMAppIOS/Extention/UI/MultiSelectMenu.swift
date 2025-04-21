@@ -32,6 +32,7 @@ struct MultiSelectMenu: View {
             ForEach(options, id: \.self) { option in
                 HStack(spacing: 6) {
                     Text(option)
+                        .foregroundColor(tempSelection.contains(option) ? Color.headerText : Color(uiColor: .systemGray))
                     Spacer()
                     ZStack {
                         Image(systemName: "checkmark")
@@ -54,10 +55,8 @@ struct MultiSelectMenu: View {
                     }
                 }
             }
-            //            .listStyle(.plain)
             .padding(.horizontal)
             .padding(.top)
-            //            .frame(minWidth: 200, maxHeight: 300)
             Divider()
                 .padding(.top)
             Button("Сохранить") {
@@ -71,7 +70,6 @@ struct MultiSelectMenu: View {
         }
         .background(Color(.systemBackground))
         .cornerRadius(12)
-        .shadow(radius: 5)
         // Сбрасываем при закрытии через жесты
         .onChange(of: isPresented) { oldValue, newValue in
             if !newValue {
