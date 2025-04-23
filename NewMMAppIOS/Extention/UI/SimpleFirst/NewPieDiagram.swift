@@ -3,7 +3,7 @@ import SwiftUI
 /// Диаграмма, отображающая секторы с прогрессом и поддержкой иерархической навигации.
 /// Поддерживает два режима отображения: с легендой снизу или сбоку.
 /// Имеет возможность отключения интерактивности и скрытия центральных надписей.
-struct SimpleFirst: View {
+struct NewPieDiagram: View {
     /// Данные для отображения в диаграмме
     let slices: [PieModel]
     /// Расстояние между секторами (0.0...1.0)
@@ -559,14 +559,14 @@ extension PieModel: Animatable {
 
         VStack {
             TabView {
-                SimpleFirst(
+                NewPieDiagram(
                     slices: value2,
                     title: "Стандартный режим",
                     showCenterLabel: $showLabels,
                     isInteractive: $isInteractive
                 )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                SimpleFirst(
+                NewPieDiagram(
                     slices: value2,
                     title: "С легендой сбоку",
                     legendOnSide: true,
