@@ -28,7 +28,7 @@ struct TabBarView: View {
                             .renderingMode(.template)
                             .foregroundColor(selectedTab == 0 ? Color.mainRed : Color.tabbarSecond)
                         
-                        Text("Рассписание")
+                        Text("Расписание")
                             .foregroundColor(selectedTab == 0 ? Color.mainRed : Color.tabbarSecond)
                     }
                     .tag(1)

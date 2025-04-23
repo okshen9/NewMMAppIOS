@@ -132,19 +132,19 @@ struct SchedulerView: View {
                         }
                     } else {
                         ShimmeringRectangle()
-                            .frame(width: 350, height: 450)
+                            .frame(width: .infinity, height: 450)
                             .cornerRadius(44)
                         
                         ShimmeringRectangle()
-                            .frame(width: 350, height: 50)
+                            .frame(width: .infinity, height: 50)
                             .cornerRadius(44)
                         
                         ShimmeringRectangle()
-                            .frame(width: 350, height: 50)
+                            .frame(width: .infinity, height: 50)
                             .cornerRadius(44)
                         
                         ShimmeringRectangle()
-                            .frame(width: 350, height: 50)
+                            .frame(width: .infinity, height: 50)
                             .cornerRadius(44)
                         Spacer()
                     }
@@ -243,7 +243,7 @@ struct SchedulerView: View {
                         isDateSelected = false
                     }
                 } label: {
-                    Text("Показать все события")
+                    Text("Показать за все время")
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(Color.mainRed)
                 }
