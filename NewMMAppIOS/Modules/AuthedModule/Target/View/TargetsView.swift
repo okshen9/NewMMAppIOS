@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct TargetsView: View {
-    @StateObject private var viewModel = TargetsViewModel()
+    @StateObject private var viewModel = TargetsViewModel.mockWithData()
     @State private var isEditingCategory: Bool = false
     @State private var selectedCategory: TargetCategory? = nil
     @State private var selectedTab = 0
@@ -237,4 +237,15 @@ struct TargetsView: View {
 
 #Preview {
     TargetsView()
+}
+
+// MARK: - Превью с моковыми данными
+struct MockTargetsView: View {
+    var body: some View {
+        TargetsView()
+    }
+}
+
+#Preview {
+    MockTargetsView()
 }
