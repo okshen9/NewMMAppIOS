@@ -52,19 +52,18 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
         var updatedTaskItems: [TaskProgress] = []
         var updatedPieModels: [PieModel] = []
         
-        // Общее количество целей для расчета пропорций
-        let totalTargetsCount = targets.count > 0 ? Double(targets.count) : 1.0
+        // Определяем категории, в которых есть цели
+        let categoriesWithTargets = categories.filter { category in
+            let targets = groupedTargets[category] ?? []
+            return !targets.isEmpty
+        }
         
-        // Если целей нет, показываем все категории равномерно
-        let equalShare = 1.0 / Double(categories.count)
+        // Если нет категорий с целями, показываем все категории равномерно
+        let equalShare = 1.0 / Double(categoriesWithTargets.isEmpty ? categories.count : categoriesWithTargets.count)
         
-        // Перебираем все категории, даже если у них нет целей
-        for categoryGroup in groupedTargets {
-            let category = categoryGroup.key
-            let categoryTargets = categoryGroup.value
-            guard !categoryTargets.isEmpty
-            else { continue }
-//            let categoryTargets = groupedTargets[category] ?? []
+        // Перебираем все категории с целями
+        for category in categoriesWithTargets.isEmpty ? categories : categoriesWithTargets {
+            let categoryTargets = groupedTargets[category] ?? []
             let totalTargets = categoryTargets.count
             let completedTargets = categoryTargets.filter { 
                 $0.targetStatus == .done || $0.targetStatus == .doneExpired 
@@ -73,24 +72,19 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
             let progress = totalTargets > 0 ? Double(completedTargets) / Double(totalTargets) : 0.0
             let categoryColor: Color = category.color
             
-            // Если целей вообще нет, используем равные доли для каждой категории
-            let value = totalTargetsCount > 0 && totalTargets > 0 ? 
-                Double(totalTargets) / totalTargetsCount : 
-                equalShare
-
             updatedTaskItems.append(
                 TaskProgress(
                     progress: progress,
                     color: categoryColor,
                     name: category.rawValue,
-                    value: value
+                    value: equalShare
                 )
             )
             
-            // Создаем PieModel для каждой категории, обязательно с ненулевым totalValue
+            // Создаем PieModel для каждой категории
             updatedPieModels.append(
                 PieModel(
-                    totalValue: max(value, 0.01), // Гарантируем минимальное значение для отображения
+                    totalValue: equalShare, // Используем равное значение для всех категорий
                     currentValue: progress,
                     subModel: categoryTargets.isEmpty ? nil : createSubPieModels(for: categoryTargets),
                     color: categoryColor,
@@ -109,13 +103,14 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
     /// - Returns: Массив дочерних PieModel для отображения в диаграмме
     private func createSubPieModels(for targets: [UserTargetDtoModel]) -> [PieModel] {
         let totalCount = Double(targets.count)
+        let equalShare = 1.0 / totalCount // Равная доля для каждой подцели
         
         return targets.map { target in
             let isDone = target.targetStatus == .done || target.targetStatus == .doneExpired
             let progress = isDone ? 1.0 : calculateTargetProgress(target)
             
             return PieModel(
-                totalValue: 1.0 / totalCount,
+                totalValue: equalShare,
                 currentValue: progress,
                 color: target.category?.color ?? .gray,
                 title: target.title ?? "Без названия"

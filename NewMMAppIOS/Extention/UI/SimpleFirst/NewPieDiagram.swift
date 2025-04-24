@@ -79,12 +79,28 @@ struct NewPieDiagram: View {
     }
     
     private var normalizedSlices: [(model: PieModel, normalizedValue: Double)] {
-        let total = animatableSlices.map(\.totalValue).reduce(0, +) 
-        let totalSpacing = segmentSpacing * Double(animatableSlices.count)
-        let available = 1 - totalSpacing
-        return animatableSlices.map { slice in
-            let nv = (slice.totalValue / total) * available
-            return (slice, nv)
+        // Общее количество секторов
+        let count = Double(animatableSlices.count)
+        // Общее пространство для отступов
+        let totalSpacing = segmentSpacing * count
+        // Доступное пространство для секторов
+        let available = 1.0 - totalSpacing
+        
+        // Проверяем, все ли значения totalValue одинаковы
+        let firstValue = animatableSlices.first?.totalValue ?? 0
+        let allEqual = animatableSlices.allSatisfy { abs($0.totalValue - firstValue) < 0.000001 }
+        
+        if allEqual {
+            // Если все значения равны, распределяем доступное пространство поровну
+            let equalShare = available / count
+            return animatableSlices.map { (model: $0, normalizedValue: equalShare) }
+        } else {
+            // Если значения разные, нормализуем их с учетом их пропорций
+            let total = animatableSlices.map(\.totalValue).reduce(0, +)
+            return animatableSlices.map { slice in
+                let normalizedValue = (slice.totalValue / total) * available
+                return (model: slice, normalizedValue: normalizedValue)
+            }
         }
     }
 
