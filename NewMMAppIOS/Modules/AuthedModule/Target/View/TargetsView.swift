@@ -9,9 +9,10 @@ import Foundation
 import SwiftUI
 
 struct TargetsView: View {
-    @StateObject private var viewModel = TargetsViewModel()//.mockWithData()
+    @StateObject private var viewModel = TargetsViewModel.mockWithData()
     @State private var isEditingCategory: Bool = false
     @State private var selectedCategory: TargetCategory? = nil
+    @State private var selectedPieSectorId: UUID? = nil
     @State private var selectedTab = 0
     @State private var showAddTarget = false
     @State private var showErrorAlert = false
@@ -108,11 +109,14 @@ struct TargetsView: View {
     @ViewBuilder
     private func mainContentView() -> some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                // Диаграмма статистики
+            VStack(alignment: .leading, spacing: 20) {
+                // Диаграмма статистики как обычный первый элемент
                 statisticsView()
                     .padding(.top, 8)
                 
+                // Разделительная линия
+                Divider()
+
                 // Категории целей
                 categoriesView()
             }
@@ -128,18 +132,51 @@ struct TargetsView: View {
     // MARK: - Statistics View
     @ViewBuilder
     private func statisticsView() -> some View {
-        StatisticsView(
-            tasks: viewModel.tasksItems.isEmpty ?
-                TargetCategory.allCases.map { category in
-                    TaskProgress(
-                        progress: 0,
-                        color: category.color,
-                        name: category.rawValue,
-                        value: 0
-                    )
-                } : viewModel.tasksItems,
-            selectedCategory: $selectedCategory
-        )
+        VStack(alignment: .center, spacing: 10) {
+            Text("Статистика по категориям")
+                .font(.headline)
+                .foregroundColor(.headerText)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.leading, 8)
+                
+            let screenWidth = UIScreen.main.bounds.width
+            let chartSize = screenWidth - 32
+                
+            // Проверка, есть ли у нас данные
+            if viewModel.pieModels.isEmpty {
+                Text("Загрузка данных...")
+                    .foregroundColor(.secondary)
+                    .frame(height: 100)
+            } else {
+                // Используем NewPieDiagram с адаптивной высотой
+                NewPieDiagram(
+                    slices: viewModel.pieModels,
+                    segmentSpacing: 0.02,
+                    cornerRadius: 8,
+                    title: "Выполнение целей",
+                    legendOnSide: false,
+                    showCenterLabel: .constant(true),
+                    isInteractive: .constant(true),
+                    onSectorSelected: { model in
+                        // Обрабатываем выбор сектора
+                        if let category = TargetCategory.allCases.first(where: { $0.rawValue == model.title }) {
+                            withAnimation {
+                                selectedCategory = category
+                            }
+                        }
+                    }
+                )
+                .frame(width: chartSize)
+                .frame(height: chartSize + 60)
+            }
+        }
+        .onChange(of: viewModel.pieModels) { _, newModels in
+            // Обновляем выбранную категорию, если она больше не существует в данных
+            if let selectedCategory = selectedCategory, 
+               !newModels.contains(where: { $0.title == selectedCategory.rawValue }) {
+                self.selectedCategory = nil
+            }
+        }
     }
     
     // MARK: - Categories View

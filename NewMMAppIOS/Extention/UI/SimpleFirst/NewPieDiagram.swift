@@ -22,6 +22,7 @@ struct NewPieDiagram: View {
     @State private var currentLevel: Int = 0
     @State private var navigationHistory: [[PieModel]] = []
     @State private var currentTitle: String = "Главная"
+    @State private var selectedSectorId: UUID? = nil
     
     /// Название диаграммы, отображаемое в центре на корневом уровне
     let diagramTitle: String
@@ -34,6 +35,8 @@ struct NewPieDiagram: View {
     @Binding var showCenterLabel: Bool
     /// Управляет возможностью взаимодействия с диаграммой (навигация по уровням)
     @Binding var isInteractive: Bool
+    /// Обработчик выбора сектора
+    var onSectorSelected: ((PieModel) -> Void)?
     
     /// Инициализатор компонента диаграммы
     /// - Parameters:
@@ -44,6 +47,7 @@ struct NewPieDiagram: View {
     ///   - legendOnSide: Флаг размещения легенды сбоку вместо внизу
     ///   - showCenterLabel: Биндинг для управления отображением надписей в центре
     ///   - isInteractive: Биндинг для управления возможностью взаимодействия
+    ///   - onSectorSelected: Замыкание, вызываемое при выборе сектора
     init(
         slices: [PieModel],
         segmentSpacing: Double = 0.02,
@@ -51,7 +55,8 @@ struct NewPieDiagram: View {
         title: String = "Главная",
         legendOnSide: Bool = false,
         showCenterLabel: Binding<Bool> = .constant(true),
-        isInteractive: Binding<Bool> = .constant(true)
+        isInteractive: Binding<Bool> = .constant(true),
+        onSectorSelected: ((PieModel) -> Void)? = nil
     ) {
         self.slices = slices
         self.segmentSpacing = segmentSpacing
@@ -60,6 +65,7 @@ struct NewPieDiagram: View {
         self.legendOnSide = legendOnSide
         self._showCenterLabel = showCenterLabel
         self._isInteractive = isInteractive
+        self.onSectorSelected = onSectorSelected
     }
     
     private var normalizedSlices: [(model: PieModel, normalizedValue: Double)] {
@@ -84,12 +90,6 @@ struct NewPieDiagram: View {
                     }
                 } else {
                     VStack(spacing: 0) {
-                        // Заголовок с текущим уровнем
-                        Text(currentTitle)
-                            .font(.headline)
-                            .padding(.top, 8)
-                            .padding(.bottom, 4)
-                        
                         chartView(size: proxy.size)
                         
                         // Легенда снизу
@@ -169,7 +169,16 @@ struct NewPieDiagram: View {
     
     // Функция для перехода на уровень ниже к дочерним моделям
     private func navigateToSubmodels(of model: PieModel) {
-        guard let subModels = model.subModel, !subModels.isEmpty else { return }
+        // Вызываем обработчик выбора сектора, если он задан
+        if let onSectorSelected = onSectorSelected {
+            onSectorSelected(model)
+        }
+        
+        // Устанавливаем выбранный сектор
+        selectedSectorId = model.id
+        
+        // Проверяем наличие дочерних моделей
+        guard let subModels = model.subModel, !subModels.isEmpty, isInteractive else { return }
         
         // Сохраняем текущий уровень в историю
         if navigationHistory.count <= currentLevel {
@@ -246,9 +255,8 @@ struct NewPieDiagram: View {
 
     // Вынесенное представление диаграммы, принимающее доступный размер
     private func chartView(size: CGSize) -> some View {
-        let availableWidth = legendOnSide ? size.width * 0.7 : size.width * 0.9
-        let availableHeight = legendOnSide ? size.height * 0.9 : size.height * 0.6
-        let chartSize = min(availableWidth, availableHeight)
+        // Используем фиксированный размер чарта, равный размеру переданной ширины
+        let chartSize = size.width
         
         return GeometryReader { geometry in
             // Диаграмма с анимацией масштаба и прозрачности
@@ -307,9 +315,9 @@ struct NewPieDiagram: View {
                     if entry.model.subModel != nil && !(entry.model.subModel?.isEmpty ?? true) && isInteractive {
                         // Вычисляем позицию для индикатора
                         let midAngle = (start + bgEnd) / 2
-                        let radius = min(geometry.size.width, geometry.size.height) / 2.5
-                        let indicatorX = geometry.size.width / 2 + cos(midAngle.radians) * radius
-                        let indicatorY = geometry.size.height / 2 + sin(midAngle.radians) * radius
+                        let radius = chartSize / 2.5
+                        let indicatorX = chartSize / 2 + cos(midAngle.radians) * radius
+                        let indicatorY = chartSize / 2 + sin(midAngle.radians) * radius
 
                         ZStack {
                             // Светящийся круг
@@ -337,7 +345,7 @@ struct NewPieDiagram: View {
                 // Центральный круг
                 Circle()
                     .foregroundStyle(.white)
-                    .frame(width: geometry.size.width / 1.5, height: geometry.size.height / 1.5)
+                    .frame(width: chartSize / 1.5, height: chartSize / 1.5)
                     .shadow(color: .black.opacity(0.1), radius: 2)
                     .contentShape(Circle())
                     .onTapGesture {
@@ -383,13 +391,12 @@ struct NewPieDiagram: View {
                         Text("Выполнено \(Int(present * 100))%")
                             .fontWeight(.semibold)
                     }
-                    .frame(width: geometry.size.width / 1.5, height: geometry.size.height / 1.5)
+                    .frame(width: chartSize / 1.5, height: chartSize / 1.5)
                 }
             }
             .scaleEffect(scale)
             .opacity(opacity)
-            .frame(width: geometry.size.width, height: geometry.size.height)
-            .id(id) // Используем id для обновления всего ZStack
+            .id(id)
         }
         .frame(width: chartSize, height: chartSize)
         .padding(.horizontal, legendOnSide ? 0 : 8)
@@ -412,93 +419,61 @@ struct NewPieDiagram: View {
                 .padding(.horizontal, 4)
                 .frame(width: UIScreen.main.bounds.width * 0.25)
             } else {
-                // Двухстрочная легенда с горизонтальным скролом для вертикального режима
-                VStack(spacing: 6) {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        LazyHGrid(
-                            rows: [
-                                GridItem(.adaptive(minimum: 22, maximum: 40)),
-                                GridItem(.adaptive(minimum: 22, maximum: 40))
-                            ],
-                            alignment: .top,
-                            spacing: 10
-                        ) {
-                            legendItems
-                        }
-                        .padding(.horizontal, 8)
+                // Компактная легенда с автоматической высотой
+                VStack(spacing: 4) {
+                    LazyVGrid(
+                        columns: [
+                            GridItem(.adaptive(minimum: 120, maximum: 160), spacing: 8)
+                        ],
+                        alignment: .leading,
+                        spacing: 6
+                    ) {
+                        legendItems
                     }
+                    .padding(.horizontal, 4)
                 }
                 .opacity(opacity)
-                .frame(height: 90)
+                // Высота адаптируется к содержимому с минимальным padding
+                .padding(.top, 4)
+                .padding(.bottom, 2)
+                .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 8)
+        .padding(.horizontal, 4)
     }
 
     // Элементы легенды, используемые в обоих режимах
     private var legendItems: some View {
         ForEach(animatableSlices) { slice in
-            GeometryReader { geo in
-                VStack(alignment: .leading, spacing: 3) {
-                    HStack(spacing: 4) {
-                        // Цветной индикатор
-                        Circle()
-                            .fill(slice.color)
-                            .frame(width: legendOnSide ? 8 : 10, height: legendOnSide ? 8 : 10)
-                        
-                        // Заголовок без процентов
-                        Text(slice.title)
-                            .font(.system(size: legendOnSide ? 12 : 13))
-                            .lineLimit(legendOnSide ? 1 : 2)
-                            .truncationMode(.tail)
-                            .multilineTextAlignment(.leading)
-                        
-                        // Индикатор наличия подуровней
-                        if slice.subModel != nil && !(slice.subModel?.isEmpty ?? true) && isInteractive {
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: legendOnSide ? 8 : 9))
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    
-                    // Процент на отдельной строке (или вместе для бокового режима)
-                    if !legendOnSide {
-                        Text("\(Int(slice.currentValue * 100))%")
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(.secondary)
-                            .padding(.leading, 14) // Отступ для выравнивания с названием
-                    } else {
-                        Spacer(minLength: 0)
-                    }
-                }
-                .frame(width: geo.size.width, height: geo.size.height)
+            HStack(spacing: 4) {
+                // Цветной индикатор
+                Circle()
+                    .fill(slice.color)
+                    .frame(width: legendOnSide ? 8 : 10, height: legendOnSide ? 8 : 10)
+                
+                // Заголовок без процентов
+                Text(slice.title)
+                    .font(.system(size: legendOnSide ? 12 : 13))
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                
+                Spacer(minLength: 4)
+                
+                // Процент выполнения
+                Text("\(Int(slice.currentValue * 100))%")
+                    .font(.system(size: legendOnSide ? 11 : 12, weight: .medium))
             }
-            .frame(width: legendItemWidth(for: slice.title))
-            .padding(.vertical, legendOnSide ? 4 : 4)
-            .padding(.horizontal, legendOnSide ? 4 : 6)
-            .background(Color.gray.opacity(0.1))
-            .cornerRadius(6)
-            .id("\(slice.id)-legend")
-            .contentShape(Rectangle())
+            .padding(.vertical, 2)
+            .padding(.horizontal, 6)
+            .background(
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color.gray.opacity(0.1))
+            )
             .onTapGesture {
                 if isInteractive {
                     navigateToSubmodels(of: slice)
                 }
             }
-        }
-    }
-
-    // Функция для расчета адаптивной ширины элемента легенды
-    private func legendItemWidth(for title: String) -> CGFloat {
-        let baseWidth: CGFloat = 60 // Базовая ширина для процентов и иконок
-        let titleWidth = min(CGFloat(title.count) * 7.5, 150) // Примерная ширина текста
-        
-        if legendOnSide {
-            return UIScreen.main.bounds.width * 0.23 // Боковой режим использует процент от ширины экрана
-        } else {
-            // Адаптивная ширина, но не менее 120 и не более 200
-            return min(200, max(120, baseWidth + titleWidth))
         }
     }
 }

@@ -5,125 +5,50 @@
 //  Created by artem on 13.04.2025.
 //
 
-
 import Foundation
 import SwiftUI
 
+/// Обертка для обеспечения обратной совместимости
+/// со старой реализацией кругового индикатора прогресса
 struct MultiProgressRingView: View {
     let tasks: [TaskProgress]
     @Binding var selectedCategory: TargetCategory?
     @State private var selectedTask: TaskProgress?
-    @State private var animatedProgress: [CGFloat] = []
+    @State private var pieModels: [PieModel] = []
     
     var body: some View {
-        VStack(spacing: 20) {
-            if tasks.isEmpty {
-                Text("Нет целей для отображения")
-                    .font(.system(size: 16))
-                    .foregroundColor(.secondary)
-                    .frame(height: 200)
-            } else {
-                ZStack {
-                    ForEach(tasks.indices, id: \.self) { index in
-                        let task = tasks[index]
-                        let scale = 1.0 - CGFloat(index) * 0.15
-                        
-                        Circle()
-                            .stroke(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [task.color.opacity(0.2), task.color.opacity(0.1)]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 12
-                            )
-                            .scaleEffect(scale)
-                        
-                        if index < animatedProgress.count {
-                            Circle()
-                                .trim(from: 0, to: animatedProgress[index])
-                                .stroke(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [task.color, task.color.opacity(0.8)]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    style: StrokeStyle(lineWidth: 12, lineCap: .round)
-                                )
-                                .scaleEffect(scale)
-                                .rotationEffect(.degrees(-90))
-                                .animation(.spring(response: 1.0, dampingFraction: 0.8), value: animatedProgress[index])
-                        }
-                        
-                        Circle()
-                            .fill(Color.clear)
-                            .frame(width: 200 * scale, height: 200 * scale)
-                            .contentShape(Circle())
-                            .onTapGesture {
-                                withAnimation {
-                                    selectedTask = task
-                                    selectedCategory = TargetCategory(rawValue: task.name)
-                                }
-                            }
-                    }
-                    
-                    if let selected = selectedTask {
-                        VStack {
-                            Text(selected.name)
-                                .font(.system(size: 16, weight: .semibold))
-                            Text("\(Int(selected.progress * 100))%")
-                                .font(.system(size: 24, weight: .bold))
-                                .foregroundColor(selected.color)
-                        }
-                        .transition(.scale.combined(with: .opacity))
-                    }
-                }
-                .frame(height: 200)
-            }
-            
-            if !tasks.isEmpty {
-                VStack(spacing: 12) {
-                    ForEach(tasks) { task in
-                        HStack {
-                            Circle()
-                                .fill(task.color)
-                                .frame(width: 12, height: 12)
-                            
-                            Text(task.name)
-                                .font(.system(size: 14))
-                            
-                            Spacer()
-                            
-                            Text("\(Int(task.progress * 100))%")
-                                .font(.system(size: 14, weight: .semibold))
-                                .foregroundColor(task.color)
-                        }
-                        .padding(.horizontal)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            withAnimation {
-                                selectedTask = task
-                                selectedCategory = TargetCategory(rawValue: task.name)
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        // Используем новый компонент диаграммы
+        NewPieDiagram(
+            slices: pieModels,
+            segmentSpacing: 0.02,
+            cornerRadius: 8,
+            title: "Выполнение целей",
+            showCenterLabel: .constant(true),
+            isInteractive: .constant(true)
+        )
         .onAppear {
-            // Инициализируем animatedProgress с нулевыми значениями
-            animatedProgress = Array(repeating: 0, count: tasks.count)
-            
-            // Анимируем прогресс после небольшой задержки
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                withAnimation(.spring(response: 1.0, dampingFraction: 0.8)) {
-                    animatedProgress = tasks.map { CGFloat($0.progress) }
-                }
-            }
+            // Конвертируем TaskProgress в PieModel для внутреннего использования
+            convertTasksToPieModels()
+        }
+        .onChange(of: tasks) { 
+            convertTasksToPieModels()
+        }
+    }
+    
+    /// Конвертирует старую модель данных в новую для использования с NewPieDiagram
+    private func convertTasksToPieModels() {
+        pieModels = tasks.map { task in
+            PieModel(
+                totalValue: task.value,
+                currentValue: task.progress,
+                color: task.color,
+                title: task.name
+            )
         }
     }
 }
 
+// Превью для демонстрации компонента
 struct PreviewView: View {
     @State private var selectedCategory: TargetCategory? = nil
 

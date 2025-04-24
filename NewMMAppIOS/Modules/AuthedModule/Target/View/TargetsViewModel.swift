@@ -18,6 +18,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
     @Published var tasksItems: [TaskProgress] = []
+    @Published var pieModels: [PieModel] = []
     @Published var groupedTargets: [TargetCategory: [UserTargetDtoModel]] = [:]
     
     // MARK: - Private Properties
@@ -49,33 +50,89 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
         // Вычисление процента выполнения для каждой категории
         let categories = TargetCategory.allCases
         var updatedTaskItems: [TaskProgress] = []
+        var updatedPieModels: [PieModel] = []
         
-        for category in categories {
-            let categoryTargets = groupedTargets[category] ?? []
-            if !categoryTargets.isEmpty {
-                let totalTargets = categoryTargets.count
-                let completedTargets = categoryTargets.filter { 
-                    $0.targetStatus == .done || $0.targetStatus == .doneExpired 
-                }.count
-                
-                let progress = totalTargets > 0 ? Double(completedTargets) / Double(totalTargets) : 0.0
-                let categoryColor: Color = category.color
-                
-                updatedTaskItems.append(
-                    TaskProgress(
-                        progress: progress,
-                        color: categoryColor,
-                        name: category.rawValue,
-                        value: Double(totalTargets) / Double(targets.count)
-                    )
+        // Общее количество целей для расчета пропорций
+        let totalTargetsCount = targets.count > 0 ? Double(targets.count) : 1.0
+        
+        // Если целей нет, показываем все категории равномерно
+        let equalShare = 1.0 / Double(categories.count)
+        
+        // Перебираем все категории, даже если у них нет целей
+        for categoryGroup in groupedTargets {
+            let category = categoryGroup.key
+            let categoryTargets = categoryGroup.value
+            guard !categoryTargets.isEmpty
+            else { continue }
+//            let categoryTargets = groupedTargets[category] ?? []
+            let totalTargets = categoryTargets.count
+            let completedTargets = categoryTargets.filter { 
+                $0.targetStatus == .done || $0.targetStatus == .doneExpired 
+            }.count
+            
+            let progress = totalTargets > 0 ? Double(completedTargets) / Double(totalTargets) : 0.0
+            let categoryColor: Color = category.color
+            
+            // Если целей вообще нет, используем равные доли для каждой категории
+            let value = totalTargetsCount > 0 && totalTargets > 0 ? 
+                Double(totalTargets) / totalTargetsCount : 
+                equalShare
+
+            updatedTaskItems.append(
+                TaskProgress(
+                    progress: progress,
+                    color: categoryColor,
+                    name: category.rawValue,
+                    value: value
                 )
-            }
+            )
+            
+            // Создаем PieModel для каждой категории, обязательно с ненулевым totalValue
+            updatedPieModels.append(
+                PieModel(
+                    totalValue: max(value, 0.01), // Гарантируем минимальное значение для отображения
+                    currentValue: progress,
+                    subModel: categoryTargets.isEmpty ? nil : createSubPieModels(for: categoryTargets),
+                    color: categoryColor,
+                    title: category.rawValue
+                )
+            )
         }
         
-        // Обновляем только если есть данные
-        if !updatedTaskItems.isEmpty {
-            tasksItems = updatedTaskItems
+        // Всегда обновляем данные
+        tasksItems = updatedTaskItems
+        pieModels = updatedPieModels
+    }
+    
+    /// Создает подмодели для PieModel из целей конкретной категории
+    /// - Parameter targets: Массив целей для конкретной категории
+    /// - Returns: Массив дочерних PieModel для отображения в диаграмме
+    private func createSubPieModels(for targets: [UserTargetDtoModel]) -> [PieModel] {
+        let totalCount = Double(targets.count)
+        
+        return targets.map { target in
+            let isDone = target.targetStatus == .done || target.targetStatus == .doneExpired
+            let progress = isDone ? 1.0 : calculateTargetProgress(target)
+            
+            return PieModel(
+                totalValue: 1.0 / totalCount,
+                currentValue: progress,
+                color: target.category?.color ?? .gray,
+                title: target.title ?? "Без названия"
+            )
         }
+    }
+    
+    /// Вычисляет прогресс выполнения для конкретной цели на основе ее подцелей
+    /// - Parameter target: Модель цели
+    /// - Returns: Значение прогресса от 0.0 до 1.0
+    private func calculateTargetProgress(_ target: UserTargetDtoModel) -> Double {
+        guard let subTargets = target.subTargets, !subTargets.isEmpty else {
+            return target.percentage.map { $0 / 100.0 } ?? 0.0
+        }
+        
+        let completedCount = subTargets.filter { $0.targetStatus == .done }.count
+        return Double(completedCount) / Double(subTargets.count)
     }
     
     // MARK: - Network Request Methods
