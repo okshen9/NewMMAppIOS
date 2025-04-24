@@ -5,34 +5,28 @@ struct TabBarView: View {
     @State private var selectedTab = 0 // Индекс текущей выбранной вкладки
 
     var body: some View {
-        if viewModel.user.isNil {
-            LoadingViewScreenView()
-                .onAppear {
-                    viewModel.fetchUserProfile()
+        TabView(selection: $selectedTab) {
+            FeedView()
+                .tabItem {
+                    Image(.MM)
+                        .renderingMode(.template)
+                        .foregroundColor(selectedTab == 0 ? Color.mainRed : Color.tabbarSecond)
+                    Text("Главная")
+                        .foregroundColor(selectedTab == 0 ? Color.mainRed : Color.tabbarSecond)
                 }
-        } else {
-            TabView(selection: $selectedTab) {
-                FeedView()
-                    .tabItem {
-                        Image(.MM)
-                            .renderingMode(.template)
-                            .foregroundColor(selectedTab == 0 ? Color.mainRed : Color.tabbarSecond)
-                        Text("Главная")
-                            .foregroundColor(selectedTab == 0 ? Color.mainRed : Color.tabbarSecond)
-                    }
-                    .tag(0)
-                
-                SchedulerView()
-                    .tabItem {
-                        Image(.calendar)
-                            .renderingMode(.template)
-                            .foregroundColor(selectedTab == 0 ? Color.mainRed : Color.tabbarSecond)
-                        
-                        Text("Расписание")
-                            .foregroundColor(selectedTab == 0 ? Color.mainRed : Color.tabbarSecond)
-                    }
-                    .tag(1)
-                
+                .tag(0)
+            
+            SchedulerView()
+                .tabItem {
+                    Image(.calendar)
+                        .renderingMode(.template)
+                        .foregroundColor(selectedTab == 0 ? Color.mainRed : Color.tabbarSecond)
+                    
+                    Text("Расписание")
+                        .foregroundColor(selectedTab == 0 ? Color.mainRed : Color.tabbarSecond)
+                }
+                .tag(1)
+            
 //                TestScreen()
 //                    .tabItem {
 //                Image(ImageResource.search)
@@ -42,46 +36,41 @@ struct TabBarView: View {
 //                            .foregroundColor(selectedTab == 1 ? Color.mainRed : Color.tabbarSecond)
 //                    }
 //                    .tag(5)
-                
-                TargetsView()
-                    .tabItem {
-                        Image(.star)
-                            .renderingMode(.template)
-                            .foregroundColor(selectedTab == 2 ? Color.mainRed : Color.tabbarSecond)
-                        Text("Цели")
-                            .foregroundColor(selectedTab == 2 ? Color.mainRed : Color.orange)
-                    }
-                    .tag(2)
-                
-                PayRequestView()
-                    .tabItem {
-                        Image(.pay)
-                            .renderingMode(.template)
-                            .foregroundColor(selectedTab == 3 ? Color.mainRed : Color.orange)
-                        Text("Оплата")
-                            .foregroundColor(selectedTab == 3 ? Color.mainRed : Color.orange)
-                    }
-                    .tag(3)
-                
-                ProfileView()
-                    .tabItem {
-                        VStack {
-                            Image(.profile)
-                                .renderingMode(.template)
-                                .foregroundColor(selectedTab == 4 ? Color.green : Color.orange)
-                            Text("Профиль")
-                                .foregroundColor(selectedTab == 4 ? Color.mainRed : Color.orange)
-                        }
-                    }
-                    .tag(4)
-            }
-            .accentColor(Color.mainRed)
-            .foregroundColor(Color.tabbarSecond)
-        }
             
-
-        
-        
+            TargetsView()
+                .tabItem {
+                    Image(.star)
+                        .renderingMode(.template)
+                        .foregroundColor(selectedTab == 2 ? Color.mainRed : Color.tabbarSecond)
+                    Text("Цели")
+                        .foregroundColor(selectedTab == 2 ? Color.mainRed : Color.orange)
+                }
+                .tag(2)
+            
+            PayRequestView()
+                .tabItem {
+                    Image(.pay)
+                        .renderingMode(.template)
+                        .foregroundColor(selectedTab == 3 ? Color.mainRed : Color.orange)
+                    Text("Оплата")
+                        .foregroundColor(selectedTab == 3 ? Color.mainRed : Color.orange)
+                }
+                .tag(3)
+            
+            ProfileView()
+                .tabItem {
+                    VStack {
+                        Image(.profile)
+                            .renderingMode(.template)
+                            .foregroundColor(selectedTab == 4 ? Color.green : Color.orange)
+                        Text("Профиль")
+                            .foregroundColor(selectedTab == 4 ? Color.mainRed : Color.orange)
+                    }
+                }
+                .tag(4)
+        }
+        .accentColor(Color.mainRed)
+        .foregroundColor(Color.tabbarSecond)
     }
 }
 

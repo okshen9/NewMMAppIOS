@@ -8,6 +8,14 @@ class TabBarViewModel: ObservableObject {
     
     @Published var user: UserProfileResultDto?
     
+    // MARK: - Init
+    init() {
+        // Пытаемся загрузить из репозитория при инициализации
+        self.user = userRepository.userProfile
+        // Запускаем загрузку/обновление профиля в фоне
+        fetchUserProfile()
+    }
+
     struct Input {
         @State var title: String = Constants.title
     }
@@ -21,15 +29,29 @@ class TabBarViewModel: ObservableObject {
 
     // MARK: - Public Methods
     func fetchUserProfile() {
+        // Проверяем, есть ли уже данные в репозитории
+        if userRepository.userProfile != nil && self.user != nil {
+            print("User profile already loaded from repository.")
+            // Можно добавить логику обновления данных в фоне, если нужно, но для старта это не требуется
+             // self.user = userRepository.userProfile // Убедимся что опубликовано актуальное значение
+            return
+        }
+        
+        print("Fetching user profile from network...")
         Task { [weak self] in
-            guard let userProfile = try? await self?.service.getProfileMe() else {
-                await ToastManager.shared.show(.baseError)
-                return print("Error fetching user profile Neshko")
-                
-            }
-            self?.userRepository.setUserProfile(userProfile)
-            DispatchQueue.main.async { [weak self] in
-                self?.user = userProfile
+            guard let self = self else { return }
+            do {
+                let userProfile = try await self.service.getProfileMe()
+                self.userRepository.setUserProfile(userProfile)
+                // Обновляем @Published свойство на главном потоке
+                await MainActor.run { 
+                    self.user = userProfile
+                    print("User profile fetched and updated.")
+                }
+            } catch {
+                // Важно: Не блокируем UI, просто выводим ошибку
+                print("Error fetching user profile: \(error.localizedDescription)")
+                await ToastManager.shared.show(.init(message: "Не удалось загрузить профиль: \(error.localizedDescription)"))
             }
         }
     }
