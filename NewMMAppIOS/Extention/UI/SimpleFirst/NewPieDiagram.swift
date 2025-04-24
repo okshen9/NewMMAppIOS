@@ -35,8 +35,15 @@ struct NewPieDiagram: View {
     @Binding var showCenterLabel: Bool
     /// Управляет возможностью взаимодействия с диаграммой (навигация по уровням)
     @Binding var isInteractive: Bool
+    /// Количество элементов текущего уровня
+    @Binding var currentItemsCount: Int
     /// Обработчик выбора сектора
     var onSectorSelected: ((PieModel) -> Void)?
+    
+    /// Количество элементов текущего уровня
+    var currentLevelItemsCount: Int {
+        animatableSlices.count
+    }
     
     /// Инициализатор компонента диаграммы
     /// - Parameters:
@@ -47,6 +54,7 @@ struct NewPieDiagram: View {
     ///   - legendOnSide: Флаг размещения легенды сбоку вместо внизу
     ///   - showCenterLabel: Биндинг для управления отображением надписей в центре
     ///   - isInteractive: Биндинг для управления возможностью взаимодействия
+    ///   - currentItemsCount: Биндинг для передачи количества элементов текущего уровня
     ///   - onSectorSelected: Замыкание, вызываемое при выборе сектора
     init(
         slices: [PieModel],
@@ -56,6 +64,7 @@ struct NewPieDiagram: View {
         legendOnSide: Bool = false,
         showCenterLabel: Binding<Bool> = .constant(true),
         isInteractive: Binding<Bool> = .constant(true),
+        currentItemsCount: Binding<Int> = .constant(0),
         onSectorSelected: ((PieModel) -> Void)? = nil
     ) {
         self.slices = slices
@@ -65,6 +74,7 @@ struct NewPieDiagram: View {
         self.legendOnSide = legendOnSide
         self._showCenterLabel = showCenterLabel
         self._isInteractive = isInteractive
+        self._currentItemsCount = currentItemsCount
         self.onSectorSelected = onSectorSelected
     }
     
@@ -84,19 +94,28 @@ struct NewPieDiagram: View {
                 if legendOnSide {
                     HStack(alignment: .center, spacing: 4) {
                         chartView(size: proxy.size)
+                            .frame(width: proxy.size.width * 0.75)
                         
                         // Компактная легенда сбоку
-                        legendView
+                        ScrollView {
+                            legendView
+                        }
+                        .frame(width: proxy.size.width * 0.25)
                     }
                 } else {
-                    VStack(spacing: 0) {
+                    VStack(spacing: 6) {
                         chartView(size: proxy.size)
+                            .frame(height: proxy.size.width)
                         
                         // Легенда снизу
-                        legendView
+                        ScrollView {
+                            legendView
+                        }
+                        .frame(maxHeight: proxy.size.height * 0.3)
                     }
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .onChange(of: slices) { oldValue, newValue in
                 // Определяем тип изменения
                 if hasSameStructureButDifferentValues(oldValue, newValue) {
@@ -128,6 +147,9 @@ struct NewPieDiagram: View {
                         isChangingStructure = false
                     }
                 }
+            }
+            .onChange(of: animatableSlices) { _, newValue in
+                currentItemsCount = newValue.count
             }
             .onAppear {
                 // При первом появлении анимируем с нуля
@@ -302,6 +324,9 @@ struct NewPieDiagram: View {
                     let bgEnd = start + .degrees(360 * norm)
                     let fgPortion = entry.model.currentValue * norm
                     let fgEnd = start + .degrees(360 * fgPortion)
+                    
+                    // Вычисляем средний угол для размещения метки сектора
+                    let midAngle = start + (bgEnd - start) / 2
 
                     // Фоновый слой
                     PieSimpleSliceView(
@@ -323,6 +348,7 @@ struct NewPieDiagram: View {
                             navigateToSubmodels(of: entry.model)
                         }
                     }
+                    .zIndex(1)
 
                     // Слой прогресса
                     PieSimpleSliceView(
@@ -344,6 +370,7 @@ struct NewPieDiagram: View {
                             navigateToSubmodels(of: entry.model)
                         }
                     }
+                    .zIndex(2)
 
                     if entry.model.subModel != nil && !(entry.model.subModel?.isEmpty ?? true) && isInteractive {
                         // Вычисляем позицию для индикатора
@@ -372,6 +399,7 @@ struct NewPieDiagram: View {
                                 .shadow(color: .black.opacity(0.2), radius: 2)
                         }
                         .position(x: indicatorX, y: indicatorY)
+                        .zIndex(5)
                     }
                 }
 
@@ -386,6 +414,7 @@ struct NewPieDiagram: View {
                             navigateToParentLevel()
                         }
                     }
+                    .zIndex(3)
                 
                 if showCenterLabel {
                     let present = (animatableSlices.reduce(0.0) { $0 + $1.currentValue }) / Double(animatableSlices.isEmpty ? 1 : animatableSlices.count)
@@ -425,87 +454,144 @@ struct NewPieDiagram: View {
                             .fontWeight(.semibold)
                     }
                     .frame(width: chartSize / 1.5, height: chartSize / 1.5)
+                    .zIndex(4)
+                }
+                
+                // Отдельный слой для меток секторов, чтобы они отображались поверх всего
+                ForEach(normalizedSlices, id: \.model.id) { entry in
+                    if entry.normalizedValue > 0.05 { // Показываем метку только для достаточно больших секторов
+                        // Рассчитываем позицию для метки в середине сектора на краю центрального круга
+                        let start = calculateStartAngle(index: animatableSlices.firstIndex(where: { $0.id == entry.model.id }) ?? 0)
+                        let norm = entry.normalizedValue
+                        let bgEnd = start + .degrees(360 * norm)
+                        let midAngle = start + (bgEnd - start) / 2
+                        let innerCircleRadius = chartSize / 3 // Радиус центрального круга
+                        
+                        // Рассчитываем координаты метки на краю центрального круга
+                        let xPos = chartSize/2 + cos(midAngle.radians) * innerCircleRadius
+                        let yPos = chartSize/2 + sin(midAngle.radians) * innerCircleRadius
+                        
+                        ZStack {
+                            // Светящийся фон для лучшего выделения
+                            Circle()
+                                .fill(entry.model.color.opacity(0.3))
+                                .blur(radius: 2)
+                                .frame(width: 26, height: 26)
+                            
+                            // Фон метки
+                            Circle()
+                                .fill(entry.model.color)
+                                .frame(width: 24, height: 24)
+                                .shadow(color: .black.opacity(0.2), radius: 1, x: 0, y: 1)
+                            
+                            // Инициалы или небольшая иконка для категории
+                            Text(categoryInitials(of: entry.model.title))
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundColor(.white)
+                        }
+                        .position(x: xPos, y: yPos)
+                        .opacity(opacity) // Анимируем вместе с диаграммой
+                        .zIndex(10) // Отображаем поверх всех остальных элементов
+                    }
                 }
             }
             .scaleEffect(scale)
             .opacity(opacity)
-            .id(id)
+            .id(id) // Используем id для обновления всего ZStack
         }
         .frame(width: chartSize, height: chartSize)
         .padding(.horizontal, legendOnSide ? 0 : 8)
         .padding(.vertical, 8)
     }
     
+    // Получение инициалов или первой буквы названия категории/цели для отображения на метке
+    private func categoryInitials(of title: String) -> String {
+        let words = title.split(separator: " ")
+        if words.count > 1 {
+            // Берем первые буквы первых двух слов
+            let firstInitial = words[0].first?.uppercased() ?? ""
+            let secondInitial = words[1].first?.uppercased() ?? ""
+            return "\(firstInitial)\(secondInitial)"
+        } else if let first = title.first {
+            // Если одно слово, берем первую букву
+            return String(first).uppercased()
+        }
+        return "•" // Если нет названия, показываем точку
+    }
+    
     // Вынесенное представление легенды
     private var legendView: some View {
-        Group {
-            if legendOnSide {
-                // Вертикальная легенда для горизонтального режима
-                LazyVGrid(
-                    columns: [GridItem(.flexible())],
-                    alignment: .leading,
-                    spacing: 6
-                ) {
-                    legendItems
-                }
-                .opacity(opacity)
-                .padding(.horizontal, 4)
-                .frame(width: UIScreen.main.bounds.width * 0.25)
-            } else {
-                // Компактная легенда с автоматической высотой
-                VStack(spacing: 4) {
-                    LazyVGrid(
-                        columns: [
-                            GridItem(.adaptive(minimum: 120, maximum: 160), spacing: 8)
-                        ],
-                        alignment: .leading,
-                        spacing: 6
-                    ) {
-                        legendItems
+        GeometryReader { geometry in
+            ScrollView(.horizontal, showsIndicators: false) {
+                VStack(spacing: 8) {
+                    // Первая строка
+                    HStack(spacing: 8) {
+                        ForEach(firstRowItems) { slice in
+                            legendItem(slice: slice)
+                        }
                     }
-                    .padding(.horizontal, 4)
+                    .frame(minWidth: geometry.size.width)
+                    
+                    // Вторая строка (появляется только если есть элементы для второй строки)
+                    if !secondRowItems.isEmpty {
+                        HStack(spacing: 8) {
+                            ForEach(secondRowItems) { slice in
+                                legendItem(slice: slice)
+                            }
+                        }
+                        .frame(minWidth: geometry.size.width)
+                    }
                 }
-                .opacity(opacity)
-                // Высота адаптируется к содержимому с минимальным padding
-                .padding(.top, 4)
-                .padding(.bottom, 2)
-                .fixedSize(horizontal: false, vertical: true)
             }
+            .opacity(opacity)
         }
-        .padding(.horizontal, 4)
     }
-
-    // Элементы легенды, используемые в обоих режимах
-    private var legendItems: some View {
-        ForEach(animatableSlices) { slice in
-            HStack(spacing: 4) {
-                // Цветной индикатор
+    
+    // Элементы для первой строки
+    private var firstRowItems: [PieModel] {
+        let itemsPerRow = Int(UIScreen.main.bounds.width / 160) // Примерная ширина элемента
+        return Array(animatableSlices.prefix(itemsPerRow))
+    }
+    
+    // Элементы для второй строки
+    private var secondRowItems: [PieModel] {
+        let itemsPerRow = Int(UIScreen.main.bounds.width / 160) // Примерная ширина элемента
+        return Array(animatableSlices.dropFirst(itemsPerRow))
+    }
+    
+    // Элемент легенды
+    private func legendItem(slice: PieModel) -> some View {
+        HStack(spacing: 4) {
+            // Цветной индикатор с меткой
+            ZStack {
                 Circle()
                     .fill(slice.color)
-                    .frame(width: legendOnSide ? 8 : 10, height: legendOnSide ? 8 : 10)
+                    .frame(width: 24, height: 24)
                 
-                // Заголовок без процентов
-                Text(slice.title)
-                    .font(.system(size: legendOnSide ? 12 : 13))
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                
-                Spacer(minLength: 4)
-                
-                // Процент выполнения
-                Text("\(Int(slice.currentValue * 100))%")
-                    .font(.system(size: legendOnSide ? 11 : 12, weight: .medium))
+                Text(categoryInitials(of: slice.title))
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(.white)
             }
-            .padding(.vertical, 2)
-            .padding(.horizontal, 6)
-            .background(
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(Color.gray.opacity(0.1))
-            )
-            .onTapGesture {
-                if isInteractive {
-                    navigateToSubmodels(of: slice)
-                }
+            
+            // Заголовок
+            Text(slice.title)
+                .font(.system(size: 13))
+                .lineLimit(1)
+                .truncationMode(.tail)
+            
+            // Процент выполнения
+            Text("\(Int(slice.currentValue * 100))%")
+                .font(.system(size: 12, weight: .medium))
+        }
+        .padding(.vertical, 4)
+        .padding(.horizontal, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 4)
+                .fill(Color.gray.opacity(0.1))
+        )
+        .onTapGesture {
+            if isInteractive {
+                navigateToSubmodels(of: slice)
             }
         }
     }
@@ -602,7 +688,7 @@ extension PieModel: Animatable {
     
 
         VStack {
-            TabView {
+//            TabView {
                 NewPieDiagram(
                     slices: value2,
                     title: "Стандартный режим",
@@ -610,16 +696,16 @@ extension PieModel: Animatable {
                     isInteractive: $isInteractive
                 )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                NewPieDiagram(
-                    slices: value2,
-                    title: "С легендой сбоку",
-                    legendOnSide: true,
-                    showCenterLabel: $showLabels,
-                    isInteractive: $isInteractive
-                )
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-            .tabViewStyle(.page)
+//                NewPieDiagram(
+//                    slices: value2,
+//                    title: "С легендой сбоку",
+//                    legendOnSide: true,
+//                    showCenterLabel: $showLabels,
+//                    isInteractive: $isInteractive
+//                )
+//                .frame(maxWidth: .infinity, maxHeight: .infinity)
+//            }
+//            .tabViewStyle(.page)
 
             // Управляющие переключатели
             VStack {

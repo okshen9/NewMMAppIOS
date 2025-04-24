@@ -15,6 +15,7 @@ struct TargetsView: View {
     @State private var currentChartLevel: Int = 0 // Отслеживаем текущий уровень диаграммы
     @State private var showAddTarget = false
     @State private var showErrorAlert = false
+    @State private var currentLevelItemsCount: Int = 0 // Добавляем состояние
     
     var body: some View {
         NavigationView {
@@ -156,6 +157,7 @@ struct TargetsView: View {
                     legendOnSide: false,
                     showCenterLabel: .constant(true),
                     isInteractive: .constant(true),
+                    currentItemsCount: $currentLevelItemsCount,
                     onSectorSelected: { model in
                         // Обрабатываем выбор сектора
                         if let category = TargetCategory.allCases.first(where: { $0.rawValue == model.title }) {
@@ -166,7 +168,7 @@ struct TargetsView: View {
                     }
                 )
                 .frame(width: chartSize)
-                .frame(height: chartSize + 60)
+                .frame(height: calculateDiagramHeight(chartSize: chartSize, itemsCount: currentLevelItemsCount).animatableData)
                 .onChange(of: currentChartLevel) { oldValue, newValue in
                     // Если возвращаемся на верхний уровень, то сбрасываем выбранную категорию
                     if newValue == 0 && oldValue > 0 {
@@ -200,6 +202,14 @@ struct TargetsView: View {
                 )
             }
         }
+    }
+    
+    // Функция для расчета высоты диаграммы
+    private func calculateDiagramHeight(chartSize: CGFloat, itemsCount: Int) -> CGFloat {
+        let itemsPerRow = Int(UIScreen.main.bounds.width / (160 + 16 + 10)) // Примерная ширина элемента
+        let rowsCount = itemsCount <= itemsPerRow ? 1 : 2
+        let legendHeight: CGFloat = rowsCount == 1 ? 40 : 80 // Высота легенды в зависимости от количества строк
+        return chartSize + legendHeight
     }
     
     // MARK: - Categories View
