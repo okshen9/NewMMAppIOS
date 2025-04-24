@@ -144,6 +144,27 @@ struct NewPieDiagram: View {
                         opacity = 1.0
                     }
                 }
+                
+                // Подписываемся на уведомление о сбросе уровня
+                NotificationCenter.default.addObserver(
+                    forName: NSNotification.Name("ResetPieChartLevel"),
+                    object: nil,
+                    queue: .main
+                ) { [self] _ in
+                    // Если мы не на верхнем уровне, возвращаемся на верх
+                    if currentLevel > 0 {
+                        // Анимируем возврат на верхний уровень
+                        resetToRootLevel()
+                    }
+                }
+            }
+            .onDisappear {
+                // Отписываемся от уведомлений при исчезновении
+                NotificationCenter.default.removeObserver(
+                    self,
+                    name: NSNotification.Name("ResetPieChartLevel"),
+                    object: nil
+                )
             }
         }
     }
@@ -193,6 +214,12 @@ struct NewPieDiagram: View {
         }
         currentTitle = model.title
         
+        // Уведомляем о изменении уровня
+        NotificationCenter.default.post(
+            name: NSNotification.Name("PieChartLevelChanged"),
+            object: currentLevel
+        )
+        
         // Анимируем переход
         withAnimation(.easeInOut(duration: 0.4)) {
             scale = 0.1
@@ -224,6 +251,12 @@ struct NewPieDiagram: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             // Уменьшаем уровень
             currentLevel -= 1
+            
+            // Уведомляем о изменении уровня
+            NotificationCenter.default.post(
+                name: NSNotification.Name("PieChartLevelChanged"),
+                object: currentLevel
+            )
             
             // Обновляем заголовок
             if currentLevel == 0 {
@@ -473,6 +506,39 @@ struct NewPieDiagram: View {
                 if isInteractive {
                     navigateToSubmodels(of: slice)
                 }
+            }
+        }
+    }
+    
+    // Функция для сброса диаграммы на верхний уровень
+    private func resetToRootLevel() {
+        // Анимируем переход
+        withAnimation(.easeInOut(duration: 0.4)) {
+            scale = 0.1
+            opacity = 0
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            // Сбрасываем до корневого уровня
+            currentLevel = 0
+            
+            // Уведомляем о изменении уровня
+            NotificationCenter.default.post(
+                name: NSNotification.Name("PieChartLevelChanged"),
+                object: currentLevel
+            )
+            
+            // Обновляем заголовок
+            currentTitle = diagramTitle
+            
+            // Восстанавливаем данные корневого уровня
+            animatableSlices = slices
+            
+            id = UUID()
+            
+            withAnimation(.spring(duration: 0.6, bounce: 0.3)) {
+                scale = 1.0
+                opacity = 1.0
             }
         }
     }

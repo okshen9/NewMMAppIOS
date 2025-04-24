@@ -12,8 +12,7 @@ struct TargetsView: View {
     @StateObject private var viewModel = TargetsViewModel.mockWithData()
     @State private var isEditingCategory: Bool = false
     @State private var selectedCategory: TargetCategory? = nil
-    @State private var selectedPieSectorId: UUID? = nil
-    @State private var selectedTab = 0
+    @State private var currentChartLevel: Int = 0 // Отслеживаем текущий уровень диаграммы
     @State private var showAddTarget = false
     @State private var showErrorAlert = false
     
@@ -168,6 +167,19 @@ struct TargetsView: View {
                 )
                 .frame(width: chartSize)
                 .frame(height: chartSize + 60)
+                .onChange(of: currentChartLevel) { oldValue, newValue in
+                    // Если возвращаемся на верхний уровень, то сбрасываем выбранную категорию
+                    if newValue == 0 && oldValue > 0 {
+                        withAnimation {
+                            selectedCategory = nil
+                        }
+                    }
+                }
+                .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("PieChartLevelChanged"))) { notification in
+                    if let level = notification.object as? Int {
+                        currentChartLevel = level
+                    }
+                }
             }
         }
         .onChange(of: viewModel.pieModels) { _, newModels in
@@ -175,6 +187,17 @@ struct TargetsView: View {
             if let selectedCategory = selectedCategory, 
                !newModels.contains(where: { $0.title == selectedCategory.rawValue }) {
                 self.selectedCategory = nil
+            }
+        }
+        .onChange(of: selectedCategory) { oldValue, newValue in
+            // Обновляем выбранную категорию в диаграмме, 
+            // когда категория выбирается из списка
+            if newValue == nil && oldValue != nil && currentChartLevel > 0 {
+                // Уведомляем диаграмму, что нужно вернуться на верхний уровень
+                NotificationCenter.default.post(
+                    name: NSNotification.Name("ResetPieChartLevel"),
+                    object: nil
+                )
             }
         }
     }

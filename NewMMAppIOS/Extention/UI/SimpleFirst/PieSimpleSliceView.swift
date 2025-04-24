@@ -68,7 +68,7 @@ struct SimpleSliceModel: Animatable, Equatable {
     var color: Color
     var startAngle: Angle
     var endAngle: Angle
-    var cornerRadius: CGFloat = 20
+    var cornerRadius: CGFloat = 50
 
     // Для анимации углов
     var animatableData: AnimatablePair<Double, Double> {
@@ -85,7 +85,7 @@ struct SimpleSliceModel: Animatable, Equatable {
         color: .red.lighten(0.5),
         startAngle: .radians(0),
         endAngle: .radians(2 * .pi / 360 * 45),
-        cornerRadius: 20
+        cornerRadius: 50
     )
 
     PieSimpleSliceView(model: angle)
@@ -96,7 +96,7 @@ struct SimpleSliceModel: Animatable, Equatable {
                 color: .red,
                 startAngle: .radians(0),
                 endAngle: .radians(2 * .pi / 360 * 180),
-                cornerRadius: 20
+                cornerRadius: 50
             )
         }
     }
@@ -107,7 +107,7 @@ struct SimpleSliceModel: Animatable, Equatable {
                 color: .red,
                 startAngle: .radians(0),
                 endAngle: .radians(2 * .pi / 360 * 30),
-                cornerRadius: 20
+                cornerRadius: 50
             )
         }
     }
@@ -118,7 +118,7 @@ struct SimpleSliceModel: Animatable, Equatable {
                 color: [Color.red, .blue, .green, .orange].randomElement()!.lighten(0.5),
                 startAngle: .radians(0),
                 endAngle: .radians(2 * .pi / 360 * 180),
-                cornerRadius: 20
+                cornerRadius: 50
             )
         }
     }
