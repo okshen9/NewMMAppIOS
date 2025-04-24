@@ -22,14 +22,9 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
     var target: UserTargetDtoModel
     
     /// Показать диалоговое окошко закрытии/открытие задачи
-    @State private var showCloseTaskDialog = false {
-        didSet {
-            print("showCloseTaskDialog изменился на: \(showCloseTaskDialog)")
-        }
-    }
+    @State private var showCloseTaskDialog = false
     /// Показать модалку по лонгтапу
     @State private var showLongTapDialog = false
-    
     /// Показать модалку по лонгтапу
     @State private var isPressed = false
     /// Свернуть/развернуть цель
@@ -38,43 +33,144 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
     @State private var isEditing: Bool = false
     /// Меняется статус цели
     @State private var isLoading = false
+    /// Показать описание
+    @State private var showDescription: Bool = false
     
     // MARK: - Body
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            headerView()
-            // Подцели
-            if isExpanded,
-               let subTargets = target.subTargets {
-                ForEach(subTargets) { subTarget in
-                    SubTargetRowView<TargetsViewModel>(
-                        myTarget: myTarget,
-                        subTarget: subTarget,
-                        parentTarget: target
-                    )
+            // Основной контент цели
+            Button(action: {
+                withAnimation(.spring(response: 0.1, dampingFraction: 3.8)) {
+                    showDescription.toggle()
+                    isExpanded.toggle()
+                }
+            }) {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Text(target.title.orEmpty)
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.headerText)
+                            .multilineTextAlignment(.leading)
+
+                        Spacer()
+
+                        Image(systemName: showDescription ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
+                            .foregroundColor(.gray)
+                            .imageScale(.small)
+                    }
+
+                    HStack(spacing: 8) {
+                        Image(systemName: "calendar")
+                            .foregroundColor(.gray)
+                            .imageScale(.small)
+
+                        Text((target.deadLineDateTime?.dateFromString ?? Date.now).toDisplayString)
+                            .font(.system(size: 14))
+                            .foregroundColor(.gray)
+
+                        if let percentage = target.percentage, percentage > 0 {
+                            Spacer()
+                            Text("\(Int(percentage))%")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(percentage == 100 ? .green : .gray)
+                        }
+                    }
+
+                    let percentTarget: Double = ((target.subTargets).isEmptyOrNil) ?
+                    (((target.targetStatus?.isDone) ?? false) ? 100.0 : 0.0) :
+                    target.percentage ?? 0.0
+
+                    ProgressView(value: percentTarget, total: 100)
+                        .tint(percentTarget == 100 ? .green : .mainRed)
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(4)
+                }
+                .background(.white)
+            }
+            .buttonStyle(PlainButtonStyle())
+
+            // Описание цели
+            VStack(alignment: .leading, spacing: 8) {
+                if showDescription,
+                   let description = target.description,
+                   !description.isEmpty {
+                    Text(description)
+                        .font(.system(size: 14))
+                        .foregroundColor(.secondary)
+                        .padding(12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(8)
+                }
+
+                // Подцели
+                if isExpanded,
+                   let subTargets = target.subTargets,
+                   !subTargets.isEmpty {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Подцели")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.headerText)
+                            .padding(.top, 4)
+
+                        ForEach(subTargets) { subTarget in
+                            SubTargetRowView<TargetsViewModel>(
+                                myTarget: myTarget,
+                                showDescription: $showDescription,
+                                subTarget: subTarget,
+                                parentTarget: target
+                            )
+                        }
+                    }
+                    .padding(.top, 4)
+                }
+
+                // Кнопка для отображения подцелей
+                //                    if let subTargets = target.subTargets, !subTargets.isEmpty {
+                //                        Button(action: {
+                //                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                //                                isExpanded.toggle()
+                //                            }
+                //                        }) {
+                //                            HStack {
+                //                                Text(isExpanded ? "Скрыть подцели" : "Показать подцели")
+                //                                    .font(.system(size: 14, weight: .medium))
+                //                                Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                //                            }
+                //                            .foregroundColor(.mainRed)
+                //                        }
+                //                        .padding(.top, 4)
+                //                    }
+            }
+                .transition(.opacity.combined(with: .identity))
+                        /*.move(edge: .trailing)))*/
+
+            // Закрыть цель
+            if let isDone = target.targetStatus?.isDone {
+                HStack {
+                    Spacer()
+                    Button(
+                        action: {
+                            showCloseTaskDialog = true
+                        }, label: {
+                            Text(isDone ? "Переоткрыть цель" : "Закрыть цель")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.mainRed)
+                        })
                 }
             }
-            let targetButtonStatus = targetButtonStatus(target: target)
-            targetButtonView(targetButtonStatus)
         }
-        .padding()
+        .padding(8)
         .background(Color(.systemBackground))
-        .cornerRadius(8)
-        .shadow(radius: 2)
-        .padding(.horizontal, 4)
+        .contentShape(Rectangle())
         .onChange(of: target, {
             isLoading = false
-            print("Изменилась TargetRowView")
         })
-        
-        // Анимация масштаба
-        .scaleEffect(isPressed ? 1.05 : 1.0)
-        // Анимация
-        .animation(.easeInOut(duration: 0.3), value: isPressed)
+        .scaleEffect(isPressed ? 0.98 : 1.0)
+        .animation(.easeInOut(duration: 0.2), value: isPressed)
         .onLongPressGesture(
-            // Минимальная длительность нажатия
             minimumDuration: 0.5,
-            // Обновляем состояние нажатия
             pressing: { isPressing in
                 if myTarget {
                     withAnimation { isPressed = isPressing }
@@ -87,21 +183,18 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
             }
         )
         .actionSheet(isPresented: $showLongTapDialog) {
-                ActionSheet(
-                    title: Text("Действия с целью"),
-                    buttons: [
-                        .default(Text("Изменить цель")) {
-                            isEditing = true
-                        },
-                        .destructive(Text("Удалить цель")) {
-                            viewModelEnvironment.deleteTarget(target: target)
-
-                        },
-                        .cancel(Text("Отмена")) {
-                            //                        selection = "Blue"
-                        },
-                    ]
-                )
+            ActionSheet(
+                title: Text("Действия с целью"),
+                buttons: [
+                    .default(Text("Изменить цель")) {
+                        isEditing = true
+                    },
+                    .destructive(Text("Удалить цель")) {
+                        viewModelEnvironment.deleteTarget(target: target)
+                    },
+                    .cancel(Text("Отмена"))
+                ]
+            )
         }
         .alert(
             (target.targetStatus?.isDone) ?? false ? "Вы хотите открыть эту цель?" : "Вы закрыли эту цель?",
@@ -110,106 +203,11 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
             Button("Да") {
                 isLoading = true
                 viewModelEnvironment.closedTarget(target: target)
-                print("Цель изменена")
             }
-            Button("Нет", role: .cancel) {
-                print("Отмена операции")
-            }
+            Button("Нет", role: .cancel) { }
         }
-    }
-    
-    // MARK: - ViewBuilder
-    /// Заголовок, дата, прогресс-бар
-    @ViewBuilder
-    func headerView() -> some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(target.title.orEmpty)
-                    .font(.subheadline)
-                    .foregroundColor(.headerText)
-                Text("Срок выполнения: \((target.deadLineDateTime?.dateFromString ?? Date.now).toDisplayString)")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-                
-                let percentTarget: Double = ((target.subTargets).isEmptyOrNil) ?
-                (((target.targetStatus?.isDone) ?? false) ? 100.0 : 0.0) :
-                target.percentage ?? 0.0
-                
-                ProgressView(value: percentTarget, total: 100)
-                    .tint(.mainRed)
-            }
-            Spacer()
-            .buttonStyle(.plain)
-            .contentShape(Rectangle())
-            .sheet(isPresented: $isEditing) {
-                TargetEditView<TargetsViewModel>(target: target, isCreateTarget: false)
-            }
-            let statusText: (String, Color) = switch target.targetStatus ?? .draft {
-            case .draft, .unknown: ("На рассмотрении", .orange)
-            case .done: ("Выполнено", .green)
-            case .expired: ("Просрочено", .red)
-            case .inProgress:
-                ("В процессе", .yellow)
-            case .doneExpired:
-                ("Выполненно с задержкой", .red)
-            case .cancelled:
-                ("Отменено", .red)
-            case .failed:
-                ("Провалено", .red)
-            }
-            Text(statusText.0)
-                .font(.subheadline)
-                .foregroundColor(statusText.1)
-        }
-    }
-    
-    /// Кнопка "Развернуть/Свернуть" Открыть / Закрыть задачу
-    @ViewBuilder
-    func targetButtonView(_ targetButtonStatus: TargetButtonStatus) -> some View {
-        if (targetButtonStatus == .toDone ||
-               targetButtonStatus == .toInProgress),
-           !myTarget {
-            EmptyView()
-        } else {
-            Button(action: {
-                withAnimation {
-                    switch targetButtonStatus {
-                    case .turn, .expand:
-                        isExpanded.toggle()
-                    case .toDone, .toInProgress:
-                        print("Показываем диалог закрытия задачи")
-                        if myTarget {
-                            showCloseTaskDialog = true
-                        }
-                    }
-                }
-            }) {
-                Text(targetButtonStatus.name)
-                    .font(.caption)
-                    .foregroundColor(isLoading ? .gray.opacity(0.5) : .mainRed)
-                    .frame(alignment: .leading)
-            }
-            .contentShape(Rectangle())
-            .overlay(content: {
-                if isLoading {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
-                }
-            })
-        }
-    }
-
-    // MARK: - Private method
-    /// Возврашщает статус кнопки цели (сервенуть/развернуть/закрыть цель/открыть цель)
-    private func targetButtonStatus(target: UserTargetDtoModel) -> TargetButtonStatus {
-        if target.subTargets.isEmptyOrNil {
-            if target.targetStatus?.isDone ?? false {
-                return .toDone
-            } else {
-                return .toInProgress
-            }
-        } else {
-            return $isExpanded.wrappedValue ? .turn : .expand
+        .sheet(isPresented: $isEditing) {
+            TargetEditView<TargetsViewModel>(target: target, isCreateTarget: false)
         }
     }
 }
@@ -240,10 +238,11 @@ extension TargetRowView {
     }
 }
 
-
-
 #Preview {
-    TargetRowView<TargetsViewModel>(target: .init(title: "Test",
-                                subTargets: [.init(title: "Test", targetSubStatus: .notDone)]))
-        .environmentObject(TargetsViewModel())
+    TargetRowView<TargetsViewModel>(target: .init(
+        title: "Test",
+        description: "Тестовое описание цели",
+        subTargets: [.init(title: "Test", description: "dssds",targetSubStatus: .notDone)]
+    ))
+    .environmentObject(TargetsViewModel())
 }

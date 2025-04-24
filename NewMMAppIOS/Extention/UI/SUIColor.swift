@@ -113,3 +113,18 @@ extension UIColor {
         return String(format: "#%02X%02X%02X", red, green, blue)
     }
 }
+
+
+struct BackGroundRedView: ViewModifier {
+    var color: Color = .red
+    func body(content: Content) -> some View {
+        content
+            .background(color)
+    }
+}
+
+extension View {
+    func bred(_ color: Color = .red) -> some View {
+        modifier(BackGroundRedView())
+    }
+}

@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct TargetsView: View {
-    @StateObject private var viewModel = TargetsViewModel.mockWithData()
+    @StateObject private var viewModel = TargetsViewModel()//.mockWithData()
     @State private var isEditingCategory: Bool = false
     @State private var selectedCategory: TargetCategory? = nil
     @State private var currentChartLevel: Int = 0 // Отслеживаем текущий уровень диаграммы
