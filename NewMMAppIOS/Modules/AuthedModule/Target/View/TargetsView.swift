@@ -219,40 +219,41 @@ struct TargetsView: View {
         VStack(alignment: .leading, spacing: 8) {
             if let selectedCategory = selectedCategory {
                 // Если выбрана определенная категория, показываем только ее
-                if let targets = viewModel.groupedTargets[selectedCategory], !targets.isEmpty {
-                    HStack {
-                        // Кнопка "Назад"
-                        Button(action: {
-                            withAnimation {
-                                self.selectedCategory = nil
-                            }
-                        }) {
-                            HStack(spacing: 4) {
-                                Image(systemName: "chevron.left")
-                                    .font(.system(size: 14, weight: .semibold))
-                                Text("Все категории")
-                                    .font(.subheadline)
-                            }
-                            .foregroundColor(.mainRed)
-                        }
-                        
-                        Spacer()
-                        
-                        // Название категории с индикатором
-                        HStack(spacing: 8) {
-                            Circle()
-                                .fill(selectedCategory.color)
-                                .frame(width: 8, height: 8)
-                            Text(selectedCategory.rawValue)
-                                .font(.headline)
-                                .foregroundColor(.headerText)
-                        }
-                    }
-                    .padding(.horizontal, 8)
-                    .padding(.bottom, 4)
-                    
-                    categoryTargetsView(category: selectedCategory)
-                }
+//                if let targets = viewModel.groupedTargets[selectedCategory], !targets.isEmpty {
+//                    HStack {
+//                        // Кнопка "Назад"
+//                        Button(action: {
+//                            withAnimation {
+//                                self.selectedCategory = nil
+//                            }
+//                        }) {
+//                            HStack(spacing: 4) {
+//                                Image(systemName: "chevron.left")
+//                                    .font(.system(size: 14, weight: .semibold))
+//                                Text("Все категории")
+//                                    .font(.subheadline)
+//                            }
+//                            .foregroundColor(.mainRed)
+//                        }
+//                        
+//                        Spacer()
+//                        
+//                        // Название категории с индикатором
+//                        HStack(spacing: 8) {
+//                            Circle()
+//                                .fill(selectedCategory.color)
+//                                .frame(width: 8, height: 8)
+//                            Text(selectedCategory.rawValue)
+//                                .font(.headline)
+//                                .foregroundColor(.headerText)
+//                        }
+//                    }
+//                    .padding(.horizontal, 8)
+//                    .padding(.bottom, 4)
+//                    
+//                    categoryTargetsView(category: selectedCategory)
+                categorySectionView(for: selectedCategory)
+//                }
             } else {
                 // Показываем все категории
                 ForEach(TargetCategory.allCases, id: \.self) { category in
@@ -263,49 +264,49 @@ struct TargetsView: View {
     }
     
     // MARK: - Category Targets View
-    @ViewBuilder
-    private func categoryTargetsView(category: TargetCategory) -> some View {
-        if let targets = viewModel.groupedTargets[category], !targets.isEmpty {
-            VStack(spacing: 12) {
-                ForEach(targets) { target in
-                    HStack(spacing: 12) {
-                        // Индикатор цели
-                        ZStack {
-                            Circle()
-                                .fill(category.color.opacity(0.15))
-                                .frame(width: 24, height: 24)
-                            
-                            // Прогресс-кольцо
-                            Circle()
-                                .trim(from: 0, to: CGFloat((target.percentage ?? 0) / 100))
-                                .stroke(category.color, lineWidth: 2)
-                                .frame(width: 20, height: 20)
-                                .rotationEffect(.degrees(-90))
-                            
-                            // Иконка цели
-                            Image(systemName: getTargetIcon(for: target))
-                                .font(.system(size: 12))
-                                .foregroundColor(category.color)
-                        }
-                        
-                        // Основной контент цели
-                        TargetRowView<TargetsViewModel>(
-                            myTarget: true,
-                            target: target
-                        )
-                    }
-                    .padding(.horizontal, 8)
-                    .swipeActions(edge: .trailing) {
-                        Button(role: .destructive) {
-                            viewModel.deleteTarget(target: target)
-                        } label: {
-                            Label("Удалить", systemImage: "trash")
-                        }
-                    }
-                }
-            }
-        }
-    }
+//    @ViewBuilder
+//    private func categoryTargetsView(category: TargetCategory) -> some View {
+//        if let targets = viewModel.groupedTargets[category], !targets.isEmpty {
+//            VStack(spacing: 12) {
+//                ForEach(targets) { target in
+//                    HStack(spacing: 12) {
+//                        // Индикатор цели
+//                        ZStack {
+//                            Circle()
+//                                .fill(category.color.opacity(0.15))
+//                                .frame(width: 24, height: 24)
+//                            
+//                            // Прогресс-кольцо
+//                            Circle()
+//                                .trim(from: 0, to: CGFloat((target.percentage ?? 0) / 100))
+//                                .stroke(category.color, lineWidth: 2)
+//                                .frame(width: 20, height: 20)
+//                                .rotationEffect(.degrees(-90))
+//                            
+//                            // Иконка цели
+//                            Image(systemName: getTargetIcon(for: target))
+//                                .font(.system(size: 12))
+//                                .foregroundColor(category.color)
+//                        }
+//                        
+//                        // Основной контент цели
+//                        TargetRowView<TargetsViewModel>(
+//                            myTarget: true,
+//                            target: target
+//                        )
+//                    }
+//                    .padding(.horizontal, 8)
+//                    .swipeActions(edge: .trailing) {
+//                        Button(role: .destructive) {
+//                            viewModel.deleteTarget(target: target)
+//                        } label: {
+//                            Label("Удалить", systemImage: "trash")
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
     
     // Получение иконки для цели
     private func getTargetIcon(for target: UserTargetDtoModel) -> String {
