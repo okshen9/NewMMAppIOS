@@ -282,36 +282,6 @@ struct NewPieDiagram: View {
                             navigateToSubmodels(of: entry.model)
                         }
                     }
-                    .overlay {
-                        if entry.model.subModel != nil && !(entry.model.subModel?.isEmpty ?? true) && isInteractive {
-                            // Вычисляем позицию для индикатора
-                            let midAngle = (start + bgEnd) / 2
-                            let radius = min(geometry.size.width, geometry.size.height) / 2.5
-                            let indicatorX = geometry.size.width / 2 + cos(midAngle.radians) * radius
-                            let indicatorY = geometry.size.height / 2 + sin(midAngle.radians) * radius
-                            
-                            ZStack {
-                                // Светящийся круг
-                                Circle()
-                                    .fill(entry.model.color.opacity(0.3))
-                                    .blur(radius: 4)
-                                    .frame(width: 30, height: 30)
-                                
-                                // Индикатор в виде круга со стрелкой
-                                Circle()
-                                    .fill(.white)
-                                    .frame(width: 22, height: 22)
-                                    .overlay {
-                                        Image(systemName: "chevron.down")
-                                            .font(.system(size: 12, weight: .bold))
-                                            .foregroundColor(entry.model.color)
-                                            .rotationEffect(.radians(midAngle.radians - .pi/2))
-                                    }
-                                    .shadow(color: .black.opacity(0.2), radius: 2)
-                            }
-                            .position(x: indicatorX, y: indicatorY)
-                        }
-                    }
 
                     // Слой прогресса
                     PieSimpleSliceView(
@@ -333,8 +303,37 @@ struct NewPieDiagram: View {
                             navigateToSubmodels(of: entry.model)
                         }
                     }
+
+                    if entry.model.subModel != nil && !(entry.model.subModel?.isEmpty ?? true) && isInteractive {
+                        // Вычисляем позицию для индикатора
+                        let midAngle = (start + bgEnd) / 2
+                        let radius = min(geometry.size.width, geometry.size.height) / 2.5
+                        let indicatorX = geometry.size.width / 2 + cos(midAngle.radians) * radius
+                        let indicatorY = geometry.size.height / 2 + sin(midAngle.radians) * radius
+
+                        ZStack {
+                            // Светящийся круг
+                            Circle()
+                                .fill(entry.model.color.opacity(0.3))
+                                .blur(radius: 4)
+                                .frame(width: 30, height: 30)
+
+                            // Индикатор в виде круга со стрелкой
+                            Circle()
+                                .fill(.white)
+                                .frame(width: 22, height: 22)
+                                .overlay {
+                                    Image(systemName: "chevron.down")
+                                        .font(.system(size: 12, weight: .bold))
+                                        .foregroundColor(entry.model.color)
+                                        .rotationEffect(.radians(midAngle.radians - .pi/2))
+                                }
+                                .shadow(color: .black.opacity(0.2), radius: 2)
+                        }
+                        .position(x: indicatorX, y: indicatorY)
+                    }
                 }
-                
+
                 // Центральный круг
                 Circle()
                     .foregroundStyle(.white)
@@ -528,8 +527,7 @@ extension PieModel: Animatable {
                 PieModel(totalValue: 0.1, currentValue: 0.7, color: .pink, title: "Подкатегория 1.2"),
                 PieModel(totalValue: 0.1, currentValue: 0.4, color: .red, title: "Подкатегория 1.3"),
                 PieModel(totalValue: 0.1, currentValue: 0.6, color: .orange, title: "Подкатегория 1.4"),
-//                PieModel(totalValue: 0.1, currentValue: 0.5, color: .pink.opacity(0.6), title: "Подкатегория 1.5"),
-//                PieModel(totalValue: 0.1, currentValue: 0.8, color: .red.opacity(0.5), title: "Подкатегория длинное название"),
+
 //                PieModel(totalValue: 0.1, currentValue: 0.2, color: .orange.opacity(0.7), title: "Подкатегория 1.7"),
 //                PieModel(totalValue: 0.1, currentValue: 0.9, color: .pink.opacity(0.8), title: "Подкатегория 1.8"),
 //                PieModel(totalValue: 0.1, currentValue: 0.7, color: .red.opacity(0.6), title: "Подкатегория 1.9"),
@@ -549,7 +547,12 @@ extension PieModel: Animatable {
             color: .green, 
             title: "Бизнес"
         ),
-        PieModel(totalValue: 0.3, currentValue: 0.6, color: .blue, title: "Категория 3"),
+        PieModel(totalValue: 0.3, currentValue: 0.6,             subModel: [
+            PieModel(totalValue: 0.3, currentValue: 0.6, color: .mint, title: "Подкатегория 2.1"),
+            PieModel(totalValue: 0.3, currentValue: 0.4, color: .teal, title: "Подкатегория 2.2"),
+            PieModel(totalValue: 0.4, currentValue: 0.2, color: .cyan, title: "Подкатегория 2.3")
+        ],
+                 color: .blue, title: "Категория 3"),
         PieModel(totalValue: 0.3, currentValue: 0.9, color: .yellow, title: "Категория 4")
     ]
     
