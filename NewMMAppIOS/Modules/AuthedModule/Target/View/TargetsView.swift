@@ -109,18 +109,19 @@ struct TargetsView: View {
     @ViewBuilder
     private func mainContentView() -> some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 16) {
                 // Диаграмма статистики как обычный первый элемент
                 statisticsView()
                     .padding(.top, 8)
                 
                 // Разделительная линия
                 Divider()
+                    .padding(.horizontal, 8)
 
                 // Категории целей
                 categoriesView()
             }
-            .padding(.horizontal)
+            .padding(.horizontal, 8)
         }
         .refreshable {
             await MainActor.run {
@@ -215,24 +216,42 @@ struct TargetsView: View {
     // MARK: - Categories View
     @ViewBuilder
     private func categoriesView() -> some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 8) {
             if let selectedCategory = selectedCategory {
                 // Если выбрана определенная категория, показываем только ее
                 if let targets = viewModel.groupedTargets[selectedCategory], !targets.isEmpty {
-                    Text("Категория: \(selectedCategory.rawValue)")
-                        .font(.headline)
-                        .foregroundColor(.headerText)
-                        .padding(.leading, 8)
+                    HStack {
+                        // Кнопка "Назад"
+                        Button(action: {
+                            withAnimation {
+                                self.selectedCategory = nil
+                            }
+                        }) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "chevron.left")
+                                    .font(.system(size: 14, weight: .semibold))
+                                Text("Все категории")
+                                    .font(.subheadline)
+                            }
+                            .foregroundColor(.mainRed)
+                        }
+                        
+                        Spacer()
+                        
+                        // Название категории с индикатором
+                        HStack(spacing: 8) {
+                            Circle()
+                                .fill(selectedCategory.color)
+                                .frame(width: 8, height: 8)
+                            Text(selectedCategory.rawValue)
+                                .font(.headline)
+                                .foregroundColor(.headerText)
+                        }
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.bottom, 4)
                     
                     categoryTargetsView(category: selectedCategory)
-                    
-                    Button("Показать все категории") {
-                        self.selectedCategory = nil
-                    }
-                    .font(.subheadline)
-                    .foregroundColor(.mainRed)
-                    .padding(.vertical, 8)
-                    .frame(maxWidth: .infinity, alignment: .center)
                 }
             } else {
                 // Показываем все категории
@@ -249,10 +268,33 @@ struct TargetsView: View {
         if let targets = viewModel.groupedTargets[category], !targets.isEmpty {
             VStack(spacing: 12) {
                 ForEach(targets) { target in
-                    TargetRowView<TargetsViewModel>(
-                        myTarget: true,
-                        target: target
-                    )
+                    HStack(spacing: 12) {
+                        // Индикатор цели
+                        ZStack {
+                            Circle()
+                                .fill(category.color.opacity(0.15))
+                                .frame(width: 24, height: 24)
+                            
+                            // Прогресс-кольцо
+                            Circle()
+                                .trim(from: 0, to: CGFloat((target.percentage ?? 0) / 100))
+                                .stroke(category.color, lineWidth: 2)
+                                .frame(width: 20, height: 20)
+                                .rotationEffect(.degrees(-90))
+                            
+                            // Иконка цели
+                            Image(systemName: getTargetIcon(for: target))
+                                .font(.system(size: 12))
+                                .foregroundColor(category.color)
+                        }
+                        
+                        // Основной контент цели
+                        TargetRowView<TargetsViewModel>(
+                            myTarget: true,
+                            target: target
+                        )
+                    }
+                    .padding(.horizontal, 8)
                     .swipeActions(edge: .trailing) {
                         Button(role: .destructive) {
                             viewModel.deleteTarget(target: target)
@@ -263,6 +305,16 @@ struct TargetsView: View {
                 }
             }
         }
+    }
+    
+    // Получение иконки для цели
+    private func getTargetIcon(for target: UserTargetDtoModel) -> String {
+        if (target.percentage ?? 0) >= 100 {
+            return "checkmark"
+        } else if (target.percentage ?? 0) > 0 {
+            return "arrow.up.right"
+        }
+        return "flag"
     }
     
     // MARK: - Shimer Loading View
