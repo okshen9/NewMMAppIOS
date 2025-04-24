@@ -40,12 +40,12 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             // Основной контент цели
-            Button(action: {
-                withAnimation(.spring(response: 0.1, dampingFraction: 3.8)) {
-                    showDescription.toggle()
-                    isExpanded.toggle()
-                }
-            }) {
+//            Button(action: {
+//                withAnimation(.spring(response: 0.1, dampingFraction: 3.8)) {
+//                    showDescription.toggle()
+//                    isExpanded.toggle()
+//                }
+//            }) {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
                         Text(target.title.orEmpty)
@@ -91,7 +91,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
                         .cornerRadius(4)
                 }
                 .background(.white)
-            }
+//            }
             .buttonStyle(PlainButtonStyle())
 
             // Описание цели
@@ -102,17 +102,21 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
                     Text(description)
                         .font(.system(size: 14))
                         .foregroundColor(.secondary)
-                        .padding(12)
+//                        .padding(12)
                         .frame(maxWidth: .infinity, alignment: .leading)
 //                        .background(Color(.systemGray6))
                         .cornerRadius(8)
                 }
+
+
 
                 // Подцели
                 if isExpanded,
                    let subTargets = target.subTargets,
                    !subTargets.isEmpty {
                     VStack(alignment: .leading, spacing: 12) {
+                        Divider()
+
                         Text("Подцели")
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(.headerText)
@@ -173,6 +177,12 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
         })
         .scaleEffect(isPressed ? 0.98 : 1.0)
         .animation(.easeInOut(duration: 0.2), value: isPressed)
+        .onTapGesture {
+            withAnimation(.spring(response: 0.1, dampingFraction: 3.8)) {
+                showDescription.toggle()
+                isExpanded.toggle()
+            }
+        }
         .onLongPressGesture(
             minimumDuration: 0.5,
             pressing: { isPressing in
@@ -190,7 +200,8 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
             ActionSheet(
                 title: Text("Действия с целью"),
                 buttons: [
-                    .default(Text("Изменить цель")) {
+                    .default(Text("Изменить цель")
+                        .foregroundStyle(Color(.systemBlue))) {
                         isEditing = true
                     },
                     .destructive(Text("Удалить цель")) {
@@ -245,7 +256,7 @@ extension TargetRowView {
 #Preview {
     TargetRowView<TargetsViewModel>(target: .init(
         title: "Test",
-        description: "Тестовое описание цели",
+        description: "Тестовое описание цели khbhhjbkjhkghjvkgvkgvkgvcgc,hgvm kgk kv jghvlvhj,,b",
         subTargets: [.init(title: "Test", description: "dssds",targetSubStatus: .notDone)]
     ))
     .environmentObject(TargetsViewModel())

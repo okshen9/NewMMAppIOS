@@ -94,7 +94,7 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
                     Text(description)
                         .font(.system(size: 13))
                         .foregroundColor(.secondary)
-                        .padding(10)
+//                        .padding(10)
                         .frame(maxWidth: .infinity, alignment: .leading)
 //                        .background(Color(.systemGray6))
                         .cornerRadius(6)
