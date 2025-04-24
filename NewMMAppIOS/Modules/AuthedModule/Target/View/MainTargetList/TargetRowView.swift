@@ -54,10 +54,14 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
                             .multilineTextAlignment(.leading)
 
                         Spacer()
-
-                        Image(systemName: showDescription ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
-                            .foregroundColor(.gray)
-                            .imageScale(.small)
+                        if let subTargets = target.subTargets,
+                           !subTargets.isEmpty,
+                           let description = target.description,
+                           !description.isEmpty {
+                            Image(systemName: showDescription ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
+                                .foregroundColor(.gray)
+                                .imageScale(.small)
+                        }
                     }
 
                     HStack(spacing: 8) {
@@ -100,7 +104,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
                         .foregroundColor(.secondary)
                         .padding(12)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color(.systemGray6))
+//                        .background(Color(.systemGray6))
                         .cornerRadius(8)
                 }
 

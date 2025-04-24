@@ -96,7 +96,7 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
                         .foregroundColor(.secondary)
                         .padding(10)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color(.systemGray6))
+//                        .background(Color(.systemGray6))
                         .cornerRadius(6)
                         .padding(.leading, 32)
                         .transition(.opacity.combined(with: .move(edge: .top)))
