@@ -14,6 +14,9 @@ final class ProfileTargetViewModel: ObservableObject {
     private let serviceNetwork = ServiceBuilder.shared
 
     private let externalId: Int
+    var canEdit: Bool {
+        UserRepository.shared.userProfile?.externalId == externalId
+    }
     @Published var isLoading = true
     // Сгруппированные цели: ключ — категория, значение — массив целей
     @Published private(set) var targetsByCategory: [TargetCategory: [UserTargetDtoModel]] = [:]
