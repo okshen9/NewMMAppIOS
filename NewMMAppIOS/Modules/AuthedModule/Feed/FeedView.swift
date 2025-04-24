@@ -41,7 +41,7 @@ struct FeedView: View {
                             if !viewModel.isAll {
                                 ActivityCell()
                                     .onAppear {
-                                        Task.detached {
+                                        Task {
                                             await viewModel.getNextEvents(resetSearch: false)
                                         }
                                     }
@@ -81,7 +81,7 @@ struct FeedView: View {
                             )
                         ) {
                             // Перезапрашиваем данные
-                            Task.detached {
+                            Task {
                                 await viewModel.getNextEvents(resetSearch: true)
                             }
                         }

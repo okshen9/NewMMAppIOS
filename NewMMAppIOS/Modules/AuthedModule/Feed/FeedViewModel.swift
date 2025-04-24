@@ -29,6 +29,8 @@ final class FeedViewModel: ObservableObject, FeedViewModelProtocol {
     var searchResponseDTO: SearchResponseDTO?
     let service = ServiceBuilder.shared
     let userRepository = UserRepository.shared
+    
+    var fetchTask: Task<Void, Error>?
 
     init() {
         print("init FeedViewModel")
@@ -41,11 +43,8 @@ final class FeedViewModel: ObservableObject, FeedViewModelProtocol {
 
     // MARK: - Public Methods
     func onApper() {
-        Task {
-            if let feedEvents = feedEvents,
-               !feedEvents.isEmpty {
-                return
-            } else {
+        if feedEvents == nil && !isLoading && !paginatingLoading {
+            Task {
                 await getNextEvents(resetSearch: true)
             }
         }

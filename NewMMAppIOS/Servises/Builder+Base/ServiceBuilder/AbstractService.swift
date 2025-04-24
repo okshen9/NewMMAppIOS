@@ -22,7 +22,7 @@ open class AbstractService {
         do {
             request = try makeRequest()
         } catch {
-            throw ResponseError.noConnection
+            throw error
         }
 
         return try await self.dataTaskBuilder.buildDataTask(request, allowRetry: allowRetry).response
@@ -35,7 +35,7 @@ open class AbstractService {
         do {
             request = try makeRequest()
         } catch {
-            throw ResponseError.noConnection
+            throw error
         }
         return try await self.dataTaskBuilder.buildEmptyDataTask(request: request, allowRetry: true)
     }
@@ -48,7 +48,7 @@ open class AbstractService {
         do {
             request = try makeRequest()
         } catch {
-            throw ResponseError.noConnection
+            throw error
         }
 
         return try await self.dataTaskBuilder.buildDataTask(request, allowRetry: allowRetry)
@@ -61,7 +61,7 @@ open class AbstractService {
         do {
             request = try makeRequest()
         } catch {
-            throw ResponseError.noConnection
+            throw error
         }
         return try await self.dataTaskBuilder.buildRawDataTask(request: request, allowRetry: true).0
     }
@@ -73,7 +73,7 @@ open class AbstractService {
         do {
             request = try makeRequest()
         } catch {
-            throw ResponseError.noConnection
+            throw error
         }
         return try await self.dataTaskBuilder.buildRawDataTask(request: request, allowRetry: true)
     }
