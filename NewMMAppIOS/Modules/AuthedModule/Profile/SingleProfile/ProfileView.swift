@@ -52,51 +52,76 @@ struct ProfileView: View {
     func contentState(profile: UserProfileResultDto) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                MapView(viewModel:
-                        .init(nameCity: viewModel.profile?.location ?? "Москва",
+                // Карта
+                MapView(canInteactive: showMap,
+                        viewModel: .init(nameCity: viewModel.profile?.location ?? "Москва",
                               nameUser: viewModel.profile?.fullName ?? "Пользователь без имени"))
                 .padding(.horizontal, -16)
                 .frame(height: showMap ? 800 : 240)
                 .cornerRadius(20)
+                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
                 .onTapGesture {
-                    /// TODO - добавить интерактивность карты
-                    //                        showMap.toggle()
+                    withAnimation(.spring()) {
+                        showMap.toggle()
+                    }
                 }
 
-                // Аватарка
+                // Профиль
                 HStack(alignment: .bottom) {
                     Spacer()
-                    VStack(spacing: 10) {
-                        HStack(spacing: 10) {
-                            ProfileStatsView(progress: 0.5, title: "Вовлек: 2/4 \n#Testing")
-                                .padding(.bottom, -130)
-                                //TODO
-                                    .opacity(/*profile.inVited != nil ? 1.0 :*/ 1.0)
-                            VStack {
+                    VStack(spacing: 16) {
+                        HStack(spacing: 20) {
+                            // Статистика слева
+//                            ProfileStatsView(progress: 0.5, title: "Вовлек: 2/4 \n#Testing")
+//                                .padding(.bottom, -130)
+//                                .opacity(1.0)
+//                                .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
+
+                            // Аватар и имя
+                            VStack(spacing: 12) {
                                 CircleImagView(photoUrl: URL(string: profile.photoUrl.orEmpty))
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.white, lineWidth: 4)
+                                    )
+                                    .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+                                
                                 Text(profile.fullName ?? "Имя не указано")
                                     .multilineTextAlignment(.center)
-                                    .font(.title)
+                                    .font(.title.bold())
                                     .foregroundColor(.headerText)
                             }
 
+                            // Статистика справа (Цели)
                             NavigationLink(destination: {
                                 if let externalId = viewModel.profile?.externalId {
                                     ProfileTargetView(externalId: externalId)
                                 }
                             }, label: {
                                 ProfileStatsView(progress: (profile.targetCalculationInfo?.allCategoriesDonePercentage ?? 0.0) / 100.0,
-                                                 title: "Цели2")
-
+                                                  title: "Цели")
                             })
                             .padding(.bottom, -130)
+                            .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
                         }
 
-                        HStack(alignment:.center) {
+                        // Локация и Telegram
+                        HStack(alignment: .center, spacing: 16) {
                             Spacer()
-                            Image(systemName: "mappin.and.ellipse")
-                            Text(profile.location ?? "Не указано")
-                                .font(.subheadline)
+                            // Локация
+                            HStack(spacing: 6) {
+                                Image(systemName: "mappin.and.ellipse")
+                                    .foregroundColor(.gray)
+                                Text(profile.location ?? "Не указано")
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.gray.opacity(0.1))
+                            .cornerRadius(15)
+                            
+                            // Telegram
                             tgView(profile)
                             Spacer()
                         }
@@ -106,27 +131,37 @@ struct ProfileView: View {
                 .offset(y: -80)
                 .padding(.bottom, -80)
 
+                // Группы
                 groupeButton(profile)
                     .padding(.horizontal, 16)
 
-                // Сегментированный контрол
-                let tabs = ["О себе", "Новости"]
-                SegmentedView(segments: tabs, selected: $selectedTab)
-                    .padding(.horizontal)
-
-                // Контент вкладок
-                if selectedTab == 0 {
-                    // Вкладка "О себе"
-                    profileInfo(profile: profile)
+                // Табы
+                VStack(spacing: 0) {
+                    SegmentedView(segments: ["О себе", "Новости"], selected: $selectedTab)
+                        .padding(.horizontal)
+                    
+                    // Разделитель под табами
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.2))
+                        .frame(height: 1)
                         .padding(.top, 8)
+                }
+
+                // Контент табов
+                if selectedTab == 0 {
+                    profileInfo(profile: profile)
+
+                        .transition(.opacity)
                 } else {
-                    // Вкладка "Новости"
                     feedBlock()
                         .padding(.horizontal)
                         .padding(.bottom, 8)
+                        .transition(.opacity)
                 }
             }
         }
+        .scrollDisabled(showMap)
+        .animation(.easeInOut, value: selectedTab)
         .refreshable {
             viewModel.onApper(onReset: true)
         }
@@ -193,27 +228,40 @@ struct ProfileView: View {
 
     @ViewBuilder
     func profileInfo(profile: UserProfileResultDto) -> some View {
-        VStack(alignment: .leading, spacing: 20) {
-            let activitySphere = (profile.activitySphere ?? Constants.activitySphereText).lowercased()
-            Text("Род деятельности: ")
-                .font(.title3.weight(.medium))
-                .foregroundColor(.headerText) +
-            Text(activitySphere)
-                .font(.title3.bold())
-                .foregroundColor(.headerText)
-
-            Divider().background(Color.black)
-            let biography = profile.biography ?? Constants.biographyText
+        VStack(alignment: .leading, spacing: 24) {
+            // Род деятельности
             VStack(alignment: .leading, spacing: 8) {
-                Text("О себе:")
+                Text("Род деятельности")
+                    .font(.headline)
+                    .foregroundColor(.gray)
+                
+                Text((profile.activitySphere ?? Constants.activitySphereText).lowercased())
                     .font(.title3.bold())
                     .foregroundColor(.headerText)
-                Text(biography)
-                    .font(.title3.weight(.medium))
-                    .foregroundColor(.headerText)
             }
+            .padding(.horizontal, 16)
+
+            Divider()
+                .padding(.horizontal, 16)
+
+            // О себе
+            VStack(alignment: .leading, spacing: 8) {
+                Text("О себе")
+                    .font(.headline)
+                    .foregroundColor(.gray)
+                
+                Text(profile.biography ?? Constants.biographyText)
+                    .font(.body)
+                    .foregroundColor(.headerText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.horizontal, 16)
         }
-        .padding(.horizontal, 16)
+        .padding(.vertical, 6)
+        .background(Color.white)
+        .cornerRadius(16)
+        .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
+        .padding(.bottom, 16)
     }
 
     @ViewBuilder
@@ -254,21 +302,21 @@ struct ProfileView: View {
 
     @ViewBuilder
     func tgView(_ profile: UserProfileResultDto) -> some View {
-        HStack {
-            //            Text("Telegram:")
-            Button (action: {
-                //GOTO Telegram
-                guard let username = profile.username else { return }
-                viewModel.openTelegramChat(username: username)
-            }, label: {
-                HStack(spacing: 2) {
-                    Text("@\(profile.username ?? "unkwonName")")
-                        .foregroundColor(.headerText)
-                    Image(.tg)
-                        .resizable()
-                        .frame(width: 20, height: 20)
-                }
-            })
+        Button(action: {
+            guard let username = profile.username else { return }
+            viewModel.openTelegramChat(username: username)
+        }) {
+            HStack(spacing: 6) {
+                Text("@\(profile.username ?? "unkwonName")")
+                    .foregroundColor(.blue)
+                Image(.tg)
+                    .resizable()
+                    .frame(width: 16, height: 16)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Color.blue.opacity(0.1))
+            .cornerRadius(15)
         }
     }
 

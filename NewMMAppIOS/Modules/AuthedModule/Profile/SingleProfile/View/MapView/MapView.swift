@@ -9,7 +9,11 @@ import SwiftUI
 import MapKit
 
 struct MapView: View {
-    
+    var canInteactive: Bool {
+        didSet {
+
+        }
+    }
     var withSgift = true
     @StateObject var viewModel: MapViewModel
     
@@ -22,8 +26,12 @@ struct MapView: View {
                     span: MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
                 )
                 
-                Map(position: .constant(.region(region)), interactionModes: []) {
-                    Annotation("\(viewModel.cityForDisplay)\n\(viewModel.nameUser)", coordinate: withSgift ? coordinatePoint : coordinateRaw) {
+                Map(position: .constant(.region(region)),
+                    interactionModes: canInteactive ? [.pitch, .zoom] : [])
+                {
+                    Annotation("\(viewModel.cityForDisplay)\n\(viewModel.nameUser)",
+                               coordinate: withSgift ? coordinatePoint : coordinateRaw)
+                    {
                         Image(systemName: "mappin.circle.fill")
                             .foregroundColor(.red)
                             .font(.title)
@@ -52,6 +60,6 @@ struct MapView: View {
 }
 
 #Preview {
-    MapView(viewModel: .init(nameCity: "Саратов", nameUser: "Артем"))
+    MapView(canInteactive: true, viewModel: .init(nameCity: "Саратов", nameUser: "Артем"))
         .frame(height: 200)
 }

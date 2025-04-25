@@ -163,7 +163,7 @@ extension ProfileViewModel {
         static let baseEventSearch: [EventsQuery.QueryValue] = [
             .sortDisplayDate(.DESC),
             .pageNumberPagination("0"),
-            .pageSizePagination("40")
+            .pageSizePagination("20")
         ]
 
         static let baseSelectedEventSearch: [EventType] = {
