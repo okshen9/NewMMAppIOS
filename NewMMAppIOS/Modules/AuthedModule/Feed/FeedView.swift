@@ -26,30 +26,33 @@ struct FeedView: View {
                         shimerState()
                     } else {
                         if let feedEvents = viewModel.feedEvents, !feedEvents.isEmpty {
-
-                            ForEach(feedEvents) { event in
-
-                                NavigationLink(destination: {
-                                    if let profileId = event.userProfile?.externalId {
-                                        ProfileView(viewModel: .init(externalId: profileId))
-                                    }
-                                }, label: {
-                                    NewFeedCell(event: event)
-                                })
-
-                            }
-                            if !viewModel.isAll {
-                                ActivityCell()
-                                    .onAppear {
+                            ForEach(Array(feedEvents.enumerated()), id: \.element.id) { index, event in
+                                NewFeedCell(
+                                    onHeaderTap: {
+                                        if let profileId = event.userProfile?.externalId {
+                                            ProfileView(viewModel: .init(externalId: profileId))
+                                        }
+                                    },
+                                    event: event)
+                                .onAppear {
+                                    let thresholdIndex = feedEvents.count - 1
+                                    if index == thresholdIndex && !viewModel.paginatingLoading && !viewModel.isAll {
                                         Task {
                                             await viewModel.getNextEvents(resetSearch: false)
                                         }
                                     }
+                                }
+                            }
+                            if viewModel.paginatingLoading {
+                                ActivityCell()
+                                    .frame(maxWidth: .infinity, alignment: .center)
+                                    .padding(.vertical)
                             }
                         } else {
                             Text("У вас пока нет новостей")
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .padding()
                         }
-
                     }
                 }
                 .padding(.horizontal)
@@ -99,7 +102,6 @@ struct FeedView: View {
                 switch route {
                 case .profile(let profile):
                     ProfileView(viewModel: .init(externalId: profile.id ?? 1))
-
                 }
             }
         }

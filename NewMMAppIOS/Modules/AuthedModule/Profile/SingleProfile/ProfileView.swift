@@ -202,7 +202,7 @@ struct ProfileView: View {
                 }
             } else if let feedEvents = viewModel.feedEvents, !feedEvents.isEmpty {
                 ForEach(feedEvents) { event in
-                    NewFeedCell(event: event)
+                    NewFeedCell(onHeaderTap: {}, event: event)
                 }
 
                 if !viewModel.isAll {
