@@ -127,6 +127,9 @@ struct ProfileView: View {
                 }
             }
         }
+        .refreshable {
+            viewModel.onApper(onReset: true)
+        }
         .sheet(isPresented: $showEditProfile) {
             ProfileInfoView(viewModel: .editProfileViewModel(needUpdateAction: {
                 Task.detached(operation: {
@@ -153,36 +156,39 @@ struct ProfileView: View {
 
     @ViewBuilder
     func feedBlock() -> some View {
-        if viewModel.isFeedLoading {
-            VStack(spacing: 20) {
-                ForEach(0...3, id: \.self) { _ in
-                    ShimmeringRectangle()
-                        .frame(height: 20)
-                        .cornerRadius(8)
-                        .padding(.horizontal, 40)
-                }
-            }
-        } else {
-            VStack(spacing: 16) {
-                if let feedEvents = viewModel.feedEvents, !feedEvents.isEmpty {
-                    ForEach(feedEvents) { event in
-                        NewFeedCell(event: event)
+        VStack(spacing: 16) {
+            if viewModel.isFeedLoading && viewModel.feedEvents.isEmptyOrNil {
+                VStack(spacing: 12) {
+                    ForEach(0..<3, id: \.self) { _ in
+                        ShimmeringRectangle()
+                            .frame(height: 60)
+                            .cornerRadius(12)
                     }
-                    if !viewModel.isAll {
-                        ActivityCell()
-                            .onAppear {
-                                Task.detached {
-                                    await viewModel.getNextEvents(resetSearch: false)
-                                }
-                            }
-                    }
-                } else {
-                    Text("У человека пока нет новостей")
-                        .foregroundColor(.secondary)
-                        .padding(.top, 6)
                 }
+            } else if let feedEvents = viewModel.feedEvents, !feedEvents.isEmpty {
+                ForEach(feedEvents) { event in
+                    NewFeedCell(event: event)
+                }
+
+                if !viewModel.isAll {
+                     ActivityCell()
+                         .frame(height: 50)
+                         .onAppear {
+                             if !viewModel.paginatingLoading {
+                                 Task.detached {
+                                     await viewModel.getNextEvents(resetSearch: false)
+                                 }
+                             }
+                         }
+                 }
+            } else {
+                Text("У человека пока нет новостей")
+                    .foregroundColor(.secondary)
+                    .padding(.top, 20)
             }
         }
+        .padding(.horizontal)
+        .padding(.bottom, 8)
     }
 
     @ViewBuilder

@@ -120,7 +120,7 @@ extension FeedViewModel {
                     self.paginatingLoading = false
                     // Показываем тост с ошибкой
                     Task { // Запускаем отдельную задачу для тоста
-                       await ToastManager.shared.show(.init(message: error.localizedDescription))
+                        await ToastManager.shared.show(.baseError)
                     }
                  }
             }

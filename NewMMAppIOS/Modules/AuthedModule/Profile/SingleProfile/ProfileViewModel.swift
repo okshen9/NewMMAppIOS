@@ -36,6 +36,10 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
     private let userRepository = UserRepository.shared
     private(set) var externalId: Int?
 
+    init() {
+        self.externalId = userRepository.externalId
+    }
+
     convenience init(externalId: Int? = nil) {
         self.init()
         self.externalId = externalId
@@ -63,13 +67,13 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
 
 
     // MARK: - Public Methods
-    func onApper() {
+    func onApper(onReset: Bool = false) {
         Task {
-            if let profileDto = userRepository.userProfile, externalId == nil {
+            if let profileDto = userRepository.userProfile, externalId == nil, !onReset {
                 await updateUI(profile: profileDto)
             } else {
                 await updateProfile()
-                await getNextEvents(resetSearch: false)
+                await getNextEvents(resetSearch: onReset)
             }
         }
     }

@@ -29,11 +29,14 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
     // MARK: - Public Methods
     func onApper() {
         Task {
-            await updateProfile()
+            if scheduleListItems.isEmpty,
+               calendarComponetsItems.isEmpty {
+                await updateData()
+            }
         }
     }
     
-    func updateProfile() async {
+    func updateData() async {
         do {
             await setIsLoading(true)
             let externalId = userRepository.externalId ?? -1
@@ -53,8 +56,8 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
     private func updateUI(scheduleListItems: [Date: [CalendatItem]], calendarItems: [DateComponents: [UIColor]], isLoading: Bool = false) {
         self.isLoading = isLoading
         self.scheduleListItems = scheduleListItems
-        calendarComponetsItems = calendarItems
-        
+        self.calendarComponetsItems = calendarItems
+
     }
     
     @MainActor

@@ -205,6 +205,11 @@ struct NewPieDiagram: View {
                 )
             }
         }
+        .onSwipe(
+            right: {
+                print( "Swiped RIGHT →")
+                navigateToParentLevel()}
+            )
     }
 
     private func calculateStartAngle(index: Int) -> Angle {

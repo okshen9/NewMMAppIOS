@@ -152,7 +152,12 @@ struct SchedulerView: View {
                 .padding(.horizontal)
             }
             .navigationTitle(Text("Расписание"))
-            .scrollPosition(id: $hashebleDate, anchor: .top)
+            .scrollPosition(id: $hashebleDate.animation(), anchor: .top)
+            .refreshable {
+                Task.detached {
+                    await viewModel.updateData()
+                }
+            }
         }
         .onChange(of: selectedDate) { oldState, newState in
             print("change eventsCalendar: \(newState)")
@@ -338,19 +343,102 @@ extension SchedulerView {
 }
 
 #Preview {
-    SchedulerView(viewModel: SchedulerViewModel(
-        payRequest: [
-            PaymentRequestResponseDto(dueDate: Date().toApiString),
-            PaymentRequestResponseDto(dueDate: Date.nowWith(plus: 1).toApiString),
-            PaymentRequestResponseDto(dueDate: Date.nowWith(plus: 2).toApiString),
-            PaymentRequestResponseDto(dueDate: Date.nowWith(plus: 3).toApiString)
-        ],
-        targets: [
-            UserTargetDtoModel(deadLineDateTime: Date.nowWith(plus: 1).toApiString),
-            UserTargetDtoModel(deadLineDateTime: Date.nowWith(plus: 2).toApiString),
-            UserTargetDtoModel(deadLineDateTime: Date.nowWith(plus: 3).toApiString)
-        ]
-    ))
+    NavigationView {
+        SchedulerView(viewModel: SchedulerViewModel(
+            payRequest: [
+                // Платежи на сегодня
+                PaymentRequestResponseDto(
+                    id: 1,
+                    externalId: 1,
+                    amount: 1500.0,
+                    dueDate: Date().toApiString,
+                    comment: "Оплата за консультацию",
+                    paymentRequestStatus: .wait,
+                    userProfilePreview: .getTestUser()
+                ),
+                // Платежи на завтра
+                PaymentRequestResponseDto(
+                    id: 2,
+                    externalId: 2,
+                    amount: 2000.0,
+                    dueDate: Date.nowWith(plus: 1).toApiString,
+                    comment: "Оплата за курс",
+                    paymentRequestStatus: .wait,
+                    userProfilePreview: .getTestUser()
+                ),
+                // Платежи на послезавтра
+                PaymentRequestResponseDto(
+                    id: 3,
+                    externalId: 3,
+                    amount: 3000.0,
+                    dueDate: Date.nowWith(plus: 2).toApiString,
+                    comment: "Оплата за материалы",
+                    paymentRequestStatus: .canceled,
+                    userProfilePreview: .getTestUser()
+                )
+            ],
+            targets: [
+                // Цели на сегодня
+                UserTargetDtoModel(
+                    id: 1,
+                    title: "Изучить SwiftUI",
+                    description: "Освоить основы SwiftUI и создать первое приложение",
+                    deadLineDateTime: Date().toApiString,
+                    targetStatus: .inProgress,
+                    category: .personal
+                ),
+                // Цели на завтра
+                UserTargetDtoModel(
+                    id: 2,
+                    title: "Прочитать книгу по архитектуре",
+                    description: "Изучить паттерны проектирования",
+                    deadLineDateTime: Date.nowWith(plus: 1).toApiString,
+                    targetStatus: .done,
+                    category: .money
+                ),
+                // Цели на следующую неделю
+                UserTargetDtoModel(
+                    id: 3,
+                    title: "Подготовить презентацию",
+                    description: "Создать презентацию для команды",
+                    deadLineDateTime: Date.nowWith(plus: 7).toApiString,
+                    targetStatus: .expired,
+                    category: .health
+                )
+            ]
+        ))
+        .preferredColorScheme(.light)
+    }
+}
+
+// Вспомогательное превью для тёмной темы
+#Preview {
+    NavigationView {
+        SchedulerView(viewModel: SchedulerViewModel(
+            payRequest: [
+                PaymentRequestResponseDto(
+                    id: 1,
+                    externalId: 1,
+                    amount: 1500.0,
+                    dueDate: Date().toApiString,
+                    comment: "Оплата за консультацию",
+                    paymentRequestStatus: .wait,
+                    userProfilePreview: .getTestUser()
+                )
+            ],
+            targets: [
+                UserTargetDtoModel(
+                    id: 1,
+                    title: "Изучить SwiftUI",
+                    description: "Освоить основы SwiftUI и создать первое приложение",
+                    deadLineDateTime: Date().toApiString,
+                    targetStatus: .inProgress,
+                    category: .personal
+                )
+            ]
+        ))
+        .preferredColorScheme(.dark)
+    }
 }
 
 let markedDates: [Date: [UIColor]] = [

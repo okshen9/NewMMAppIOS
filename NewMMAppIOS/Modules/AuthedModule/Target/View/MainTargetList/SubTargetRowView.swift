@@ -40,55 +40,48 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Button(action: {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                    showDescription.toggle()
-                }
-            }) {
-                HStack {
-                    if isLoading {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle())
-                    } else {
-                        Button(action: {
-                            if myTarget {
-                                if isLastUnclosedSubtarget {
-                                    showCustomAlert = true
-                                } else {
-                                    showConfirmationDialog = true
-                                }
+            HStack {
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle())
+                } else {
+                    Button(action: {
+                        if myTarget {
+                            if isLastUnclosedSubtarget {
+                                showCustomAlert = true
+                            } else {
+                                showConfirmationDialog = true
                             }
-                        }) {
-                            Image(systemName: subTarget.targetStatus == .done ? "checkmark.circle.fill" : "circle")
-                                .foregroundColor(subTarget.targetStatus == .done ? .green : .gray)
-                                .imageScale(.large)
                         }
-                        .buttonStyle(.plain)
+                    }) {
+                        Image(systemName: subTarget.targetStatus == .done ? "checkmark.circle.fill" : "circle")
+                            .foregroundColor(subTarget.targetStatus == .done ? .green : .gray)
+                            .imageScale(.large)
                     }
-                    
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text(subTarget.title.orEmpty)
-                                .font(.system(size: 15, weight: .medium))
-                                .foregroundColor(.headerText)
-                            
-                            Spacer()
-                        }
-                        
-                        HStack(spacing: 8) {
-                            Image(systemName: "calendar")
-                                .foregroundColor(.gray)
-                                .imageScale(.small)
-                            
-                            Text((subTarget.deadLineDateTime?.dateFromString ?? Date.now).toDisplayString)
-                                .font(.system(size: 13))
-                                .foregroundColor(.gray)
-                        }
+                    .buttonStyle(.plain)
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(subTarget.title.orEmpty)
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundColor(.headerText)
+
+                        Spacer()
+                    }
+
+                    HStack(spacing: 8) {
+                        Image(systemName: "calendar")
+                            .foregroundColor(.gray)
+                            .imageScale(.small)
+
+                        Text((subTarget.deadLineDateTime?.dateFromString ?? Date.now).toDisplayString)
+                            .font(.system(size: 13))
+                            .foregroundColor(.gray)
                     }
                 }
             }
-            .buttonStyle(PlainButtonStyle())
-            
+
             if showDescription {
                 if let description = subTarget.description, !description.isEmpty {
                     Text(description)
