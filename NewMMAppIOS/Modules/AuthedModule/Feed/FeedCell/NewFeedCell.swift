@@ -52,7 +52,7 @@ extension BasicEventCell {
     func bottomDate() -> some View {
         HStack {
             Spacer()
-            let displayString = event.displayDate?.dateFromString?.toDisplayString ?? Date().toDisplayString
+            let displayString = event.displayDate?.dateFromApiString?.toDisplayString ?? Date().toDisplayString
             Text(displayString)
                 .font(.body)
                 .foregroundStyle(Color.headerText)

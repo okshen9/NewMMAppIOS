@@ -458,8 +458,8 @@ extension String {
                                                      timeZone: .init(identifier: "Europe/Moscow")))
     }
     
-    /// Влзвращает дату из строки "2024-02-01T21:24:23"
-    var dateFromString: Date? {
+    /// Влзвращает дату из строки "2024-02-01T21:24:23.999"
+    var dateFromApiString: Date? {
         return MMDateFormatter.date(from: self,
                                     withConfigurator: .init(dateFormat: .apiFullDateFormat,
                                                             locale: .rus,
@@ -489,6 +489,10 @@ extension String {
 }
 
 extension Date {
+    var toISO8601String: String {
+        return ISO8601DateFormatter().string(from: self)
+    }
+
     /// 2024-02-01T21:24:23.999
     var toApiString: String {
         let temp = MMDateFormatter.string(from: self,

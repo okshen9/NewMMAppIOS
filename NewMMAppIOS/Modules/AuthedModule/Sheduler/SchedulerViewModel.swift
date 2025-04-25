@@ -3,7 +3,10 @@ import Combine
 
 // MARK: - ViewModel
 class SchedulerViewModel: ObservableObject, SubscriptionStore {
-    
+
+    /// только для превью
+    var userPreview: UserProfileResultDto?
+
     private var payRequest: [PaymentRequestResponseDto]?
     private var targets: [UserTargetDtoModel]?
     @Published var isLoading: Bool = false
@@ -14,9 +17,12 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
     @Published var scheduleListItems = [Date: [CalendatItem]]()
     @Published var calendarComponetsItems: Dictionary<DateComponents, [UIColor]> = [DateComponents: [UIColor]]()
 
-    
-    convenience init(payRequest: [PaymentRequestResponseDto], targets: [UserTargetDtoModel]) {
+    /// Только для превью
+    convenience init(payRequest: [PaymentRequestResponseDto],
+                     targets: [UserTargetDtoModel],
+                     userPreview: UserProfileResultDto? = .getTestUser()) {
         self.init()
+        self.userPreview = userPreview
         self.payRequest = payRequest
         self.targets = targets
 
@@ -65,7 +71,8 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
         self.isLoading = isLoading
     }
     
-    private func prepereScheduleListItems(paymant: [PaymentRequestResponseDto], targets: [UserTargetDtoModel]) -> (scheduleListItems: [Date: [CalendatItem]], calendarItems: [DateComponents: [UIColor]]) {
+    private func prepereScheduleListItems(paymant: [PaymentRequestResponseDto],
+                                          targets: [UserTargetDtoModel]) -> (scheduleListItems: [Date: [CalendatItem]], calendarItems: [DateComponents: [UIColor]]) {
         self.payRequest = paymant
         self.targets = targets
         
@@ -73,10 +80,13 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
         
         // Обработка платежей
         paymant.forEach({ payMent in
-            guard let dateOfPay = payMent.dueDate?.dateFromStringISO8601,
-                  var user = userRepository.userProfile
-            else { return }
-            
+            guard let dateOfPay = payMent.dueDate?.dateFromApiString,
+                  let user = userRepository.userProfile ?? userPreview
+            else {
+                print("neshko1 ERROR")
+                return
+            }
+
             // Используем startOfDay для группировки по дням
             let startOfDay = Calendar.current.startOfDay(for: dateOfPay)
             let componentOfPay = startOfDay.dateComponentsFor()

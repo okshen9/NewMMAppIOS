@@ -75,7 +75,7 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
                             .foregroundColor(.gray)
                             .imageScale(.small)
 
-                        Text((subTarget.deadLineDateTime?.dateFromString ?? Date.now).toDisplayString)
+                        Text((subTarget.deadLineDateTime?.dateFromApiString ?? Date.now).toDisplayString)
                             .font(.system(size: 13))
                             .foregroundColor(.gray)
                     }

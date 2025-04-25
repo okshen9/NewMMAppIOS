@@ -69,7 +69,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
                             .foregroundColor(.gray)
                             .imageScale(.small)
 
-                        Text((target.deadLineDateTime?.dateFromString ?? Date.now).toDisplayString)
+                        Text((target.deadLineDateTime?.dateFromApiString ?? Date.now).toDisplayString)
                             .font(.system(size: 14))
                             .foregroundColor(.gray)
 

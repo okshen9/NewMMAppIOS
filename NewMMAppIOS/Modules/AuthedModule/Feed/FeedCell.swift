@@ -27,7 +27,7 @@ struct FeedCell: View {
             Text(subtitle)
                 .font(.subheadline)
                 .foregroundStyle(Color.headerText)
-            Text((date.dateFromString?.toDisplayString ?? ""))
+            Text((date.dateFromApiString?.toDisplayString ?? ""))
                 .foregroundStyle(Color.headerText)
         }
         //        .frame(width: .infinity)

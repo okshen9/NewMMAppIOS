@@ -70,7 +70,7 @@ struct AddTargetView: View {
                                     .foregroundColor(.secondary)
                             }
                             
-                            let date = subTargets[index].deadLineDateTime?.dateFromString ?? deadLineDateTime
+                            let date = subTargets[index].deadLineDateTime?.dateFromApiString ?? deadLineDateTime
                             Text("Срок: \(date.formatted(date: .abbreviated, time: .omitted))")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
