@@ -8,18 +8,12 @@
 import SwiftUI
 import SwiftUICore
 
-enum FeedViewRoute: Hashable {
-    case profile(UserProfileResultDto)
-//    case settings
-}
-
 struct FeedView: View {
     @StateObject private var viewModel = FeedViewModel()
-    @State private var path = NavigationPath()
     @State private var showEventTypeMenu = false
     
     var body: some View {
-        NavigationStack(path: $path) {
+        NavigationStack(path: $viewModel.navigationPath) {
             ScrollView {
                 LazyVStack(spacing: 8) {
                     if viewModel.isLoading {
@@ -29,8 +23,9 @@ struct FeedView: View {
                             ForEach(Array(feedEvents.enumerated()), id: \.element.id) { index, event in
                                 NewFeedCell(
                                     onHeaderTap: {
-                                        if let profileId = event.userProfile?.externalId {
-                                            ProfileView(viewModel: .init(externalId: profileId))
+                                        if let externalId = Int(event.creatorExternalId.orEmpty) {
+                                            print("Navigating to profile with externalId: \(externalId)")
+                                            viewModel.navigateToProfile(withId: externalId)
                                         }
                                     },
                                     event: event)
@@ -58,58 +53,62 @@ struct FeedView: View {
                 .padding(.horizontal)
                 .padding(.top, 8)
             }
+            .navigationDestination(for: NavigationRoute.self) { route in
+                switch route {
+                case .profile(let externalId):
+                    ProfileView(externalId: externalId)
+//                        .navigationTitle("Профиль")
+                }
+            }
             .navigationTitle("События")
             .toolbar(content: {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showEventTypeMenu = true
-                    }) {
-                        Image(systemName: "line.3.horizontal.decrease.circle")
-                            .foregroundColor(.accentColor)
-                    }
-                    .popover(isPresented: $showEventTypeMenu) {
-                        MultiSelectMenu(
-                            isPresented: $showEventTypeMenu,
-                            options: EventType.allTargetsType.map { $0.name },
-                            originalSelection: Binding(
-                                get: { 
-                                    Set(viewModel.selectedType.filter { $0.value }.keys.map { $0.name })
-                                },
-                                set: { newSelection in
-                                    // Обновляем выбранные типы
-                                    for type in EventType.allTargetsType {
-                                        viewModel.selectedType[type] = newSelection.contains(type.name)
-                                    }
-                                }
-                            )
-                        ) {
-                            // Перезапрашиваем данные
-                            Task {
-                                await viewModel.getNextEvents(resetSearch: true)
-                            }
-                        }
-                        .presentationCompactAdaptation(.popover)
-                    }
+                toolBarMenu()
                 }
             })
             .refreshable {
                 await viewModel.getNextEvents(resetSearch: true)
             }
             .onAppear {
+                print("onAppear FeedView ===")
                 viewModel.onApper()
             }
-            .navigationDestination(for: FeedViewRoute.self) { route in
-                switch route {
-                case .profile(let profile):
-                    ProfileView(viewModel: .init(externalId: profile.id ?? 1))
-                }
-            }
+
         }
     }
 
     @ViewBuilder
-    func getMenu() -> some View {
-
+    func toolBarMenu() -> some View {
+        
+        Button(action: {
+            showEventTypeMenu = true
+        }) {
+            Image(systemName: "line.3.horizontal.decrease.circle")
+                .foregroundColor(.accentColor)
+        }
+        .popover(isPresented: $showEventTypeMenu) {
+            MultiSelectMenu(
+                isPresented: $showEventTypeMenu,
+                options: EventType.allTargetsType.map { $0.name },
+                originalSelection: Binding(
+                    get: {
+                        Set(viewModel.selectedType.filter { $0.value }.keys.map { $0.name })
+                    },
+                    set: { newSelection in
+                        // Обновляем выбранные типы
+                        for type in EventType.allTargetsType {
+                            viewModel.selectedType[type] = newSelection.contains(type.name)
+                        }
+                    }
+                )
+            ) {
+                // Перезапрашиваем данные
+                Task {
+                    await viewModel.getNextEvents(resetSearch: true)
+                }
+            }
+            .presentationCompactAdaptation(.popover)
+        }
     }
 
     // MARK: - ViewBuilder

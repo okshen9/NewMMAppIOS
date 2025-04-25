@@ -37,13 +37,16 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
     private(set) var externalId: Int?
 
     init() {
+        print("init ProfileViewModel() без параметров")
         self.externalId = userRepository.externalId
     }
 
     convenience init(externalId: Int? = nil) {
         self.init()
-        self.externalId = externalId
-
+        print("init ProfileViewModel(externalId: \(externalId ?? -1))")
+        if let externalId = externalId {
+            self.externalId = externalId
+        }
     }
     
     /// Only Debug
@@ -52,6 +55,10 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
         self.externalId = profile.externalId
         self.profile = profile
         self.groupedTargets = groupedTargets(profile)
+    }
+    
+    deinit {
+        print("deinit ProfileViewModel === externalId: \(externalId ?? -1)")
     }
 
     func groupedTargets(_ profile: UserProfileResultDto?) -> [TargetCategory: [UserTargetDtoModel]] {
@@ -81,20 +88,30 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
     func updateProfile(externalId: Int? = nil) async {
         do {
             await setIsLoading(true)
-//            guard let updatetedProfile = try await serviceNetwork.getUserProfile(externalId: 10) else { return }
-//            await updateUI(profile: updatetedProfile)
+            let targetExternalId = externalId ?? self.externalId
+            print("updateProfile с externalId: \(targetExternalId ?? -1)")
 
-            if let externalId = self.externalId {
-                guard let updatetedProfile = try await serviceNetwork.getUserProfile(externalId: externalId) else { return }
+            if let targetExternalId = targetExternalId {
+                guard let updatetedProfile = try await serviceNetwork.getUserProfile(externalId: targetExternalId) else { 
+                    print("Не удалось получить профиль с externalId: \(targetExternalId)")
+                    await setIsLoading(false)
+                    return 
+                }
+                print("Успешно получен профиль с externalId: \(targetExternalId)")
                 await updateUI(profile: updatetedProfile)
             } else {
-                guard let updatetedProfile = try await serviceNetwork.getProfileMe() else { return }
+                guard let updatetedProfile = try await serviceNetwork.getProfileMe() else { 
+                    print("Не удалось получить свой профиль")
+                    await setIsLoading(false)
+                    return 
+                }
+                print("Успешно получен свой профиль")
                 await updateUI(profile: updatetedProfile)
             }
         } catch {
             await ToastManager.shared.show(.baseError)
             await updateUI(profile: nil)
-            print("Neshko updateProfile \(error) - Ошибка загрзуки профиля на странице профиля")
+            print("Ошибка updateProfile \(error) - Ошибка загрзуки профиля на странице профиля")
         }
     }
     
