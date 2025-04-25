@@ -16,8 +16,18 @@ class UserRepository {
     private(set) var authUser: AuthTGRequestModel?
     func setAuthUser(_ newValue: AuthTGRequestModel?) {
         authUser = newValue
-        setJWT(newValue?.jwt)
-        setRefreshJWT(newValue?.refreshToken)
+        
+        if let jwt = newValue?.jwt {
+            setJWT(jwt)
+        } else {
+            clearJWT()
+        }
+        
+        if let refreshJWT = newValue?.refreshToken {
+            setRefreshJWT(refreshJWT)
+        } else {
+            clearRefreshJWT()
+        }
         setRoles(newValue?.authUserDto?.roles?.map({$0.rawValue}))
     }
     
@@ -66,13 +76,13 @@ class UserRepository {
             return nil
         }
     }
-    func setJWT(_ newValue: String?) {
+    func setJWT(_ newValue: String) {
         _jwt = newValue
-        if let jwt = newValue {
-            KeyChainStorage.jwtToken.save(value: jwt)
-        } else {
-            KeyChainStorage.deleteAllJWTKeychain()
-        }
+        KeyChainStorage.jwtToken.save(value: newValue)
+    }
+    func clearJWT() {
+        KeyChainStorage.deleteAllJWTKeychain()
+        _jwt = nil
     }
 
     // MARK: - JWT Refresh
@@ -86,14 +96,13 @@ class UserRepository {
             return nil
         }
     }
-    
-    func setRefreshJWT(_ newValue: String?) {
+    func setRefreshJWT(_ newValue: String) {
+        KeyChainStorage.refreshToken.save(value: newValue)
         _refreshJWT = newValue
-        if let jwt = newValue {
-            KeyChainStorage.refreshToken.save(value: jwt)
-        } else {
-            KeyChainStorage.deleteAllJWTKeychain()
-        }
+    }
+    func clearRefreshJWT() {
+        KeyChainStorage.deleteAllJWTKeychain()
+        _refreshJWT = nil
     }
 
     func makeRefreshToken() async throws -> String {
@@ -168,8 +177,8 @@ class UserRepository {
         setExternalId(nil)
         setAuthUser(nil)
         setUserProfile(nil)
-        setJWT(nil)
-        setRefreshJWT(nil)
+        clearJWT()
+        clearRefreshJWT()
         setRoles(nil)
     }
     
