@@ -102,33 +102,12 @@ struct EventRowView: View {
     }
     
     private func relativeDateString(_ date: Date) -> String {
-        let today = Calendar.current.startOfDay(for: Date())
-        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today)!
-        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: today)!
-        
-        if Calendar.current.isDate(date, inSameDayAs: today) {
-            return "Сегодня"
-        } else if Calendar.current.isDate(date, inSameDayAs: tomorrow) {
-            return "Завтра"
-        } else if Calendar.current.isDate(date, inSameDayAs: yesterday) {
-            return "Вчера"
-        } else {
-            return "\(daysDifference(from: today, to: date)) дн."
-        }
+        return date.relativeTimeString
     }
     
     private func isOverdue(_ date: Date) -> Bool {
         let today = Calendar.current.startOfDay(for: Date())
         return date < today
-    }
-    
-    private func daysDifference(from date1: Date, to date2: Date) -> Int {
-        let days = Calendar.current.dateComponents([.day], from: date1, to: date2).day ?? 0
-        if days < 0 {
-            return days
-        } else {
-            return days + 1 // +1 because we count inclusively (tomorrow = 2 days)
-        }
     }
 }
 
@@ -176,7 +155,7 @@ struct EventRowView: View {
             user: .getTestUser(),
             title: "Закрыть цель: Пробежать 5 км",
             type: .target,
-            date: Date().addingTimeInterval(172800), // Day after tomorrow
+            date: Date().addingTimeInterval(172800 * 10), // Day after tomorrow
             category: .health
         ))
         .padding()

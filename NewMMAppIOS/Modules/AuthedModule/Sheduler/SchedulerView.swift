@@ -95,10 +95,9 @@ struct SchedulerView: View {
                         Spacer()
                     }
                 }
-                
             }
             .navigationBarTitle(Text("Расписание"), displayMode: .inline)
-            .scrollPosition(id: $hashebleDate.animation(), anchor: .top)
+            .scrollPosition(id: $hashebleDate.animation(.easeIn(duration: 0.3)), anchor: .top)
             .refreshable {
                 Task.detached {
                     await viewModel.updateData()
@@ -114,33 +113,6 @@ struct SchedulerView: View {
             viewModel.onApper()
         }
     }
-    
-    @ViewBuilder
-    func getCell2(event: CalendatItem) -> some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(event.title)
-                    .font(.headline)
-                HStack(spacing: 8) {
-                    Text(event.type.name)
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                    
-                    if let category = event.category {
-                        Text("• \(category.rawValue)")
-                            .font(.subheadline)
-                            .foregroundColor(category.color)
-                    }
-                }
-            }
-            Spacer()
-            Circle()
-                .fill(Color(event.type.color))
-                .frame(width: 10, height: 10)
-        }
-        .padding(.vertical, 8)
-    }
-    
     
     @ViewBuilder
     private func eventList2() -> some View {
@@ -288,7 +260,7 @@ extension SchedulerView {
     }
 }
 
-#Preview {
+#Preview("1") {
     NavigationView {
         SchedulerView(viewModel: SchedulerViewModel(
             payRequest: [
@@ -358,7 +330,7 @@ extension SchedulerView {
 }
 
 // Вспомогательное превью для тёмной темы
-#Preview {
+#Preview("2") {
     NavigationView {
         SchedulerView(viewModel: SchedulerViewModel(
             payRequest: [

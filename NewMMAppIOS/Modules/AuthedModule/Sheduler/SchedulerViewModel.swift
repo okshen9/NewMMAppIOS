@@ -25,9 +25,12 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
         self.userPreview = userPreview
         self.payRequest = payRequest
         self.targets = targets
-
+        
         let items = prepereScheduleListItems(paymant: payRequest, targets: targets)
+        
         print("neshko1 \(items)")
+        
+        print("neshko2 \(items.scheduleListItems.values.flatMap({$0}).count)")
         self.scheduleListItems = items.scheduleListItems
         self.calendarComponetsItems = items.calendarItems
     }
@@ -72,7 +75,9 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
     }
     
     private func prepereScheduleListItems(paymant: [PaymentRequestResponseDto],
-                                          targets: [UserTargetDtoModel]) -> (scheduleListItems: [Date: [CalendatItem]], calendarItems: [DateComponents: [UIColor]]) {
+                                          targets: [UserTargetDtoModel]
+    ) ->(scheduleListItems: [Date: [CalendatItem]], calendarItems: [DateComponents: [UIColor]])
+    {
         self.payRequest = paymant
         self.targets = targets
         
@@ -107,7 +112,7 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
             // Используем startOfDay для группировки по дням
             let startOfDay = Calendar.current.startOfDay(for: component)
             
-            let name = "Крайний срок цели: \(target.title ?? "Цель без названия")"
+            let name = "Дедлайн цели: \(target.title ?? "Цель без названия")"
             var enetsCurrent = rawTempScheduleListItems[startOfDay] ?? []
             enetsCurrent.append(.init(payment: nil, target: target, user: user, title: name, type: .target, date: component, category: target.category))
             rawTempScheduleListItems[startOfDay] = enetsCurrent
