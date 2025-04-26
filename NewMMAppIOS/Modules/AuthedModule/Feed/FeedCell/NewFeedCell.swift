@@ -62,11 +62,15 @@ extension BasicEventCell {
 }
 
 struct NewFeedCell: BasicEventCell {
+    var onHeaderTap: () -> Void
     var event: EventDTO
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             headerEvent()
                 .padding(.bottom, 8)
+                .onTapGesture {
+                    onHeaderTap()
+                }
             bodyEvent()
             bottomDate()
         }
@@ -101,6 +105,6 @@ struct NewFeedCell: BasicEventCell {
 }
 
 #Preview {
-    NewFeedCell(event: .getTextEvent(for: .TARGET_DONE))
+    NewFeedCell(onHeaderTap: {}, event: .getTextEvent(for: .TARGET_DONE))
         .padding(.horizontal, 8)
 }

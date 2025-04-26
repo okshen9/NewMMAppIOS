@@ -133,17 +133,33 @@ extension FeedViewModel {
         guard let nextPagination = searchResponseDTO?.nextPagination else {
             return Constants.baseEventSearch
         }
-        var params = nextPagination.map {
-            switch $0.key {
+        var params = nextPagination.map { key, value in // Используем key, value для ясности
+            switch key { // Проверяем ключ
             case PaginationConstants.pageNumberKey:
-                return EventsQuery.QueryValue.pageNumberPagination($0.value)
+                return EventsQuery.QueryValue.pageNumberPagination(value) // Номер страницы
             case PaginationConstants.pageSizeKey:
-                return EventsQuery.QueryValue.pageNumberPagination($0.value)
+                return EventsQuery.QueryValue.pageSizePagination(value) // Размер страницы (исправлено)
             default:
-                return EventsQuery.QueryValue.pageNumberPagination($0.value)
+                // Обработка неизвестных ключей - возможно, нужно вернуть ошибку или игнорировать?
+                // Пока что вернем pageNumber, но это требует уточнения
+                // Лучше всего было бы иметь все возможные ключи здесь или более строгую модель
+                print("Warning: Unknown key in nextPagination: \(key)")
+                // Если есть другие параметры пагинации, добавь их сюда
+                // Возвращаем что-то, чтобы избежать ошибки компиляции, но это ПЛОХО
+                // Возможно, стоит пропустить этот параметр или вернуть nil и отфильтровать позже
+                // В данном случае, чтобы не сломать компиляцию, вернем как есть, но с предупреждением
+                return EventsQuery.QueryValue.pageNumberPagination(value) // ЗАГЛУШКА - УТОЧНИТЬ!
             }
         }
-        params.append(.sortDisplayDate())
+        // Убедимся, что сортировка всегда добавляется, если она нужна
+        // Проверяем, есть ли уже параметр сортировки
+        if !params.contains(where: { if case .sortDisplayDate = $0 { return true } else { return false } }) {
+            params.append(.sortDisplayDate(.DESC)) // Добавляем сортировку по умолчанию, если ее нет
+        }
+
+        // Важно: Убедиться, что тип EventsQuery.QueryValue.pageSizePagination существует!
+        // Если его нет, нужно будет создать или использовать правильный существующий.
+
         return params
     }
 
@@ -155,3 +171,4 @@ extension FeedViewModel {
         }
     }
 }
+

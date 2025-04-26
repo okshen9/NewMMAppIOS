@@ -11,6 +11,8 @@ enum RequestUrls {
     /// базовый url приложения
 //    static let baseUrl = "http://194.87.93.98:8080"
     static let baseUrl = "https://appmastermind.ru/api"
+//    static let baseUrl = "http://45.141.102.197/api"
+//    http:45.141.102.197
 //    static let baseUrl = "http://localhost:8080"
     
     // MARK: - Работа с профилем

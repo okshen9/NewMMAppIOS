@@ -9,10 +9,18 @@ import Foundation
 import Combine
 import SwiftUI
 
+// MARK: - Navigation Routes
+enum NavigationRoute: Hashable {
+    case profile(Int)
+    // Здесь можно добавить другие маршруты навигации в будущем
+}
+
 protocol FeedViewModelProtocol: ObservableObject {
     func onApper()
     var isLoading: Bool { get set }
     var feedEvents: [EventDTO]? { get set }
+    var navigationPath: NavigationPath { get set }
+    func navigateToProfile(withId externalId: Int)
 }
 
 // MARK: - ViewModel
@@ -20,7 +28,7 @@ final class FeedViewModel: ObservableObject, FeedViewModelProtocol {
     @Published var isLoading = false
     @Published var paginatingLoading = false
     @Published var isAll = false
-
+    @Published var navigationPath = NavigationPath()
 
     @Published var feedEvents: [EventDTO]?
     @Published var currentEventSearch: [EventsQuery.QueryValue] = Constants.baseEventSearch
@@ -40,6 +48,11 @@ final class FeedViewModel: ObservableObject, FeedViewModelProtocol {
         print("deinit FeedViewModel")
     }
 
+    // MARK: - Navigation Methods
+    func navigateToProfile(withId externalId: Int) {
+        print("FeedViewModel: Добавляю профиль с ID \(externalId) в навигационный путь")
+        navigationPath.append(NavigationRoute.profile(externalId))
+    }
 
     // MARK: - Public Methods
     func onApper() {

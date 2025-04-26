@@ -27,15 +27,15 @@ struct TabBarView: View {
                 }
                 .tag(1)
             
-//                TestScreen()
-//                    .tabItem {
-//                Image(ImageResource.search)
-//                            .renderingMode(.template)
-//                            .foregroundColor(selectedTab == 1 ? Color.mainRed : Color.tabbarSecond)
-//                        Text("Поиск")
-//                            .foregroundColor(selectedTab == 1 ? Color.mainRed : Color.tabbarSecond)
-//                    }
-//                    .tag(5)
+            //                TestScreen()
+            //                    .tabItem {
+            //                Image(ImageResource.search)
+            //                            .renderingMode(.template)
+            //                            .foregroundColor(selectedTab == 1 ? Color.mainRed : Color.tabbarSecond)
+            //                        Text("Поиск")
+            //                            .foregroundColor(selectedTab == 1 ? Color.mainRed : Color.tabbarSecond)
+            //                    }
+            //                    .tag(5)
             
             TargetsView()
                 .tabItem {
@@ -56,18 +56,19 @@ struct TabBarView: View {
                         .foregroundColor(selectedTab == 3 ? Color.mainRed : Color.orange)
                 }
                 .tag(3)
-            
-            ProfileView()
-                .tabItem {
-                    VStack {
-                        Image(.profile)
-                            .renderingMode(.template)
-                            .foregroundColor(selectedTab == 4 ? Color.green : Color.orange)
-                        Text("Профиль")
-                            .foregroundColor(selectedTab == 4 ? Color.mainRed : Color.orange)
-                    }
+            NavigationStack {
+                ProfileView()
+            }
+            .tabItem {
+                VStack {
+                    Image(.profile)
+                        .renderingMode(.template)
+                        .foregroundColor(selectedTab == 4 ? Color.green : Color.orange)
+                    Text("Профиль")
+                        .foregroundColor(selectedTab == 4 ? Color.mainRed : Color.orange)
                 }
-                .tag(4)
+            }
+            .tag(4)
         }
         .accentColor(Color.mainRed)
         .foregroundColor(Color.tabbarSecond)
