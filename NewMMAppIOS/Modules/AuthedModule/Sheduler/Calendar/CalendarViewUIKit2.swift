@@ -8,7 +8,7 @@
 import SwiftUI
 
 public struct CalendarViewUIKit2: UIViewRepresentable {
-	struct Decoration {
+	public struct Decoration {
 		var systemImage: String?
 		var image: String?
 		var color: Color?
@@ -241,6 +241,20 @@ public extension CalendarViewUIKit2 {
 		view.add(Decoration(customView: { AnyView(customView($0)) }), for: dateComponents)
 		return view
 	}
+    
+    func decorating(_ dateComponents: [DateComponents: [Decoration]]) -> Self {
+        var view = self
+        view.add(dateComponents)
+        return view
+    }
+    
+    private mutating func add(_ dateComponents: [DateComponents: [Decoration]]) {
+        for key in dateComponents.compactMap(\.key) {
+            if let tempDecoration = dateComponents[key]?.first {
+                decorations[key] = tempDecoration
+            }
+        }
+    }
 	
 	private mutating func add(_ decoration: Decoration, for dateComponents: Set<DateComponents>) {
 		for key in dateComponents.compactMap(\.decorationKey) {

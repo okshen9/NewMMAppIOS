@@ -16,23 +16,20 @@ struct SchedulerView: View {
     ]
     
     var body: some View {
-        NavigationView {
-            ScrollView {
+        NavigationStack {
+            ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading) {
                     if viewModel.isLoading == false {
                         VStack(alignment: .leading) {
                             // Календарь с возможностью снятия выбора
-                            ZStack {
                                 CalendarViewUIKit(
-                                    selectedDate: $selectedDate, 
+                                    selectedDate: $selectedDate,
                                     events: viewModel.calendarComponetsItems,
                                     canDeselectSameDate: true
                                 )
-                                    .tint(Color.red)
-                                    .frame(height: 450)
-                                    .padding(.horizontal, 24)
-                                    .padding(.top, 24)
-                            }
+                                .adaptiveHeight()
+                                .tint(Color.red)
+                                .padding(.top, 24)
                             
                             // Легенда категорий
                             VStack(alignment: .leading, spacing: 18) {
@@ -95,7 +92,6 @@ struct SchedulerView: View {
 //                                    .padding(.top, 4)
 //                                }
                             }
-                            .padding(.vertical, 12)
                         }
 //                        .toolbar(content: {
 //                            Button(action: {
@@ -149,9 +145,9 @@ struct SchedulerView: View {
                         Spacer()
                     }
                 }
-                .padding(.horizontal)
+                
             }
-            .navigationTitle(Text("Расписание"))
+            .navigationBarTitle(Text("Расписание"), displayMode: .inline)
             .scrollPosition(id: $hashebleDate.animation(), anchor: .top)
             .refreshable {
                 Task.detached {

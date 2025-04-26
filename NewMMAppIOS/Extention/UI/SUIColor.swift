@@ -123,8 +123,22 @@ struct BackGroundRedView: ViewModifier {
     }
 }
 
+struct RandomBackGroundColor: ViewModifier {
+    var color: Color = Color(
+        UIColor(red: .random(in: 0...1), green: .random(in: 0...1), blue: .random(in: 0...1), alpha: 1)
+    )
+    func body(content: Content) -> some View {
+        content
+            .background(color)
+    }
+}
+
 extension View {
     func bred(_ color: Color = .red) -> some View {
         modifier(BackGroundRedView())
+    }
+    
+    func randomBColor() -> some View {
+        modifier(RandomBackGroundColor())
     }
 }

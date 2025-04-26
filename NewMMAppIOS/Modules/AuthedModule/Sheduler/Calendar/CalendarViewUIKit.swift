@@ -13,6 +13,9 @@ struct CalendarViewUIKit: UIViewRepresentable {
     @Binding var selectedDate: Date?
     var events: [DateComponents: [UIColor]] // Несколько событий на одну дату
     var canDeselectSameDate: Bool = true // Можно ли отменить выбор, нажав на ту же дату
+    
+    // Соотношение сторон для календаря (ширина:высота)
+    var aspectRatio: CGFloat = 0.9
 
     func makeUIView(context: Context) -> UICalendarView {
         let calendarView = UICalendarView()
@@ -102,7 +105,6 @@ struct CalendarViewUIKit: UIViewRepresentable {
             }
             
             guard let date = Calendar.current.date(from: dateComponents!) else {
-                print("❌ CalendarViewUIKit: не удалось создать дату из компонентов")
                 return
             }
             
@@ -111,13 +113,11 @@ struct CalendarViewUIKit: UIViewRepresentable {
                 if self.parent.canDeselectSameDate,
                    let currentSelectedDate = self.parent.selectedDate,
                    Calendar.current.isDate(currentSelectedDate, inSameDayAs: date) {
-                    print("🔄 CalendarViewUIKit: отмена выбора даты \(date)")
                     // Сбрасываем выбор в UI компоненте
                     selection.setSelected(nil, animated: true)
                     // Сбрасываем значение биндинга
                     self.parent.selectedDate = nil
                 } else {
-                    print("✅ CalendarViewUIKit: выбор новой даты \(date)")
                     // Устанавливаем новую дату
                     self.parent.selectedDate = date
                 }
@@ -186,6 +186,23 @@ struct CalendarViewUIKit: UIViewRepresentable {
     }
 }
 
+// Расширение для поддержки адаптивного размера
+extension CalendarViewUIKit {
+    func adaptiveHeight() -> some View {
+        GeometryReader { geometry in
+            self
+                .frame(maxWidth: .infinity)
+                .frame(height: geometry.size.width * aspectRatio)
+        }
+    }
+    
+    // Метод для установки фиксированной ширины 360 points
+    func fixedWidth(_ width: CGFloat = 360) -> some View {
+        self
+            .frame(width: width)
+            .frame(height: width * aspectRatio)
+    }
+}
 
 /// Пример использования календаря
 struct CustomCalendarView: View {
@@ -222,7 +239,6 @@ struct CustomCalendarView: View {
             .background(.green)
             CalendarViewUIKit(selectedDate: $selectedDate, events: markedDates2)
                 .tint(.mainRed)
-                .frame(height: 450)
         }
         .padding()
     }
@@ -230,5 +246,6 @@ struct CustomCalendarView: View {
 
 #Preview {
     CustomCalendarView(selectedDate: Date.now)
+    
 //        .background(.green)
 }
