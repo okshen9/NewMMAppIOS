@@ -22,109 +22,59 @@ struct SchedulerView: View {
                     if viewModel.isLoading == false {
                         VStack(alignment: .leading) {
                             // Календарь с возможностью снятия выбора
-                                CalendarViewUIKit(
-                                    selectedDate: $selectedDate,
-                                    events: viewModel.calendarComponetsItems,
-                                    canDeselectSameDate: true
-                                )
-                                .adaptiveHeight()
-                                .tint(Color.red)
-                                .padding(.top, 24)
+                            CalendarViewUIKit(
+                                selectedDate: $selectedDate,
+                                events: viewModel.calendarComponetsItems,
+                                canDeselectSameDate: true
+                            )
+                            .adaptiveHeight()
+                            .tint(Color.red)
+                            .frame(height: 500)
                             
                             // Легенда категорий
-                            VStack(alignment: .leading, spacing: 18) {
-                                // Типы событий и категории в одном блоке
-                                VStack(alignment: .leading, spacing: 12) {
-                                    Text("События и категории")
-                                        .font(.headline)
-                                        .foregroundColor(.primary)
-                                        .padding(.horizontal, 24)
-                                    
-                                    // Типы событий - компактно в одной строке
-                                    HStack(spacing: 16) {
-                                        HStack(spacing: 8) {
-                                            Circle()
-                                                .foregroundStyle(.green)
-                                                .frame(width: 12, height: 12)
-                                            Text("Цели")
-                                                .font(.subheadline)
-                                        }
-                                        
-                                        HStack(spacing: 8) {
-                                            Circle()
-                                                .foregroundStyle(Color.mainRed)
-                                                .frame(width: 12, height: 12)
-                                            Text("Платежи")
-                                                .font(.subheadline)
-                                        }
-                                    }
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text("События и категории")
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
                                     .padding(.horizontal, 24)
-                                }
                                 
-                                // Категории целей
-//                                if !viewModel.scheduleListItems.isEmpty {
-//                                    ScrollView(.horizontal, showsIndicators: false) {
-//                                        HStack(spacing: 8) {
-//                                            ForEach(categories, id: \.self) { category in
-//                                                Button(action: {
-//                                                    // Здесь можно добавить действие для фильтрации по категории
-//                                                }) {
-//                                                    HStack(spacing: 6) {
-//                                                        Circle()
-//                                                            .fill(category.color)
-//                                                            .frame(width: 10, height: 10)
-//                                                        Text(category.rawValue)
-//                                                            .font(.footnote)
-//                                                            .foregroundColor(.primary)
-//                                                    }
-//                                                    .padding(.vertical, 8)
-//                                                    .padding(.horizontal, 12)
-//                                                    .background(
-//                                                        RoundedRectangle(cornerRadius: 16)
-//                                                            .fill(Color(UIColor.secondarySystemBackground))
-//                                                    )
-//                                                }
-//                                                .buttonStyle(PlainButtonStyle())
-//                                            }
-//                                        }
-//                                        .padding(.horizontal, 24)
-//                                    }
-//                                    .padding(.top, 4)
-//                                }
-                            }
-                        }
-//                        .toolbar(content: {
-//                            Button(action: {
-//                                withAnimation {
-//                                    selectedDate = nil
-//                                    isDateSelected = false
-//                                }
-//                            }) {
-//                                HStack(spacing: 4) {
-//                                    Image(systemName: "calendar")
-//                                    Text("Все события")
-//                                }
-//                                .foregroundStyle(Color.mainRed)
-//                            }
-//                            .opacity(selectedDate == nil ? 0.5 : 1)
-//                            .disabled(selectedDate == nil)
-//                        })
-                        if !viewModel.scheduleListItems.isEmpty {
-                            Text("События")
-                                .font(.headline)
-                                .foregroundColor(.primary)
+                                // Типы событий - компактно в одной строке
+                                HStack(spacing: 16) {
+                                    HStack(spacing: 8) {
+                                        Circle()
+                                            .foregroundStyle(.green)
+                                            .frame(width: 12, height: 12)
+                                        Text("Цели")
+                                            .font(.subheadline)
+                                    }
+                                    
+                                    HStack(spacing: 8) {
+                                        Circle()
+                                            .foregroundStyle(Color.mainRed)
+                                            .frame(width: 12, height: 12)
+                                        Text("Платежи")
+                                            .font(.subheadline)
+                                    }
+                                }
                                 .padding(.horizontal, 24)
-                                .padding(.top, 8)
-                            
-                            eventList2()
-                                .padding()
-                            Spacer()
-                        } else {
-                            Spacer()
-                            Text("У вас нет событий")
-                                .font(.headline)
-                                .foregroundColor(.headerText)
-                            Spacer()
+                            }
+                            if !viewModel.scheduleListItems.isEmpty {
+                                Text("События")
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
+                                    .padding(.horizontal, 24)
+                                    .padding(.top, 8)
+                                
+                                eventList2()
+                                    .padding()
+                                Spacer()
+                            } else {
+                                Spacer()
+                                Text("У вас нет событий")
+                                    .font(.headline)
+                                    .foregroundColor(.headerText)
+                                Spacer()
+                            }
                         }
                     } else {
                         ShimmeringRectangle()
@@ -209,13 +159,13 @@ struct SchedulerView: View {
             }
         }
         
-        return Group {
+//        Group {
             if filteredEvents.isEmpty {
                 noEventsForSelectedDate
             } else {
                 eventsListContent(filteredEvents)
             }
-        }
+//        }
     }
     
     // MARK: - No Events View

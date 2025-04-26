@@ -22,6 +22,11 @@ struct CalendarViewUIKit: UIViewRepresentable {
         calendarView.locale = Locale(identifier: "ru_RU")
         calendarView.delegate = context.coordinator
         
+        // Улучшаем адаптивность компонента
+        calendarView.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        calendarView.setContentHuggingPriority(.defaultLow, for: .vertical)
+        calendarView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        
         // Создаем и настраиваем поведение выбора даты
         let selectionBehavior = UICalendarSelectionSingleDate(delegate: context.coordinator)
         selectionBehavior.setSelected(nil, animated: false)
@@ -192,7 +197,7 @@ extension CalendarViewUIKit {
         GeometryReader { geometry in
             self
                 .frame(maxWidth: .infinity)
-                .frame(height: geometry.size.width * aspectRatio)
+                .frame(height: 500)
         }
     }
     
@@ -201,6 +206,22 @@ extension CalendarViewUIKit {
         self
             .frame(width: width)
             .frame(height: width * aspectRatio)
+    }
+
+    // Метод для фиксированного размера, который действительно работает с UICalendarView
+    func constrainedSize(width: CGFloat = 360) -> some View {
+        let height = width * aspectRatio
+        
+        return GeometryReader { geometry in
+            // Используем ZStack с фиксированным размером, чтобы принудительно ограничить размер
+            ZStack {
+                self
+                    .fixedSize() // Важно: заставляет UIKit view соблюдать свои intrinsic размеры
+                    .frame(width: min(width, geometry.size.width), height: height)
+            }
+            .frame(width: min(width, geometry.size.width), height: height)
+        }
+        .frame(width: width, height: height)
     }
 }
 
@@ -238,6 +259,7 @@ struct CustomCalendarView: View {
             })
             .background(.green)
             CalendarViewUIKit(selectedDate: $selectedDate, events: markedDates2)
+                .constrainedSize(width: 360)
                 .tint(.mainRed)
         }
         .padding()
@@ -246,6 +268,34 @@ struct CustomCalendarView: View {
 
 #Preview {
     CustomCalendarView(selectedDate: Date.now)
-    
 //        .background(.green)
+}
+
+#Preview {
+    NavigationView {
+        SchedulerView(viewModel: SchedulerViewModel(
+            payRequest: [
+                PaymentRequestResponseDto(
+                    id: 1,
+                    externalId: 1,
+                    amount: 1500.0,
+                    dueDate: Date().toApiString,
+                    comment: "Оплата за консультацию",
+                    paymentRequestStatus: .wait,
+                    userProfilePreview: .getTestUser()
+                )
+            ],
+            targets: [
+                UserTargetDtoModel(
+                    id: 1,
+                    title: "Изучить SwiftUI",
+                    description: "Освоить основы SwiftUI и создать первое приложение",
+                    deadLineDateTime: Date().toApiString,
+                    targetStatus: .inProgress,
+                    category: .personal
+                )
+            ]
+        ))
+        .preferredColorScheme(.dark)
+    }
 }
