@@ -53,8 +53,9 @@ struct NewMMAppIOSApp: App {
 
                 // Установка начального состояния
                 let newState: AppStateService.AppState =
-                (UserRepository.shared.roles?.contains(Roles.user.rawValue)).orFalse ||
-                (UserRepository.shared.roles?.contains(Roles.admin.rawValue)).orFalse
+                ((UserRepository.shared.roles?.contains(Roles.user.rawValue)).orFalse ||
+                (UserRepository.shared.roles?.contains(Roles.admin.rawValue)).orFalse) &&
+                !UserRepository.shared.jwt.isEmptyOrNil && !UserRepository.shared.refreshJWT.isEmptyOrNil
                 ? .authorized : .unAuthorized
                 appStateService.setNewState(newState)
             }
