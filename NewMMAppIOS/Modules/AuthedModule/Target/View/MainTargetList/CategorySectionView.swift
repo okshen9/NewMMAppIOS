@@ -90,10 +90,10 @@ struct CategorySectionView: View {
         VStack(spacing: 16) {
             ForEach(targets) { target in
                 VStack {
-                    HStack(alignment: .firstTextBaseline, spacing: 12) {
+                    HStack(alignment: .top, spacing: 12) {
                         // Индикатор цели
                         indicatorTargetView(target)
-                            .offset(.init(width: 0, height: 10))
+                            .offset(.init(width: 0, height: 12))
 
                         // Основной контент цели
                         TargetRowView<TargetsViewModel>(

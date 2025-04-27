@@ -111,11 +111,9 @@ extension ImageSheduler {
                         .frame(width: 40, height: 40)
                     ImageSheduler(
                         event: CalendatItem(
-                            payment: nil,
-                            target: UserTargetDtoModel(targetStatus: .inProgress),
                             user: .getTestUser(),
                             title: "Цель в процессе",
-                            type: .target,
+                            type: .target(UserTargetDtoModel(targetStatus: .inProgress)),
                             date: Date(),
                             category: .family
                         ),
@@ -133,11 +131,9 @@ extension ImageSheduler {
                         .frame(width: 40, height: 40)
                     ImageSheduler(
                         event: CalendatItem(
-                            payment: PaymentRequestResponseDto(paymentRequestStatus: .wait),
-                            target: nil,
                             user: .getTestUser(),
                             title: "Платеж ожидает",
-                            type: .payment,
+                            type: .payment(PaymentRequestResponseDto(paymentRequestStatus: .wait)),
                             date: Date(),
                             category: nil
                         ),

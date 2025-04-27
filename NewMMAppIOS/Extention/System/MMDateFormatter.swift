@@ -278,19 +278,19 @@ final class MMDateFormatter {
         let pastSuffix = " назад"
         
         if let years = components.year, years > 0 {
-            let text = short ? "\(years) г." : "\(years) \(pluralize(years, singular: "год", plural: "года", pluralGenitive: "лет"))"
+            let text = short ? "\(years.ifMoreOne) г." : "\(years) \(pluralize(years, singular: "год", plural: "года", pluralGenitive: "лет"))"
             return isPast ? text + pastSuffix : futurePrefix + text
         } else if let months = components.month, months > 0 {
-            let text =  short ? "\(months) м." : "\(months) \(pluralize(months, singular: "месяц", plural: "месяца", pluralGenitive: "месяцев"))"
+            let text =  short ? "\(months.ifMoreOne) мес." : "\(months) \(pluralize(months, singular: "месяц", plural: "месяца", pluralGenitive: "месяцев"))"
             return isPast ? text + pastSuffix : futurePrefix + text
         } else if let days = components.day, days > 0 {
-            let text =  short ? "\(days) д." : "\(days) \(pluralize(days, singular: "день", plural: "дня", pluralGenitive: "дней"))"
+            let text =  short ? "\(days.ifMoreOne) дн." : "\(days) \(pluralize(days, singular: "день", plural: "дня", pluralGenitive: "дней"))"
             return isPast ? text + pastSuffix : futurePrefix + text
         } else if let hours = components.hour, hours > 0 {
-            let text =  short ? "\(hours) ч." : "\(hours) \(pluralize(hours, singular: "час", plural: "часа", pluralGenitive: "часов"))"
+            let text =  short ? "\(hours.ifMoreOne) ч." : "\(hours) \(pluralize(hours, singular: "час", plural: "часа", pluralGenitive: "часов"))"
             return isPast ? text + pastSuffix : futurePrefix + text
         } else if let minutes = components.minute, minutes > 0 {
-            let text =  short ? "\(minutes) м." : "\(minutes) \(pluralize(minutes, singular: "минута", plural: "минуты", pluralGenitive: "минут"))"
+            let text =  short ? "\(minutes.ifMoreOne) мин." : "\(minutes) \(pluralize(minutes, singular: "минута", plural: "минуты", pluralGenitive: "минут"))"
             return isPast ? text + pastSuffix : futurePrefix + text
         }
         

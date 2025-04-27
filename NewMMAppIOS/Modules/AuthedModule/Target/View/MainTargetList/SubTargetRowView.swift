@@ -40,7 +40,7 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            HStack {
+            HStack(alignment: .top) {
                 if isLoading {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle())
@@ -59,6 +59,7 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
                             .imageScale(.medium)
                     }
                     .buttonStyle(.plain)
+                    .padding(.top, 2)
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -66,6 +67,8 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
                         Text(subTarget.title.orEmpty)
                             .font(.system(size: 15, weight: .medium))
                             .foregroundColor(.headerText)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .lineLimit(2)
 
                         Spacer()
                     }
@@ -78,6 +81,7 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
                         Text((subTarget.deadLineDateTime?.dateFromApiString ?? Date.now).toDisplayString)
                             .font(.system(size: 13))
                             .foregroundColor(.gray)
+                            .lineLimit(1)
                     }
                 }
             }
@@ -87,9 +91,9 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
                     Text(description)
                         .font(.system(size: 13))
                         .foregroundColor(.secondary)
-//                        .padding(10)
                         .frame(maxWidth: .infinity, alignment: .leading)
-//                        .background(Color(.systemGray6))
+                        .fixedSize(horizontal: false, vertical: true)
+                        .lineLimit(nil)
                         .cornerRadius(6)
                         .padding(.leading, 32)
                         .transition(.opacity.combined(with: .move(edge: .top)))

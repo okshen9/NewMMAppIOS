@@ -13,6 +13,9 @@ struct EventRowView: View {
     @State private var isExpanded = false
 
     var body: some View {
+        let subTargets = event.target?.subTargets
+        let description = event.target?.description
+        
         VStack(alignment: .leading, spacing: 0) {
             // Основная информация о событии
             Button(action: {
@@ -20,7 +23,7 @@ struct EventRowView: View {
                     isExpanded.toggle()
                 }
             }) {
-                HStack(alignment: .top, spacing: 12) {
+                HStack(alignment: .top, spacing: 8) {
                     // Иконка события
                     eventIconView
                         .padding(.top, 2)
@@ -30,27 +33,30 @@ struct EventRowView: View {
                         Text(event.title)
                             .font(.subheadline.weight(.medium))
                             .foregroundColor(.primary)
-//                            .lineLimit(2)
+                            .lineLimit(isExpanded ? nil : 3)
                             .fixedSize(horizontal: false, vertical: true)
                         
                         // Компактная информация о событии
                         HStack {
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 8) {
+//                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 4) {
                                     if let category = event.category {
                                         categoryLabel(category)
                                     }
                                     
-                                    if let amount = event.payment?.amount, event.type == .payment {
+                                    if let amount = event.payment?.amount,
+                                        case .payment(_) = event.type
+                                    {
                                         paymentLabel(amount)
                                     }
                                     
-                                    if event.type == .target, let subTargets = event.target?.subTargets, !subTargets.isEmpty {
+                                    if case .target(_) = event.type, let subTargets = event.target?.subTargets, !subTargets.isEmpty {
                                         subtasksLabel(subTargets)
                                     }
                                 }
                                 .padding(.vertical, 2)
-                            }
+//                            }
+//                            .frame(maxWidth: .infinity, alignment: .leading)
                             .mask(
                                 LinearGradient(
                                     gradient: Gradient(colors: [Color.black, Color.black, Color.black.opacity(0.8)]),
@@ -59,8 +65,8 @@ struct EventRowView: View {
                                 )
                             )
                             
-                            if event.type == .target, let target = event.target, 
-                               (target.description != nil && !target.description.isEmptyOrNil) || 
+                            if case .target(_) = event.type, let target = event.target, 
+                               (target.description != nil && !target.description.isEmptyOrNil) ||
                                (target.subTargets != nil && !target.subTargets!.isEmpty) {
                                 Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                                     .font(.caption)
@@ -82,9 +88,9 @@ struct EventRowView: View {
             .padding(.vertical, 12)
             
             // Дополнительная информация при развороте
-            if isExpanded,
-               let subTargets = event.target?.subTargets, !subTargets.isEmpty,
-               let description = event.target?.description, !description.isEmptyOrNil
+            if isExpanded &&
+                ((!subTargets.isEmptyOrNil) ||
+               (!description.isEmptyOrNil))
             {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 8) {
@@ -178,7 +184,7 @@ struct EventRowView: View {
                                             Text(desc)
                                                 .font(.caption2)
                                                 .foregroundColor(.secondary)
-                                                .lineLimit(2)
+                                                .lineLimit(3)
                                                 .fixedSize(horizontal: false, vertical: true)
                                         }
                                     }
@@ -371,7 +377,9 @@ extension Optional where Wrapped == String {
 
 #Preview {
     let item = CalendatItem(
-        payment: .init(
+        user: .getTestUser(),
+        title: "Оплата курса наставничества",
+        type: .payment(.init(
             id: 12,
             externalId: 11,
             amount: 100.0,
@@ -379,46 +387,39 @@ extension Optional where Wrapped == String {
             comment: "надо оплатить",
             paymentRequestStatus: PaymentRequestStatus.wait,
             userProfilePreview: UserProfileResultDto.getTestUser()
-        ),
-        target: .getBaseTarget(),
-        user: .getTestUser(),
-        title: "Оплата курса наставничества",
-        type: .payment,
+        )),
         date: Date(),
         category: nil
     )
-    
-    VStack {
-        EventRowView(event: item)
+    ScrollView {
+        VStack {
+            EventRowView(event: item)
+                .padding()
+                .background(Color.white)
+                .cornerRadius(8)
+            
+            EventRowView(event: CalendatItem(
+                user: .getTestUser(),
+                title: "3.Собрал команду в корпоративной практике - подписал трудовые договоры с новыми сотрудниками (ведущий юрист, юрист, руководитель отдела) до 12.05.2025",
+                type: .target(.getBaseTarget(withOutSub: true, withOutDesc: true)),
+                date: Date().addingTimeInterval(86400), // Tomorrow
+                category: .money
+            ))
             .padding()
             .background(Color.white)
             .cornerRadius(8)
-        
-        EventRowView(event: CalendatItem(
-            payment: nil,
-            target: .getBaseTarget(),
-            user: .getTestUser(),
-            title: "Закрыть цель: Прочитать книгу по SwiftUI",
-            type: .target,
-            date: Date().addingTimeInterval(86400), // Tomorrow
-            category: .money
-        ))
+            
+            EventRowView(event: CalendatItem(
+                user: .getTestUser(),
+                title: "Закрыть цель: Пробежать 5 км",
+                type: .target(.getBaseTarget()),
+                date: Date().addingTimeInterval(172800 * 10), // Day after tomorrow
+                category: .health
+            ))
+            .padding()
+            .background(Color.white)
+            .cornerRadius(8)
+        }
         .padding()
-        .background(Color.white)
-        .cornerRadius(8)
-        
-        EventRowView(event: CalendatItem(
-            payment: nil,
-            target: .getBaseTarget(),
-            user: .getTestUser(),
-            title: "Закрыть цель: Пробежать 5 км",
-            type: .target,
-            date: Date().addingTimeInterval(172800 * 10), // Day after tomorrow
-            category: .health
-        ))
-        .padding()
-        .background(Color.white)
-        .cornerRadius(8)
     }
-    .padding()
 }

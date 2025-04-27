@@ -208,8 +208,8 @@ struct SchedulerView: View {
             Divider()
                 .padding(.horizontal)
             
-            // Список событий
-            VStack(spacing: 4) {
+            // Список событий с оптимизированным лейаутом
+            VStack(spacing: 8) {
                 ForEach(events) { event in
                     EventRowView(event: event)
                         .padding(.horizontal)

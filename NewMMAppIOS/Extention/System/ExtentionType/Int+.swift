@@ -9,6 +9,10 @@ import Foundation
 
 extension Int {
     var toString: String { .init(self) }
+    
+    var ifMoreOne: String {
+        return self > 1 ? String(self) : ""
+    }
 }
 
 public extension Int {

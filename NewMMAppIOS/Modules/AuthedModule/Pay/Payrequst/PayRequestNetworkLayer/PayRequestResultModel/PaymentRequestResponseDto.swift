@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct PaymentRequestResponseDto: Codable {
+struct PaymentRequestResponseDto: Codable, Equatable {
     let id: Int?
     let externalId: Int?
     let amount: Double?

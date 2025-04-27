@@ -47,11 +47,13 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 //                }
 //            }) {
                 VStack(alignment: .leading, spacing: 6) {
-                    HStack {
+                    HStack(alignment: .top) {
                         Text(target.title.orEmpty)
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundColor(.headerText)
                             .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .lineLimit(3)
 
                         Spacer()
                         if let subTargets = target.subTargets,
@@ -61,6 +63,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
                             Image(systemName: showDescription ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
                                 .foregroundColor(.gray)
                                 .imageScale(.small)
+                                .padding(.top, 2)
                         }
                     }
 
@@ -73,6 +76,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
                         Text((target.deadLineDateTime?.dateFromApiString ?? Date.now).toDisplayString)
                             .font(.system(size: 14))
                             .foregroundColor(.gray)
+                            .lineLimit(1)
 
                         if let percentage = target.percentage, percentage > 0 {
                             Spacer()
@@ -103,9 +107,9 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
                     Text(description)
                         .font(.system(size: 14))
                         .foregroundColor(.secondary)
-//                        .padding(12)
                         .frame(maxWidth: .infinity, alignment: .leading)
-//                        .background(Color(.systemGray6))
+                        .fixedSize(horizontal: false, vertical: true)
+                        .lineLimit(nil)
                         .cornerRadius(8)
                 }
 

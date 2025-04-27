@@ -16,8 +16,16 @@ struct CalendatItem: Identifiable, Equatable {
     
     var id = UUID()
 
-    let payment: PaymentRequestResponseDto?
-    let target: UserTargetDtoModel?
+    var payment: PaymentRequestResponseDto? {
+        if case let .payment(payment) = type {
+            return payment
+        } else { return nil }
+    }
+    var target: UserTargetDtoModel? {
+        if case let .target(target) = type {
+            return target
+        } else { return nil }
+    }
 
     let user: UserProfileResultDto
     let title: String
@@ -26,8 +34,8 @@ struct CalendatItem: Identifiable, Equatable {
     let category: TargetCategory?
     
     enum CalendatItemType: Equatable {
-        case payment
-        case target
+        case payment(PaymentRequestResponseDto)
+        case target(UserTargetDtoModel)
         case anyEvent(String?)
         
         var name: String {

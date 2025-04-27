@@ -122,7 +122,7 @@ extension UserTargetDtoModel: Equatable {
 
 
 extension UserTargetDtoModel {
-    static func getBaseTarget() -> UserTargetDtoModel {
+    static func getBaseTarget(withOutSub: Bool = false, withOutDesc: Bool = false) -> UserTargetDtoModel {
         let subTargets = [
             UserSubTargetDtoModel(
                 id: 32,
@@ -139,7 +139,7 @@ extension UserTargetDtoModel {
             UserSubTargetDtoModel(
                 id: 33,
                 title: "sddfsdfdsf",
-                description: nil,
+                description: "длинное описание 3.Собрал команду в корпоративной практике - подписал трудовые договоры с новыми сотрудниками (ведущий юрист, юрист, руководитель отдела) до 12.05.2025",
                 subTargetPercentage: 50,
                 targetSubStatus: .notDone,
                 rootTargetId: 45,
@@ -153,13 +153,13 @@ extension UserTargetDtoModel {
         return UserTargetDtoModel(
             id: 45,
             title: "sfsdfsdfsdf",
-            description: "sdfsdfsdf",
+            description: withOutDesc ? nil : "длинное описание Цели 3.Собрал команду в корпоративной практике - подписал трудовые договоры с новыми сотрудниками (ведущий юрист, юрист, руководитель отдела) до 12.05.2025",
             userExternalId: 11,
             percentage: 0,
             deadLineDateTime: "2025-03-31T23:59:59.999",
             streamId: nil,
             targetStatus: .inProgress,
-            subTargets: subTargets,
+            subTargets: withOutSub ? nil : subTargets,
             isDeleted: false,
             creationDateTime: "2025-03-29T16:45:24.752155",
             lastUpdatingDateTime: nil,

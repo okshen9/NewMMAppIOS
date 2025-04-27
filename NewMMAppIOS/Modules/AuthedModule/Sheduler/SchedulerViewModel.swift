@@ -101,7 +101,7 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
             let title = payMent.comment.isEmptyOrNil ? "Оплата" : payMent.comment.orEmpty
             
             var currentScheduleListItems = rawTempScheduleListItems[startOfDay] ?? []
-            currentScheduleListItems.append(.init(payment: payMent, target: nil, user: user, title: title, type: .payment, date: dateOfPay, category: nil))
+            currentScheduleListItems.append(.init(user: user, title: title, type: .payment(payMent), date: dateOfPay, category: nil))
             rawTempScheduleListItems[startOfDay] = currentScheduleListItems
         })
         
@@ -130,7 +130,7 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
             }
             
             var eventsCurrent = rawTempScheduleListItems[startOfDay] ?? []
-            eventsCurrent.append(.init(payment: nil, target: targetWithDetails, user: user, title: title, type: .target, date: deadlineDate, category: category))
+            eventsCurrent.append(.init(user: user, title: title, type: .target(targetWithDetails), date: deadlineDate, category: category))
             rawTempScheduleListItems[startOfDay] = eventsCurrent
         })
         
@@ -148,9 +148,9 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
             
             // Проверяем типы событий
             for event in events {
-                if event.type == .payment {
+                if case .payment = event.type  {
                     hasPayment = true
-                } else if event.type == .target {
+                } else if case .target = event.type {
                     hasTarget = true
                 }
             }
