@@ -15,10 +15,12 @@ struct PhoneNumberTextField: View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Номер телефона")
                 .font(.headline)
-            TextField("+7 (XXX) XXX-XX-XX", text: $phoneNumber)
+                .foregroundColor(Color.headerText)
+            TextField("+X (XXX) XXX-XX-XX", text: $phoneNumber)
 
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .keyboardType(.phonePad)
+                .foregroundColor(Color.headerText)
                 .onChange(of: phoneNumber) { newValue in
                     phoneNumber = formatPhoneNumber(newValue)
                 }

@@ -61,7 +61,7 @@ struct ProfileInfoView: View {
                             Text("Сохранить")
                                 .frame(maxWidth: .infinity)
                                 .padding()
-                                .background(viewModel.isValid ? Color.mainRed : Color.gray.opacity(0.8))
+                                .background(Color.mainRed)
                                 .foregroundColor(.white)
                                 .cornerRadius(16)
                         } else {
@@ -72,7 +72,7 @@ struct ProfileInfoView: View {
                             .padding(4)
                         }
                     }
-//                    .disabled(!viewModel.isValid)
+                    .disabled(!viewModel.isValid)
 
                 }
                 .padding()
