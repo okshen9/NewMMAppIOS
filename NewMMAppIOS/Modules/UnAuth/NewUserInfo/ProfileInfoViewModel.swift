@@ -59,8 +59,8 @@ class ProfileInfoViewModel: ObservableObject {
             errors["about"] =  userProfile.about.isEmpty || userProfile.about.count > 3 ? nil : "Поле 'О себе' не может быть 3 символов"
             errors["phoneNumber"] =  (userProfile.phoneNumber.isEmpty || isValidPhoneNumber(userProfile.phoneNumber))  ? nil : "Некорректный номер телефона"
             
+            // поля не должны быть пустыми
             let anyEmpty = userProfile.firstName.isEmpty || userProfile.telegramUsername.isEmpty || userProfile.occupation.isEmpty || userProfile.city.isEmpty || userProfile.about.isEmpty || userProfile.phoneNumber.isEmpty
-            
             isValid = errors.isEmpty && !anyEmpty
         }
         

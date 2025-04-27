@@ -25,7 +25,9 @@ struct ValidatedTextField: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.headline)
+                .foregroundStyle(Color.headerText)
             TextField("", text: $text)
+                .foregroundColor(Color.headerText)
                 .textFieldStyle(.roundedBorder)
                 .disabled(!canEdit) // Блокировка поля
             if let error = error {

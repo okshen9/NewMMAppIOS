@@ -41,21 +41,6 @@ struct ProfileView: View {
         .onAppear {
             viewModel.onApper()
         }
-        //            .onChange(of: viewModel.navigationPath) { navPathOld, navPathNew in
-        //                switch navPathNew {
-        //                case .toTarget:
-        //
-        //                }
-        ////                switch navPathNew {
-        ////                case .authView:
-        ////                    break
-        ////                case .toInfoView:
-        ////                    let authUser = UserRepository.shared.authUser?.authUserDto
-        ////                    navigationManager.navigate(to: .signup(profileModel: nil, authModel: authUser))
-        ////                case .toMinView:
-        ////                    appStateServise.setNewState(.authorized)
-        ////                }
-        //            }
         .ignoresSafeArea(edges: .top)
         
     }
@@ -498,5 +483,8 @@ extension ProfileView {
 }
 
 #Preview("tabView") {
-    ProfileView().profileTabs(profile: UserProfileResultDto.getTestUser())
+//    ProfileView().profileTabs(profile: UserProfileResultDto.getTestUser())
+    NavigationStack {
+        ProfileView().contentState(profile: UserProfileResultDto.getTestUser())
+    }
 }

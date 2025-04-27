@@ -16,12 +16,14 @@ struct ValidatedTextEditor: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.headline)
+                .foregroundColor(Color.headerText)
             TextEditor(text: $text)
+                .foregroundColor(Color.headerText)
                 .frame(height: 100)
                 .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray, lineWidth: 1))
             if let error = error {
                 Text(error)
-                    .foregroundColor(.red)
+                    .foregroundColor(.headerText)
                     .font(.caption)
             }
         }
@@ -29,5 +31,6 @@ struct ValidatedTextEditor: View {
 }
 
 #Preview {
-    ValidatedTextEditor(title: "test", text: .constant(""), error: "error")
+    @Previewable @State var text = "wed"
+    ValidatedTextEditor(title: "test", text: $text, error: "error")
 }
