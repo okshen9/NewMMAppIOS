@@ -51,7 +51,9 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
             let externalId = userRepository.externalId ?? -1
             guard let targets = try await serviceNetwork.getUserTargets(externalId: externalId).userTargets,
                   let paymant = try await serviceNetwork.getPaymentPlan(id: externalId)
-            else { return }
+            else {
+                return
+            }
             let items = prepereScheduleListItems(paymant: paymant, targets: targets)
             await updateUI(scheduleListItems: items.scheduleListItems, calendarItems: items.calendarItems)
         } catch {
@@ -94,46 +96,77 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
 
             // Используем startOfDay для группировки по дням
             let startOfDay = Calendar.current.startOfDay(for: dateOfPay)
-            let componentOfPay = startOfDay.dateComponentsFor()
+            let dateComponents = startOfDay.dateComponentsFor([.year, .month, .day])
             
-            let name = "Оплата \(payMent.amount ?? 0.0) ₽"
+            let title = payMent.comment.isEmptyOrNil ? "Оплата" : payMent.comment.orEmpty
             
             var currentScheduleListItems = rawTempScheduleListItems[startOfDay] ?? []
-            currentScheduleListItems.append(.init(payment: payMent, target: nil, user: user, title: name, type: .payment, date: dateOfPay, category: nil))
+            currentScheduleListItems.append(.init(payment: payMent, target: nil, user: user, title: title, type: .payment, date: dateOfPay, category: nil))
             rawTempScheduleListItems[startOfDay] = currentScheduleListItems
         })
         
         // Обработка целей
         targets.forEach({ target in
-            guard let component = target.deadLineDateTime?.dateFromStringISO8601,
-                  var user = userRepository.userProfile
+            guard let deadlineDate = target.deadLineDateTime?.dateFromStringISO8601,
+                  let user = userRepository.userProfile ?? userPreview
             else { return }
             
             // Используем startOfDay для группировки по дням
-            let startOfDay = Calendar.current.startOfDay(for: component)
+            let startOfDay = Calendar.current.startOfDay(for: deadlineDate)
             
-            let name = "Дедлайн цели: \(target.title ?? "Цель без названия")"
-            var enetsCurrent = rawTempScheduleListItems[startOfDay] ?? []
-            enetsCurrent.append(.init(payment: nil, target: target, user: user, title: name, type: .target, date: component, category: target.category))
-            rawTempScheduleListItems[startOfDay] = enetsCurrent
+            // Определяем категорию
+            let category = target.category
+            
+            let title = "Цель: \(target.title ?? "Без названия")"
+            
+            // Создаем копию модели цели с полным списком подцелей для отображения
+            var targetWithDetails = target
+            
+            // Отфильтровываем только необходимые подцели (если нужна дополнительная логика фильтрации)
+            if let subTargets = targetWithDetails.subTargets {
+                // Здесь можно добавить фильтрацию подцелей по статусу, если необходимо
+                // Например, только невыполненные или с близким дедлайном
+                targetWithDetails.subTargets = subTargets
+            }
+            
+            var eventsCurrent = rawTempScheduleListItems[startOfDay] ?? []
+            eventsCurrent.append(.init(payment: nil, target: targetWithDetails, user: user, title: title, type: .target, date: deadlineDate, category: category))
+            rawTempScheduleListItems[startOfDay] = eventsCurrent
         })
-        
-        // Уже сгруппировали по дням, поэтому дополнительная группировка не нужна
-        let tempScheduleListItems = rawTempScheduleListItems
         
         // Создаем данные для отметок в календаре
         var tempCalendar = [DateComponents: [UIColor]]()
-        let calendarItemsByDay = rawTempScheduleListItems.mapValues { events in
-            events.map { $0.type.color }
-        }
         
-        // Преобразуем даты в компоненты для календаря
-        for (date, colors) in calendarItemsByDay {
+        // Группируем события по дням для календаря
+        for (date, events) in rawTempScheduleListItems {
             let dateComponents = date.dateComponentsFor([.year, .month, .day])
+            
+            // Отдельные цвета для платежей и целей
+            var hasPayment = false
+            var hasTarget = false
+            var colors: [UIColor] = []
+            
+            // Проверяем типы событий
+            for event in events {
+                if event.type == .payment {
+                    hasPayment = true
+                } else if event.type == .target {
+                    hasTarget = true
+                }
+            }
+            
+            // Добавляем цвета в порядке приоритета
+            if hasPayment {
+                colors.append(UIColor(Color.mainRed))
+            }
+            if hasTarget {
+                colors.append(UIColor.systemGreen)
+            }
+            
             tempCalendar[dateComponents] = colors
         }
         
-        return (tempScheduleListItems, tempCalendar)
+        return (rawTempScheduleListItems, tempCalendar)
     }
 }
 

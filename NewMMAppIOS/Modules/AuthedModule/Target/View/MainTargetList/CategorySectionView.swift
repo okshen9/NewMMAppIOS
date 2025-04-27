@@ -164,12 +164,18 @@ struct CategorySectionView: View {
     
     // Получение иконки для цели
     private func getTargetIcon(for target: UserTargetDtoModel) -> String {
-        if (target.percentage ?? 0) >= 100 {
-            return "checkmark"
-        } else if (target.percentage ?? 0) > 0 {
-            return "arrow.up.right"
+        guard let status = target.targetStatus else { return "star" }
+        
+        switch status {
+        case .inProgress:
+            return "star"
+        case .done, .doneExpired:
+            return "star.fill"
+        case .expired:
+            return "exclamationmark.circle"
+        default:
+            return "star"
         }
-        return "flag"
     }
 }
 

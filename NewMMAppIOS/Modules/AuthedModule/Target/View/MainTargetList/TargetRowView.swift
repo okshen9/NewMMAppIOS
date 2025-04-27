@@ -65,7 +65,8 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
                     }
 
                     HStack(spacing: 8) {
-                        Image(systemName: "calendar")
+                        // Используем иконку календаря из AppIcons
+                        AppIcons.calendar
                             .foregroundColor(.gray)
                             .imageScale(.small)
 

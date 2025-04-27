@@ -42,7 +42,7 @@ struct SchedulerView: View {
                                 HStack(spacing: 16) {
                                     HStack(spacing: 8) {
                                         Circle()
-                                            .foregroundStyle(.green)
+                                            .foregroundStyle(Color.green)
                                             .frame(width: 12, height: 12)
                                         Text("Цели")
                                             .font(.subheadline)

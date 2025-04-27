@@ -24,35 +24,15 @@ struct ImageSheduler: View {
 
     @ViewBuilder
     func getTargetImage() -> some View {
-        if let status = event.target?.targetStatus {
-            switch status {
-            case .inProgress:
-                Constants.targetInProgressImage
-                    .renderingMode(.template)
-                    .foregroundStyle(.green)
-                    .font(font)
-                    .symbolRenderingMode(.hierarchical)
-            case .done:
-                Constants.targetDoneImage
-                    .renderingMode(.template)
-                    .foregroundStyle(.green)
-                    .font(font)
-                    .symbolRenderingMode(.hierarchical)
-            case .expired:
-                Constants.targetExpiredImage
-                    .renderingMode(.template)
-                    .foregroundStyle(.orange)
-                    .font(font)
-                    .symbolRenderingMode(.hierarchical)
-            default:
-                Constants.targetDefaultImage
-                    .renderingMode(.template)
-                    .foregroundStyle(.green)
-                    .font(font)
-                    .symbolRenderingMode(.hierarchical)
-            }
+        // Используем иконки из централизованного AppIcons
+        if let target = event.target, let status = target.targetStatus {
+            AppIcons.Target.icon(for: status)
+                .renderingMode(.template)
+                .foregroundStyle(AppIcons.Target.color(for: status))
+                .font(font)
+                .symbolRenderingMode(.hierarchical)
         } else {
-            Constants.targetDefaultImage
+            AppIcons.Target.defaultIcon
                 .renderingMode(.template)
                 .foregroundStyle(.green)
                 .font(font)
@@ -62,31 +42,17 @@ struct ImageSheduler: View {
 
     @ViewBuilder
     func getPaymentImage() -> some View {
+        // Используем иконки из централизованного AppIcons
         if let status = event.payment?.paymentRequestStatus {
-            switch status {
-            case .wait:
-                Constants.paymentWaitingImage
-                    .renderingMode(.template)
-                    .foregroundStyle(.red)
-                    .font(font)
-                    .symbolRenderingMode(.hierarchical)
-            case .canceled:
-                Constants.paymentCancelledImage
-                    .renderingMode(.template)
-                    .foregroundStyle(.red)
-                    .font(font)
-                    .symbolRenderingMode(.hierarchical)
-            default:
-                Constants.paymentDefaultImage
-                    .renderingMode(.template)
-                    .foregroundStyle(.red)
-                    .font(font)
-                    .symbolRenderingMode(.hierarchical)
-            }
-        } else {
-            Constants.paymentDefaultImage
+            AppIcons.Payment.icon(for: status)
                 .renderingMode(.template)
-                .foregroundStyle(.red)
+                .foregroundStyle(AppIcons.Payment.color(for: status))
+                .font(font)
+                .symbolRenderingMode(.hierarchical)
+        } else {
+            AppIcons.Payment.defaultIcon
+                .renderingMode(.template)
+                .foregroundStyle(Color.mainRed)
                 .font(font)
                 .symbolRenderingMode(.hierarchical)
         }
@@ -94,7 +60,8 @@ struct ImageSheduler: View {
     
     @ViewBuilder
     func getDefaultEventImage() -> some View {
-        Constants.defaultEventImage
+        // Используем комбинированную иконку из AppIcons
+        AppIcons.combined
             .renderingMode(.template)
             .foregroundStyle(.blue)
             .font(font)
@@ -107,18 +74,18 @@ extension ImageSheduler {
         // Целевые иконки
         static let targetDefaultImage = Image(systemName: "star.fill")
         static let targetInProgressImage = Image(systemName: "star.fill")
-        static let targetDoneImage = Image(systemName: "checkmark.circle.fill")
-        static let targetExpiredImage = Image(systemName: "exclamationmark.circle.fill")
+        static let targetDoneImage = Image(systemName: "star.fill")
+        static let targetExpiredImage = Image(systemName: "star.fill")
         
 
         // Иконки платежей
         static let paymentDefaultImage = Image(systemName: "creditcard.fill")
         static let paymentWaitingImage = Image(systemName: "creditcard.fill")
-        static let paymentCompletedImage = Image(systemName: "checkmark.circle.fill")
-        static let paymentCancelledImage = Image(systemName: "xmark.circle.fill")
+        static let paymentCompletedImage = Image(systemName: "creditcard.fill")
+        static let paymentCancelledImage = Image(systemName: "creditcard.fill")
         
         // Остальные иконки
-        static let defaultEventImage = Image(systemName: "calendar.badge")
+        static let defaultEventImage = Image(systemName: "calendar.badge.exclamationmark")
         
         // Устаревшие иконки (оставлены для обратной совместимости)
         static let xmarkImage = Image(systemName: "xmark.circle.fill")

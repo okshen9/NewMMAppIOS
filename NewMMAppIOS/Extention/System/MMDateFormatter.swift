@@ -258,7 +258,7 @@ final class MMDateFormatter {
     /// Форматирует дату в относительный строковый формат (например, "3 дня назад" или "через 5 дней")
     /// - Parameter date: Дата для форматирования
     /// - Returns: Строка, показывающая сколько времени прошло или осталось до даты
-    static func relativeTimeString(from date: Date) -> String {
+    static func relativeTimeString(from date: Date, _ short: Bool) -> String {
         let now = Date()
         let calendar = Calendar.current
         
@@ -278,19 +278,19 @@ final class MMDateFormatter {
         let pastSuffix = " назад"
         
         if let years = components.year, years > 0 {
-            let text = "\(years) \(pluralize(years, singular: "год", plural: "года", pluralGenitive: "лет"))"
+            let text = short ? "\(years) г." : "\(years) \(pluralize(years, singular: "год", plural: "года", pluralGenitive: "лет"))"
             return isPast ? text + pastSuffix : futurePrefix + text
         } else if let months = components.month, months > 0 {
-            let text = "\(months) \(pluralize(months, singular: "месяц", plural: "месяца", pluralGenitive: "месяцев"))"
+            let text =  short ? "\(months) м." : "\(months) \(pluralize(months, singular: "месяц", plural: "месяца", pluralGenitive: "месяцев"))"
             return isPast ? text + pastSuffix : futurePrefix + text
         } else if let days = components.day, days > 0 {
-            let text = "\(days) \(pluralize(days, singular: "день", plural: "дня", pluralGenitive: "дней"))"
+            let text =  short ? "\(days) д." : "\(days) \(pluralize(days, singular: "день", plural: "дня", pluralGenitive: "дней"))"
             return isPast ? text + pastSuffix : futurePrefix + text
         } else if let hours = components.hour, hours > 0 {
-            let text = "\(hours) \(pluralize(hours, singular: "час", plural: "часа", pluralGenitive: "часов"))"
+            let text =  short ? "\(hours) ч." : "\(hours) \(pluralize(hours, singular: "час", plural: "часа", pluralGenitive: "часов"))"
             return isPast ? text + pastSuffix : futurePrefix + text
         } else if let minutes = components.minute, minutes > 0 {
-            let text = "\(minutes) \(pluralize(minutes, singular: "минута", plural: "минуты", pluralGenitive: "минут"))"
+            let text =  short ? "\(minutes) м." : "\(minutes) \(pluralize(minutes, singular: "минута", plural: "минуты", pluralGenitive: "минут"))"
             return isPast ? text + pastSuffix : futurePrefix + text
         }
         
@@ -500,10 +500,11 @@ extension String {
     
     /// Влзвращает дату из строки "2024-02-01T21:24:23.999"
     var dateFromApiString: Date? {
-        return MMDateFormatter.date(from: self,
-                                    withConfigurator: .init(dateFormat: .apiFullDateFormat,
-                                                            locale: .rus,
-                                                            timeZone: .init(identifier: "Europe/Moscow")))
+//        return MMDateFormatter.date(from: self,
+//                                    withConfigurator: .init(dateFormat: .apiFullDateFormat,
+//                                                            locale: .rus,
+//                                                            timeZone: .init(identifier: "Europe/Moscow")))
+        return self.dateFromStringISO8601
     }
     
     var dateFromStringISO8601: Date? {
@@ -551,8 +552,8 @@ extension Date {
     }
     
     /// Относительное время (например, "3 дня назад" или "через 5 дней")
-    var relativeTimeString: String {
-        return MMDateFormatter.relativeTimeString(from: self)
+    func relativeTimeString(short: Bool = true) -> String {
+        return MMDateFormatter.relativeTimeString(from: self, short)
     }
     
     /// Компонетны даты DateComponents [.year, .month, .day]

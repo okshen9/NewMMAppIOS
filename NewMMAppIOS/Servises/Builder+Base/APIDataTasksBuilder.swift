@@ -161,20 +161,29 @@ extension APIDataTasksBuilder {
             return (data as! T, httpResponse.allHeaderFields)
         }
         
+        let jsonString = String(data: data, encoding: .utf8) ?? "<не удалось сконвертировать в строку>"
+        print("🟢 PAYPLAN JSON: \(jsonString)")
+        
         do {
             let responseObject = try decoder.decode(T.self, from: data)
             return (responseObject, httpResponse.allHeaderFields)
-        } catch {
-            print("Neshko responseObject Error: \(error) ")
+        } catch let error as DecodingError {
+            switch error {
+            case .keyNotFound(let key, let context):
+                print("❌ Key '\(key.stringValue)' not found: \(context.debugDescription), path: \(context.codingPath)")
+            case .typeMismatch(let type, let context):
+                print("❌ Type '\(type)' mismatch: \(context.debugDescription), path: \(context.codingPath)")
+            case .valueNotFound(let type, let context):
+                print("❌ Value '\(type)' not found: \(context.debugDescription), path: \(context.codingPath)")
+            case .dataCorrupted(let context):
+                print("❌ Data corrupted: \(context.debugDescription), path: \(context.codingPath)")
+            @unknown default:
+                print("❌ Unknown decoding error: \(error)")
+            }
             throw APIError.responseObject
-            //            let mapError = ResponseError.mapping(
-            //                response: httpResponse,
-            //                error: error,
-            //                stringData: String(data: data, encoding: .utf8) ?? ""
-            //            )
-            //
-            //            debugErrorHandler.error = mapError
-            //            throw mapError
+        } catch {
+            print("❌ Other error: \(error)")
+            throw APIError.responseObject
         }
     }
     

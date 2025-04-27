@@ -62,16 +62,52 @@ struct CalendarViewUIKit: UIViewRepresentable {
         }
 
         func calendarView(_ calendarView: UICalendarView, decorationFor dateComponents: DateComponents) -> UICalendarView.Decoration? {
-            let calendar = Calendar.current
-            
             // Ищем совпадающие метки событий для текущего дня
             guard let colors = findEventColors(for: dateComponents) else {
                 return nil
             }
-
-            // Генерация иконки с цветными точками
-            let image = generateMultiStripeImage(colors: colors)
-            return .image(image)
+            
+            // Если есть хоть одно событие, используем декорацию с иконкой
+            if !colors.isEmpty {
+                return .customView {
+                    let iconContainer = UIView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
+                    
+                    // Проверяем какие типы событий присутствуют
+                    let hasPayment = colors.contains { $0 == UIColor(Color.mainRed) }
+                    let hasTarget = colors.contains { $0 == UIColor.systemGreen }
+                    
+                    // Выбираем иконку на основе типов событий и соответствующий цвет
+                    var iconImageName = "circle.fill"
+                    var iconColor = UIColor.gray
+                    
+                    if hasPayment && hasTarget {
+                        // Есть и платеж и цель - используем комбинированную иконку из AppIcons
+                        iconImageName = "calendar.badge.exclamationmark" // Соответствует AppIcons.combined
+                        iconColor = UIColor(Color.mainRed) // Приоритет у платежей
+                    } else if hasPayment {
+                        // Только платеж - используем иконку платежа из AppIcons
+                        iconImageName = "creditcard.fill" // Соответствует AppIcons.Payment.default
+                        iconColor = UIColor(Color.mainRed)
+                    } else if hasTarget {
+                        // Только цель - используем иконку цели из AppIcons
+                        iconImageName = "star.fill" // Соответствует AppIcons.Target.completed
+                        iconColor = UIColor.systemGreen
+                    }
+                    
+                    // Создаем иконку
+                    let iconImage = UIImage(systemName: iconImageName)
+                    let iconView = UIImageView(image: iconImage)
+                    iconView.tintColor = iconColor
+                    iconView.contentMode = .scaleAspectFit
+                    iconView.frame = iconContainer.bounds
+                    
+                    iconContainer.addSubview(iconView)
+                    return iconContainer
+                }
+            }
+            
+            // Если нет событий, возвращаем nil (нет декорации)
+            return nil
         }
         
         /// Находит цвета событий для указанной даты
@@ -142,51 +178,6 @@ struct CalendarViewUIKit: UIViewRepresentable {
             // Всегда разрешаем отмену выбора даты
             print("⚡️ CalendarViewUIKit: запрос на canDeselectDate, разрешаем")
             return true
-        }
-
-        /// Создает изображение с цветными точками
-        private func generateMultiStripeImage(colors: [UIColor]) -> UIImage {
-            let size = CGSize(width: 34, height: 16) // Размер иконки
-            let renderer = UIGraphicsImageRenderer(size: size)
-
-            return renderer.image { ctx in
-                let stripeHeight: CGFloat = 3  // Высота полоски
-                let spacing: CGFloat = 1       // Отступ между полосками
-                let maxVisibleStripes = 2      // Отображаем не больше 2 полосок
-                let totalStripes = min(colors.count, maxVisibleStripes)
-                
-//                let totalHeight = CGFloat(totalStripes) * (stripeHeight + spacing) - spacing
-                var yOffset = 0.0 //(size.height - totalHeight) / 2  // Центрирование
-
-                for i in 0..<totalStripes {
-                    let rect = CGRect(x: 0, y: yOffset, width: size.width, height: stripeHeight)
-                    let path = UIBezierPath(roundedRect: rect, cornerRadius: 1.5)
-                    
-                    ctx.cgContext.setFillColor(colors[i].cgColor)
-                    ctx.cgContext.addPath(path.cgPath)
-                    ctx.cgContext.fillPath()
-                    
-                    yOffset += stripeHeight + spacing
-                }
-
-                // Если событий больше 3, рисуем +n
-                if colors.count > maxVisibleStripes {
-                    let number = colors.count - maxVisibleStripes
-                    let numberText = "+\(number)"
-                    let attributes: [NSAttributedString.Key: Any] = [
-                        .font: UIFont.systemFont(ofSize: 6, weight: .bold),
-                        .foregroundColor: UIColor.black
-                    ]
-                    let textSize = numberText.size(withAttributes: attributes)
-                    let textRect = CGRect(
-                        x: (size.width - textSize.width) / 2,
-                        y: size.height - textSize.height - 1,
-                        width: textSize.width,
-                        height: textSize.height
-                    )
-                    numberText.draw(in: textRect, withAttributes: attributes)
-                }
-            }
         }
     }
 }

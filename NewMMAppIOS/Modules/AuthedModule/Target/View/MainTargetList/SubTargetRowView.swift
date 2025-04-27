@@ -56,7 +56,7 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
                     }) {
                         Image(systemName: subTarget.targetStatus == .done ? "checkmark.circle.fill" : "circle")
                             .foregroundColor(subTarget.targetStatus == .done ? .green : .gray)
-                            .imageScale(.large)
+                            .imageScale(.medium)
                     }
                     .buttonStyle(.plain)
                 }

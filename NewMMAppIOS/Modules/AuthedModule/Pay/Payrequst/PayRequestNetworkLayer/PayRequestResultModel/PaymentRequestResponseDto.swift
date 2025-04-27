@@ -44,7 +44,7 @@ struct PaymentRequestResponseDto: Codable {
     }
 }
 
-enum PaymentRequestStatus: String, Codable, UnknownCasedEnum {
+enum PaymentRequestStatus: String, UnknownCasedEnum, Codable {
     case unknown = "UNKNOWN"
     
     case fullPaid = "FULL_PAID"
