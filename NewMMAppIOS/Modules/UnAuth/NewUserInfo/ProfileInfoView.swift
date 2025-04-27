@@ -61,18 +61,20 @@ struct ProfileInfoView: View {
                             Text("Сохранить")
                                 .frame(maxWidth: .infinity)
                                 .padding()
-                                .background(Color.mainRed)
+                                .background(viewModel.isValid ? Color.mainRed : Color.gray.opacity(0.8))
                                 .foregroundColor(.white)
                                 .cornerRadius(16)
                         } else {
                             ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle())
-                            .frame(width: 16,
-                                   height: 16)
-                            .padding(4)
+                                .progressViewStyle(CircularProgressViewStyle())
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.gray.opacity(0.3))
+                                .foregroundColor(.white)
+                                .cornerRadius(16)
                         }
                     }
-                    .disabled(!viewModel.isValid)
+                    .disabled(!viewModel.isValid || viewModel.isLoaded)
 
                 }
                 .padding()
@@ -91,6 +93,7 @@ struct ProfileInfoView: View {
                     dismiss()
                 }
             }
+            .disabled(viewModel.isLoaded) // Блокируем взаимодействие с формой при загрузке
         }
             .scrollDismissesKeyboard(.interactively)
 

@@ -61,17 +61,34 @@ class ProfileInfoViewModel: ObservableObject {
             
             // поля не должны быть пустыми
             let anyEmpty = userProfile.firstName.isEmpty || userProfile.telegramUsername.isEmpty || userProfile.occupation.isEmpty || userProfile.city.isEmpty || userProfile.about.isEmpty || userProfile.phoneNumber.isEmpty
+            print("neshko777 isValid \(isValid) anyEmpty \(anyEmpty)")
             isValid = errors.isEmpty && !anyEmpty
         }
         
         
     }
     
-    // Проверка номера телефона
+    // Проверка номера телефона с поддержкой международных форматов
     private func isValidPhoneNumber(_ phoneNumber: String) -> Bool {
-        let phoneRegex = "^\\+7 \\(9\\d{2}\\) \\d{3}-\\d{2}-\\d{2}$"
-        let predicate = NSPredicate(format: "SELF MATCHES %@", phoneRegex)
-        return predicate.evaluate(with: phoneNumber)
+        // Извлекаем только цифры для проверки длины
+        let digits = phoneNumber.filter { $0.isNumber }
+        
+        // Минимально допустимая длина: код страны + местный номер
+        // Обычно телефон содержит от 7 до 15 цифр по стандарту E.164
+        guard digits.count >= 7 && digits.count <= 15 else {
+            return false
+        }
+        
+        // Проверяем, что строка начинается с +
+        guard phoneNumber.hasPrefix("+") else {
+            return false
+        }
+        
+        // Проверка на наличие хотя бы одного пробела или дефиса для разделения частей
+        // Но не проверяем конкретные форматы, так как они могут отличаться
+        let containsFormatting = phoneNumber.contains(" ") || phoneNumber.contains("-")
+        
+        return containsFormatting
     }
     
     // Функция сохранения профиля (адаптирована из запроса)
@@ -97,6 +114,10 @@ class ProfileInfoViewModel: ObservableObject {
                                                                     biography: userProfile.about
                                                                 )
                 )
+                // Сохраняем обновленный профиль в UserRepository
+                if let updatedUser = updatedUser {
+                    UserRepository.shared.setUserProfile(updatedUser)
+                }
                 UserRepository.shared.setRoles([(updatedUser?.userProfileStatus) ?? ""])
                 await setIsLoaded(false)
                 self.needUpdateAction()

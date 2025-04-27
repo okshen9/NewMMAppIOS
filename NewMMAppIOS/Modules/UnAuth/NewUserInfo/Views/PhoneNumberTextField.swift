@@ -16,8 +16,7 @@ struct PhoneNumberTextField: View {
             Text("Номер телефона")
                 .font(.headline)
                 .foregroundColor(Color.headerText)
-            TextField("+X (XXX) XXX-XX-XX", text: $phoneNumber)
-
+            TextField("+X XXX XXX-XX-XX", text: $phoneNumber)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .keyboardType(.phonePad)
                 .foregroundColor(Color.headerText)
@@ -26,9 +25,8 @@ struct PhoneNumberTextField: View {
                 }
                 .onAppear {
                     if !phoneNumber.isEmpty {
-                        phoneNumber = formatPhoneNumber("7" + phoneNumber)
+                        phoneNumber = formatPhoneNumber(phoneNumber)
                     }
-
                 }
             if let error = error {
                 Text(error)
@@ -38,35 +36,78 @@ struct PhoneNumberTextField: View {
         }
     }
     
-    // Форматирование номера по маске
+    // Форматирование номера телефона из любого формата
     private func formatPhoneNumber(_ input: String) -> String {
-        let cleanedInput = input.filter { $0.isNumber }
-        guard !cleanedInput.isEmpty else { return "" }
-
-        var result = ""
-        let maxDigits = 11 // Максимум цифр: код страны + 10 цифр
-
-        for (index, digit) in cleanedInput.prefix(maxDigits).enumerated() {
-            switch index {
-            case 0:
-                result += "+\(digit)"
-            case 1:
-                result += " (\(digit)"
-            case 4:
-                result += ") \(digit)"
-            case 7, 9:
-                result += "-\(digit)"
-            default:
-                result += "\(digit)"
+        // Извлекаем только цифры из входной строки
+        let digits = input.filter { $0.isNumber }
+        
+        // Если номер пустой, возвращаем пустую строку
+        guard !digits.isEmpty else { return "" }
+        
+        var formattedNumber = "+"
+        
+        // Применяем форматирование в зависимости от количества цифр
+        switch digits.count {
+        case 1:
+            // Только код страны
+            formattedNumber += digits
+        case 2...3:
+            // Код страны
+            formattedNumber += digits
+        case 4...6:
+            // Код страны и начало номера
+            formattedNumber += digits.prefix(1) + " " + digits.dropFirst()
+        case 7...10:
+            // Типичный формат для многих стран
+            let country = digits.prefix(1)
+            let areaCode = digits.dropFirst().prefix(3)
+            let firstPart = digits.dropFirst(4).prefix(3)
+            let remainder = digits.dropFirst(7)
+            
+            formattedNumber += "\(country) \(areaCode) \(firstPart)"
+            if !remainder.isEmpty {
+                formattedNumber += "-\(remainder)"
             }
+        case 11...:
+            // Предполагаем российский номер +7 XXX XXX-XX-XX
+            if digits.hasPrefix("7") || digits.hasPrefix("8") {
+                let country = "7" // Всегда используем 7 для России
+                let areaCode = digits.dropFirst().prefix(3)
+                let firstPart = digits.dropFirst(4).prefix(3)
+                let secondPart = digits.dropFirst(7).prefix(2)
+                let thirdPart = digits.dropFirst(9).prefix(2)
+                
+                formattedNumber += "\(country) \(areaCode) \(firstPart)-\(secondPart)"
+                if !thirdPart.isEmpty {
+                    formattedNumber += "-\(thirdPart)"
+                }
+            } else {
+                // Для других стран просто группируем цифры
+                let country = digits.prefix(2)
+                let remainder = digits.dropFirst(2)
+                
+                formattedNumber += "\(country) "
+                
+                var remainderStr = String(remainder)
+                if remainderStr.count > 3 {
+                    formattedNumber += remainderStr.prefix(3) + " "
+                    remainderStr = String(remainderStr.dropFirst(3))
+                    
+                    if remainderStr.count > 4 {
+                        formattedNumber += remainderStr.prefix(4) + "-"
+                        remainderStr = String(remainderStr.dropFirst(4))
+                    }
+                    
+                    formattedNumber += remainderStr
+                } else {
+                    formattedNumber += remainderStr
+                }
+            }
+        default:
+            formattedNumber += digits
         }
-
-        // Удаление лишних символов при удалении цифр
-        if cleanedInput.count < input.filter({ $0.isNumber }).count {
-            return String(result.prefix(result.count))
-        }
-
-        return result
+        
+        return formattedNumber
     }
 }
 
