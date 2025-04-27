@@ -13,11 +13,10 @@ struct SubTargetEditView: View {
     
     var body: some View {
         
-        VStack {
+        VStack(spacing: 8) {
             TextField("Название", text: $subTarget.title.orEmptyBinding)
-                .foregroundStyle(Color.black.opacity(0.8))
-            TextField("Описание", text: $subTarget.description.orEmptyBinding)
-                .foregroundStyle(Color.black.opacity(0.8))
+                .foregroundStyle(Color.headerText)
+            TextEditorWithPalceHolder(palceHolder: "Описание", textBinding: $subTarget.description.orEmptyBinding)
             DatePicker("Срок выполнения", selection: $subTarget.deadLineDateTime.asBindingDate, displayedComponents: .date)
                 .tint(Color.mainRed)
         }

@@ -40,12 +40,7 @@ struct TargetsView: View {
                 }
             }
             .sheet(isPresented: $showAddTarget) {
-                AddTargetView(onSave: { target in
-                    Task {
-                        await viewModel.saveTarget(target, isCreateTarget: true)
-                    }
-                    showAddTarget = false
-                })
+                TargetEditView<TargetsViewModel>(category: .money, isCreateTarget: true)
             }
             .alert(isPresented: $showErrorAlert) {
                 Alert(

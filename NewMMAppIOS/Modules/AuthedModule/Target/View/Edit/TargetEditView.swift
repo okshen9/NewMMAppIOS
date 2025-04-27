@@ -21,21 +21,52 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
     var isCreateTarget: Bool
     @State private var newTarget: UserTargetDtoModel
     
+    // Состояние для новой подцели
+    @State private var showAddSubtarget: Bool = false
+    @State private var newSubTargetTitle: String = ""
+    @State private var newSubTargetDescription: String = ""
+    @State private var newSubTargetDeadline: Date = Date().addingTimeInterval(86400 * 7)
+    
+    // Валидация
+    @State private var showValidationAlert: Bool = false
+    @State private var validationMessage: String = ""
+    
     init(target: UserTargetDtoModel, isCreateTarget: Bool) {
         self.target = target
         self.isCreateTarget = isCreateTarget
         _newTarget = State(initialValue: target)
     }
     
+    // Инициализатор для создания новой цели с опциональной категорией
+    init(category: TargetCategory? = nil, isCreateTarget: Bool = true) {
+        let newEmptyTarget = UserTargetDtoModel(
+            title: "",
+            description: "",
+            userExternalId: UserRepository.shared.externalId,
+            percentage: 0,
+            deadLineDateTime: Date().addingTimeInterval(86400 * 7).toApiString,
+            targetStatus: .draft,
+            subTargets: nil,
+            category: category ?? .personal
+        )
+        self.target = newEmptyTarget
+        self.isCreateTarget = isCreateTarget
+        _newTarget = State(initialValue: newEmptyTarget)
+    }
+    
+    private var isFormValid: Bool {
+        !newTarget.title.orEmpty.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section(header: headerView()) {
                     TextField("Название", text: $newTarget.title.orEmpty)
-                        .foregroundStyle(Color.black.opacity(0.8))
-                    textEditor(textBinding: $newTarget.description.orEmpty)
-                        .foregroundStyle(Color.black.opacity(0.8))
-                    Picker("Категория цели", selection:  $newTarget.category.orDefault(.other)) {
+                        .foregroundStyle(Color.headerText)
+                    TextEditorWithPalceHolder(palceHolder: "Описание подцели", textBinding: $newTarget.description.orEmpty)
+                        .foregroundStyle(Color.headerText)
+                    Picker("Категория цели", selection: $newTarget.category.orDefault(.other)) {
                         ForEach(TargetCategory.allCases.filter({ $0 != .unknown })) { category in
                             Text(category.rawValue).tag(category)
                         }
@@ -46,64 +77,57 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                         .tint(.mainRed)
                 }
                 
-                Text("Подцели")
-                    .font(.title3.weight(.medium))
-                    .foregroundStyle(Color.black.opacity(0.9))
-                subTargetsSection()
-                
+                Section(header: Text("Подцели")
+                    .font(.headline)
+                    .foregroundStyle(Color.black.opacity(0.9))) {
+                    subTargetsSection()
+                }
+            }
+            .alert("Ошибка", isPresented: $showValidationAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(validationMessage)
             }
         }
+        .navigationTitle(isCreateTarget ? "Создание цели" : "Редактирование цели")
+        .navigationBarTitleDisplayMode(.inline)
     }
     
     @ViewBuilder
     func subTargetsSection() -> some View {
-        List {
+        if let subTargets = newTarget.subTargets, !subTargets.isEmpty {
             ForEach($newTarget.subTargets.orDefault([]), id: \.creationDateTime) { $item in
                 SubTargetEditView(subTarget: $item)
-                    .padding(.vertical, 4)
+                    .padding(.vertical)
                     .swipeActions(edge: .trailing) {
-                        Button("Удалить") {
-                            newTarget.subTargets?.removeAll(where: {
-                                $0 == $item.wrappedValue
-                            })
+                        Button(role: .destructive, action: {
+                            if let index = newTarget.subTargets?.firstIndex(of: item) {
+                                newTarget.subTargets?.remove(at: index)
+                            }
+                        }) {
+                            Label("Удалить", systemImage: "trash")
                         }
+
                         .tint(.red)
                     }
             }
         }
         
         Button(action: {
-            if newTarget.subTargets == nil {
-                newTarget.subTargets = []
-            }
-            newTarget.subTargets?.append(UserSubTargetDtoModel(title: "", description: "", targetSubStatus: .notDone, rootTargetId: target.id, creationDateTime: Date.now.toApiString, deadLineDateTime: Date.now.toApiString))
-            print("Добавить \(newTarget.subTargets?.count)")
+            addNewSubTarget()
         }, label: {
-            Text("Добавить подцель")
+            Label("Добавить подцель", systemImage: "plus.circle")
                 .foregroundColor(.mainRed)
         })
-    }
-    
-    /// Многострочное текстовое поле
-    @ViewBuilder
-    func textEditor(title: String = "Описание цели",
-                    textBinding: Binding<String>) -> some View {
-        ZStack(alignment: .topLeading) {
-            if textBinding.wrappedValue.isEmpty {
-                Text(title)
-                    .foregroundColor(.gray)
-                    .padding(4)
-            }
-            TextEditor(text: textBinding)
-                .frame(height: 100)
-        }
     }
     
     /// Хежер экрана
     @ViewBuilder
     func headerView() -> some View {
         HStack {
-            Text("Редактирование цели")
+            Text(isCreateTarget ? "Создание цели" : "Редактирование цели")
+                .font(Font.subheadline)
+                .foregroundStyle(Color.headerText)
             Spacer()
             if isLoading {
                 ProgressView()
@@ -112,25 +136,12 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                            height: 16)
                     .padding(4)
             } else {
-                let isActive = target != $newTarget.wrappedValue
+                let isActive = isCreateTarget || target != $newTarget.wrappedValue
                 Button(action: {
-                    ///SAVE
-                    isLoading = true
-                    Task {
-                        if await viewModelEnvironment.saveTarget(newTarget, isCreateTarget: isCreateTarget) != nil {
-                            
-                            isLoading = false
-                            await ToastManager.shared.show(
-                                //                                🎯
-                                ToastModel(message: "Цель успешно отправлена на рассмотерение", icon: "checkmark.circle", duration: 2)
-                            )
-                            dismiss()
-                        } else {
-                            await ToastManager.shared.show(
-                                ToastModel(message: "Ошибка изменения цели", icon: "xmark", duration: 2)
-                            )
-                            isLoading = false
-                        }
+                    if validateForm() {
+                        saveTarget()
+                    } else {
+                        showValidationAlert = true
                     }
                 }, label: {
                     HStack(spacing: 0) {
@@ -145,17 +156,84 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                             .padding(4)
                     }
                 })
-                .disabled(!isActive)
+                .disabled(!isActive || !isFormValid)
+            }
+        }
+    }
+    
+    // MARK: - Вспомогательные методы
+    private func addNewSubTarget() {
+        if newTarget.subTargets == nil {
+            newTarget.subTargets = []
+        }
+        
+        let newSubTarget = UserSubTargetDtoModel(
+            title: "",
+            description: "",
+            subTargetPercentage: 0.0,
+            targetSubStatus: .notDone,
+            rootTargetId: target.id,
+            creationDateTime: Date.now.toApiString, 
+            deadLineDateTime: Date.now.toApiString
+        )
+        
+        newTarget.subTargets?.append(newSubTarget)
+    }
+    
+    private func validateForm() -> Bool {
+        if newTarget.title.orEmpty.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            validationMessage = "Название цели не может быть пустым"
+            return false
+        }
+        
+        if let deadlineDate = newTarget.deadLineDateTime?.dateFromApiString, deadlineDate < Date() {
+            validationMessage = "Срок выполнения не может быть раньше текущей даты"
+            return false
+        }
+        
+        return true
+    }
+    
+    private func saveTarget() {
+        // Нормализация данных перед сохранением
+        newTarget.title = newTarget.title.orEmpty.trimmingCharacters(in: .whitespacesAndNewlines)
+        newTarget.description = newTarget.description?.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Равномерное распределение процентов между подцелями
+        if let subTargets = newTarget.subTargets, !subTargets.isEmpty {
+            for (index, _) in subTargets.enumerated() {
+                newTarget.subTargets?[index].subTargetPercentage = 100.0 / Double(subTargets.count)
+            }
+        }
+        
+        isLoading = true
+        Task {
+            if await viewModelEnvironment.saveTarget(newTarget, isCreateTarget: isCreateTarget) != nil {
+                isLoading = false
+                await ToastManager.shared.show(
+                    ToastModel(message: isCreateTarget ? "Цель успешно создана" : "Цель успешно отредактирована", icon: "checkmark.circle", duration: 2)
+                )
+                dismiss()
+            } else {
+                await ToastManager.shared.show(
+                    ToastModel(message: "Ошибка сохранения цели", icon: "xmark", duration: 2)
+                )
+                isLoading = false
             }
         }
     }
 }
 
 #Preview {
-    TargetEditView<TargetsViewModel>(target: .init(title: "Test",
+    Group {
+        TargetEditView<TargetsViewModel>(target: .init(title: "Test",
                                                    targetStatus: .inProgress,
                                                    subTargets: [.init(title: "TestSub", targetSubStatus: .notDone, creationDateTime: Date.now.toApiString)]
                                                   ), isCreateTarget: false)
-        .environmentObject(TargetsViewModel())
+            .environmentObject(TargetsViewModel())
+        
+//        TargetEditView<TargetsViewModel>(category: .family, isCreateTarget: true)
+//            .environmentObject(TargetsViewModel())
+    }
 }
 
