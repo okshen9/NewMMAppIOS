@@ -78,15 +78,18 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
                             .foregroundColor(.gray)
                             .lineLimit(1)
 
-                        if let percentage = target.percentage, percentage > 0 {
+                        if let percentage = target.percentage {
                             Spacer()
-                            Text("\(Int(percentage))%")
+                            let isDone = (target.targetStatus?.isDone ?? false)
+                            let textPercent = isDone ? "Выполнил!" : "\(Int(percentage))%"
+                            
+                            Text(textPercent)
                                 .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(percentage == 100 ? .green : .gray)
+                                .foregroundColor((percentage == 100 || isDone) ? .green : .gray)
                         }
                     }
 
-                    let percentTarget: Double = ((target.subTargets).isEmptyOrNil) ?
+                    let percentTarget: Double = (target.subTargets.isEmptyOrNil) ?
                     (((target.targetStatus?.isDone) ?? false) ? 100.0 : 0.0) :
                     target.percentage ?? 0.0
 
@@ -160,7 +163,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
                         /*.move(edge: .trailing)))*/
 
             // Закрыть цель
-            if let isDone = target.targetStatus?.isDone {
+            if let isDone = target.targetStatus?.isDone, myTarget {
                 HStack {
                     Spacer()
                     Button(
@@ -262,6 +265,8 @@ extension TargetRowView {
     TargetRowView<TargetsViewModel>(target: .init(
         title: "Test",
         description: "Тестовое описание цели khbhhjbkjhkghjvkgvkgvkgvcgc,hgvm kgk kv jghvlvhj,,b",
+        percentage: 10,
+        targetStatus: .done,
         subTargets: [.init(title: "Test", description: "dssds",targetSubStatus: .notDone)]
     ))
     .environmentObject(TargetsViewModel())
