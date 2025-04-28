@@ -47,11 +47,11 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
                 } else {
                     Button(action: {
                         if myTarget {
-                            if isLastUnclosedSubtarget {
-                                showCustomAlert = true
-                            } else {
+//                            if isLastUnclosedSubtarget {
+//                                showCustomAlert = true
+//                            } else {
                                 showConfirmationDialog = true
-                            }
+//                            }
                         }
                     }) {
                         Image(systemName: subTarget.targetStatus == .done ? "checkmark.circle.fill" : "circle")
@@ -105,65 +105,11 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
         .onChange(of: subTarget, {
             isLoading = false
         })
-        .sheet(isPresented: $showCustomAlert) {
-            VStack(spacing: 0) {
-                Text("Завершение последней подцели")
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(.headerText)
-                    .multilineTextAlignment(.center)
-                    .padding(.top, 20)
-                    .padding(.horizontal, 16)
-                
-                Text("Это последняя незавершенная подцель. Что вы хотите сделать?")
-                    .font(.system(size: 13))
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.top, 8)
-                    .padding(.horizontal, 16)
-                
-                Divider()
-                    .padding(.top, 16)
-                
-                Toggle("Завершить всю цель полностью", isOn: $isClosingWholeTarget)
-                    .padding(.horizontal, 16)
-                    .padding(.top, 16)
-                    .tint(.accentColor)
-                
-                Spacer()
-                
-                Divider()
-                
-                HStack {
-                    Button(action: {
-                        showCustomAlert = false
-                    }) {
-                        Text("Отмена")
-                            .foregroundColor(.red)
-                            .frame(maxWidth: .infinity)
-                    }
-                    
-                    Divider()
-                    
-                    Button(action: {
-                        isLoading = true
-                        viewModelEnvironment.closedSubTargetWithParent(subTarget, closeParent: isClosingWholeTarget)
-                        showCustomAlert = false
-                    }) {
-                        Text("Подтвердить")
-                            .bold()
-                            .frame(maxWidth: .infinity)
-                    }
-                }
-                .frame(height: 44)
-            }
-            .background(Color(.systemBackground))
-            .cornerRadius(12)
-            .padding()
-        }
         .alert("Завершить подцель?", isPresented: $showConfirmationDialog) {
             Button("Да") {
                 isLoading = true
-                viewModelEnvironment.closedSubTarget(subTarget)
+//                viewModelEnvironment.closedSubTarget(subTarget)
+                viewModelEnvironment.closedSubTargetWithParent(subTarget, closeParent: isLastUnclosedSubtarget)
             }
             Button("Нет", role: .cancel) { }
         }

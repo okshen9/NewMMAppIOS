@@ -367,9 +367,10 @@ struct ProfileView: View {
             {
                 
                 NavigationLink(destination: {
+                    let dateEnd = stream.dateTo.orEmpty.dateFromStringISO8601 ?? Date.yesterday
                     StreamProfileList(
                         type: .stream(stream.title ?? "Поток без названия"),
-                        status: stream.isActive ? .current : .ended,
+                        status: dateEnd > Date() ? .current : .ended,
                         mentors: owners,
                         participants: participants,
                         dateStart: (profile.stream?.dateFrom?.dateFromStringISO8601) ?? Date.init(timeIntervalSince1970: 232),

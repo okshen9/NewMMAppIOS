@@ -302,15 +302,15 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
                 // Обновляем цель с новым статусом подцели и, возможно, цели
                 let updatedTarget = try await self?.networkService.updateTargetAll(model: findedTarget)
                 
-                // Если выбрано НЕ закрывать цель полностью, добавляем новую подцель
-                if !closeParent {
-                    self?.addNewSubtarget(
-                        to: findedTarget,
-                        withName: "Завершить \(findedTarget.title ?? "цель")"
-                    )
-                } else {
+//                // Если выбрано НЕ закрывать цель полностью, добавляем новую подцель
+//                if !closeParent {
+//                    self?.addNewSubtarget(
+//                        to: findedTarget,
+//                        withName: "Завершить \(findedTarget.title ?? "цель")"
+//                    )
+//                } else {
                     await self?.refreshTargetsData()
-                }
+//                }
             } catch {
                 print("Ошибка при закрытии последней подцели: \(error.localizedDescription)")
             }

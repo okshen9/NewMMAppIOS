@@ -41,14 +41,15 @@ struct UserTargetDtoModel: Codable, JSONRepresentable, Identifiable, Hashable {
                          _ newDescription: String? = nil,
                          _ newDeadLineDateTime: String? = nil,
                          _ newCategory: TargetCategory? = nil,
-                         _ newSubTargets: [UserSubTargetDtoModel]? = nil) {
+                         _ newSubTargets: [UserSubTargetDtoModel]? = nil,
+                         _ sattus: TargetStatus) {
         self.title = newTitle ?? self.title
         self.description = newDescription ?? self.description
         self.deadLineDateTime = newDeadLineDateTime ?? self.deadLineDateTime
         self.category = newCategory ?? self.category
         self.subTargets = newSubTargets ?? self.subTargets
         
-        self.targetStatus = .draft
+        self.targetStatus = sattus
     }
     
     init(id: Int? = nil, title: String? = nil, description: String? = nil, userExternalId: Int? = nil, percentage: Double? = nil, deadLineDateTime: String? = nil, streamId: Int? = nil, targetStatus: TargetStatus? = nil, subTargets: [UserSubTargetDtoModel]? = nil, isDeleted: Bool? = nil, creationDateTime: String? = nil, lastUpdatingDateTime: String? = nil, category: TargetCategory? = nil) {

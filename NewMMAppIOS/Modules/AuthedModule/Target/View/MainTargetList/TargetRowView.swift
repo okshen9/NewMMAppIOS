@@ -16,7 +16,7 @@ protocol TargetRowViewModelProtocol: ObservableObject {
 
 struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
     @EnvironmentObject private var viewModelEnvironment: ViewModel
-
+    
     var myTarget = true
     /// Отображаемый таргет
     var target: UserTargetDtoModel
@@ -39,143 +39,97 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
     // MARK: - Body
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // Основной контент цели
-//            Button(action: {
-//                withAnimation(.spring(response: 0.1, dampingFraction: 3.8)) {
-//                    showDescription.toggle()
-//                    isExpanded.toggle()
-//                }
-//            }) {
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack(alignment: .top) {
-                        Text(target.title.orEmpty)
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(.headerText)
-                            .multilineTextAlignment(.leading)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .lineLimit(3)
-
-                        Spacer()
-                        if let subTargets = target.subTargets,
-                           !subTargets.isEmpty,
-                           let description = target.description,
-                           !description.isEmpty {
-                            Image(systemName: showDescription ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
-                                .foregroundColor(.gray)
-                                .imageScale(.small)
-                                .padding(.top, 2)
-                        }
-                    }
-
-                    HStack(spacing: 8) {
-                        // Используем иконку календаря из AppIcons
-                        AppIcons.calendar
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(alignment: .top) {
+                    Text(target.title.orEmpty)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.headerText)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .lineLimit(isExpanded ? nil : 3)
+                    
+                    Spacer()
+                    if let subTargets = target.subTargets,
+                       !subTargets.isEmpty,
+                       let description = target.description,
+                       !description.isEmpty {
+                        Image(systemName: showDescription ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
                             .foregroundColor(.gray)
                             .imageScale(.small)
-
-                        Text((target.deadLineDateTime?.dateFromApiString ?? Date.now).toDisplayString)
-                            .font(.system(size: 14))
-                            .foregroundColor(.gray)
-                            .lineLimit(1)
-
-                        if let percentage = target.percentage {
-                            Spacer()
-                            let isDone = (target.targetStatus?.isDone ?? false)
-                            let textPercent = isDone ? "Выполнил!" : "\(Int(percentage))%"
-                            
-                            Text(textPercent)
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor((percentage == 100 || isDone) ? .green : .gray)
-                        }
+                            .padding(.top, 2)
+                            .offset(.init(width: 0, height: 4))
                     }
-
-                    let percentTarget: Double = (target.subTargets.isEmptyOrNil) ?
-                    (((target.targetStatus?.isDone) ?? false) ? 100.0 : 0.0) :
-                    target.percentage ?? 0.0
-
-                    ProgressView(value: percentTarget, total: 100)
-                        .tint(percentTarget == 100 ? .green : .mainRed)
-                        .background(Color.gray.opacity(0.1))
-                        .cornerRadius(4)
                 }
-                .background(.white)
-//            }
-            .buttonStyle(PlainButtonStyle())
-
+                
+                HStack(spacing: 8) {
+                    AppIcons.calendar
+                        .foregroundColor(.gray)
+                        .imageScale(.small)
+                    
+                    Text((target.deadLineDateTime?.dateFromApiString ?? Date.now).toDisplayString)
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                        .lineLimit(1)
+                    
+                    if let percentage = target.percentage {
+                        Spacer()
+                        let isDone = (target.targetStatus?.isDone ?? false)
+                        let textPercent = isDone ? "Выполнил!" : "\(Int(percentage))%"
+                        
+                        Text(textPercent)
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor((percentage == 100 || isDone) ? .green : .gray)
+                    }
+                }
+                
+                let percentTarget: Double = (target.subTargets.isEmptyOrNil) ?
+                (((target.targetStatus?.isDone) ?? false) ? 100.0 : 0.0) :
+                target.percentage ?? 0.0
+                
+                ProgressView(value: percentTarget, total: 100)
+                    .tint(percentTarget == 100 ? .green : .mainRed)
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(4)
+            }
+            .background(.white)
+            
             // Описание цели
             VStack(alignment: .leading, spacing: 8) {
-                if showDescription,
-                   let description = target.description,
+                if let description = target.description,
                    !description.isEmpty {
                     Text(description)
                         .font(.system(size: 14))
                         .foregroundColor(.secondary)
+                        .lineLimit(showDescription ? nil : 2)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .fixedSize(horizontal: false, vertical: true)
                         .lineLimit(nil)
                         .cornerRadius(8)
                 }
-
-
-
+                
                 // Подцели
                 if isExpanded,
                    let subTargets = target.subTargets,
                    !subTargets.isEmpty {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Divider()
-
-                        Text("Подцели")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.headerText)
-                            .padding(.top, 4)
-
-                        ForEach(subTargets) { subTarget in
-                            SubTargetRowView<TargetsViewModel>(
-                                myTarget: myTarget,
-                                showDescription: $showDescription,
-                                subTarget: subTarget,
-                                parentTarget: target
-                            )
-                        }
-                    }
-                    .padding(.top, 4)
-                }
-
-                // Кнопка для отображения подцелей
-                //                    if let subTargets = target.subTargets, !subTargets.isEmpty {
-                //                        Button(action: {
-                //                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                //                                isExpanded.toggle()
-                //                            }
-                //                        }) {
-                //                            HStack {
-                //                                Text(isExpanded ? "Скрыть подцели" : "Показать подцели")
-                //                                    .font(.system(size: 14, weight: .medium))
-                //                                Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                //                            }
-                //                            .foregroundColor(.mainRed)
-                //                        }
-                //                        .padding(.top, 4)
-                //                    }
-            }
-                .transition(.opacity.combined(with: .identity))
-                        /*.move(edge: .trailing)))*/
-
-            // Закрыть цель
-            if let isDone = target.targetStatus?.isDone, myTarget {
-                HStack {
-                    Spacer()
-                    Button(
-                        action: {
-                            showCloseTaskDialog = true
-                        }, label: {
-                            Text(isDone ? "Переоткрыть цель" : "Закрыть цель")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(.mainRed)
-                        })
+                    subTasks(subTargets)
                 }
             }
+            .transition(.opacity.combined(with: .identity))
+            
+            //            // Закрыть цель
+            //            if let isDone = target.targetStatus?.isDone, myTarget {
+            //                HStack {
+            //                    Spacer()
+            //                    Button(
+            //                        action: {
+            //                            showCloseTaskDialog = true
+            //                        }, label: {
+            //                            Text(isDone ? "Переоткрыть цель" : "Закрыть цель")
+            //                                .font(.system(size: 14, weight: .medium))
+            //                                .foregroundColor(.mainRed)
+            //                        })
+            //                }
+            //            }
         }
         .padding(8)
         .background(Color(.systemBackground))
@@ -208,10 +162,13 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
             ActionSheet(
                 title: Text("Действия с целью"),
                 buttons: [
+                    .default(Text((target.targetStatus?.isDone).orFalse ? "Переоткрыть цель" : "Закрыть цель")) {
+                        showCloseTaskDialog = true
+                    },
                     .default(Text("Изменить цель")
                         .foregroundStyle(Color(.systemBlue))) {
-                        isEditing = true
-                    },
+                            isEditing = true
+                        },
                     .destructive(Text("Удалить цель")) {
                         viewModelEnvironment.deleteTarget(target: target)
                     },
@@ -232,6 +189,48 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
         .sheet(isPresented: $isEditing) {
             TargetEditView<TargetsViewModel>(target: target, isCreateTarget: false)
         }
+    }
+    
+    @ViewBuilder
+    func subTasks(_ subTargets: [UserSubTargetDtoModel]) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Divider()
+            
+            Text("Подцели")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.headerText)
+                .padding(.top, 4)
+            
+            ForEach(subTargets) { subTarget in
+                SubTargetRowView<TargetsViewModel>(
+                    myTarget: myTarget,
+                    showDescription: $showDescription,
+                    subTarget: subTarget,
+                    parentTarget: target
+                )
+            }
+        }
+        .padding(.top, 4)
+    }
+    
+    @ViewBuilder
+    private func subTasksLabel(_ subTargets: [UserSubTargetDtoModel]) -> some View {
+        let done = subTargets.filter({ $0.targetStatus == .done }).count
+        let total = subTargets.count
+        
+        HStack(spacing: 4) {
+            Image(systemName: "checklist")
+                .font(.system(size: 8))
+            Text("\(done)/\(total)")
+                .font(.caption)
+        }
+        .foregroundColor(.blue)
+        .padding(.vertical, 3)
+        .padding(.horizontal, 6)
+        .background(
+            Capsule()
+                .fill(Color.blue.opacity(0.1))
+        )
     }
 }
 

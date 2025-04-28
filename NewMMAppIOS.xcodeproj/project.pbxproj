@@ -15,9 +15,22 @@
 		ACF16C762DA42CD000991F43 /* NewMMAppIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NewMMAppIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AC2E101E2DBED7B900F98765 /* Exceptions for "NewMMAppIOS" folder in "NewMMAppIOS" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = ACF16C752DA42CD000991F43 /* NewMMAppIOS */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		ACF16C782DA42CD000991F43 /* NewMMAppIOS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AC2E101E2DBED7B900F98765 /* Exceptions for "NewMMAppIOS" folder in "NewMMAppIOS" target */,
+			);
 			path = NewMMAppIOS;
 			sourceTree = "<group>";
 		};
@@ -95,11 +108,12 @@
 				};
 			};
 			buildConfigurationList = ACF16C712DA42CD000991F43 /* Build configuration list for PBXProject "NewMMAppIOS" */;
-			developmentRegion = en;
+			developmentRegion = ru;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				ru,
 			);
 			mainGroup = ACF16C6D2DA42CD000991F43;
 			minimizedProjectReferenceProxies = 1;
@@ -269,6 +283,8 @@
 				DEVELOPMENT_TEAM = A85HZ7CNSR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NewMMAppIOS/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -302,6 +318,8 @@
 				DEVELOPMENT_TEAM = A85HZ7CNSR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NewMMAppIOS/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

@@ -16,6 +16,7 @@ struct TargetsView: View {
     @State private var showAddTarget = false
     @State private var showErrorAlert = false
     @State private var currentLevelItemsCount: Int = 0 // Добавляем состояние
+    @State private var currentLevelPie: Int = 0 // Добавляем состояние
     
     var body: some View {
         NavigationView {
@@ -161,7 +162,8 @@ struct TargetsView: View {
                                 selectedCategory = category
                             }
                         }
-                    }
+                    },
+                    currentLevel: $currentLevelPie
                 )
                 .frame(width: chartSize)
                 .frame(height: calculateDiagramHeight(chartSize: chartSize, itemsCount: currentLevelItemsCount).animatableData)

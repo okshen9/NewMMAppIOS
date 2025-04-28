@@ -9,7 +9,11 @@
 import SwiftUI
 
 struct PieModel: Identifiable, Equatable {
-    let id = UUID()
+    typealias ID = String
+    var id: Self.ID { get {
+        self.title
+    }}
+    
     /// процент от общего значения Category
     var totalValue: Double
     /// текущее заполенение конкретной Category (0.0...1.0)

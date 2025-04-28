@@ -19,6 +19,7 @@ struct SubTargetEditView: View {
             TextEditorWithPalceHolder(palceHolder: "Описание", textBinding: $subTarget.description.orEmptyBinding)
             DatePicker("Срок выполнения", selection: $subTarget.deadLineDateTime.asBindingDate, displayedComponents: .date)
                 .tint(Color.mainRed)
+                .foregroundStyle(Color.headerText)
         }
     }
 }

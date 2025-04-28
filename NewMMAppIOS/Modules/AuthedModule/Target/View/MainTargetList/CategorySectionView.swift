@@ -92,8 +92,14 @@ struct CategorySectionView: View {
                 VStack {
                     HStack(alignment: .top, spacing: 12) {
                         // Индикатор цели
-                        indicatorTargetView(target)
-                            .offset(.init(width: 0, height: 12))
+                        VStack(spacing: 6) {
+                            indicatorTargetView(target)
+                            if let subTargets = target.subTargets,
+                               !subTargets.isEmpty {
+                                subTasksLabel(subTargets)
+                            }
+                        }
+                        .offset(.init(width: 0, height: 12))
 
                         // Основной контент цели
                         TargetRowView<TargetsViewModel>(
@@ -151,6 +157,26 @@ struct CategorySectionView: View {
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(category.color)
         }
+    }
+    
+    @ViewBuilder
+    private func subTasksLabel(_ subTargets: [UserSubTargetDtoModel]) -> some View {
+        let done = subTargets.filter({ $0.targetStatus == .done }).count
+        let total = subTargets.count
+        
+        HStack(spacing: 4) {
+            Image(systemName: "checklist")
+                .font(.system(size: 8))
+            Text("\(done)/\(total)")
+                .font(.caption)
+        }
+        .foregroundColor(.blue)
+        .padding(.vertical, 3)
+        .padding(.horizontal, 6)
+        .background(
+            Capsule()
+                .fill(Color.blue.opacity(0.1))
+        )
     }
 
     // Получение инициалов категории

@@ -19,10 +19,10 @@ struct NewPieDiagram: View {
     @State private var isChangingStructure = false
     
     // Состояние для навигации по иерархии моделей
-    @State private var currentLevel: Int = 0
+    @Binding var currentLevel: Int
     @State private var navigationHistory: [[PieModel]] = []
     @State private var currentTitle: String = "Главная"
-    @State private var selectedSectorId: UUID? = nil
+    @State private var selectedSectorId: String? = nil
     
     /// Название диаграммы, отображаемое в центре на корневом уровне
     let diagramTitle: String
@@ -65,7 +65,8 @@ struct NewPieDiagram: View {
         showCenterLabel: Binding<Bool> = .constant(true),
         isInteractive: Binding<Bool> = .constant(true),
         currentItemsCount: Binding<Int> = .constant(0),
-        onSectorSelected: ((PieModel) -> Void)? = nil
+        onSectorSelected: ((PieModel) -> Void)? = nil,
+        currentLevel: Binding<Int>
     ) {
         self.slices = slices
         self.segmentSpacing = segmentSpacing
@@ -76,6 +77,7 @@ struct NewPieDiagram: View {
         self._isInteractive = isInteractive
         self._currentItemsCount = currentItemsCount
         self.onSectorSelected = onSectorSelected
+        self._currentLevel = currentLevel
     }
     
     private var normalizedSlices: [(model: PieModel, normalizedValue: Double)] {
@@ -714,7 +716,8 @@ extension PieModel: Animatable {
                     slices: value2,
                     title: "Стандартный режим",
                     showCenterLabel: $showLabels,
-                    isInteractive: $isInteractive
+                    isInteractive: $isInteractive,
+                    currentLevel: .constant(0)
                 )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 //                NewPieDiagram(

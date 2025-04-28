@@ -24,7 +24,8 @@ struct MultiProgressRingView: View {
             cornerRadius: 8,
             title: "Выполнение целей",
             showCenterLabel: .constant(true),
-            isInteractive: .constant(true)
+            isInteractive: .constant(true),
+            currentLevel: .constant(0)
         )
         .onAppear {
             // Конвертируем TaskProgress в PieModel для внутреннего использования

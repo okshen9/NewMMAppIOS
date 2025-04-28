@@ -51,7 +51,12 @@ public extension URLBuilding {
 // MARK: - URLBuilding
 
 public struct APIURLBuilder: URLBuilding {
-    private let baseUrl = RequestUrls.baseUrl
+//    #if DEBUG
+//    let baseUrl = RequestUrls.testBaseUrl
+//    #else
+    let baseUrl = RequestUrls.prodBaseUrl
+//    #endif
+    
     
     public func buildURL(path: String) throws -> URL {
         var path = path
