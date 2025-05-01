@@ -114,34 +114,28 @@ struct FeedView: View {
     // MARK: - ViewBuilder
     @ViewBuilder
     func shimerState() -> some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 8) {
 			ShimmeringRectangle()
-				.frame(height: 40)
-				.cornerRadius(8)
-				.padding(.top, 20)
+				.frame(height: 100)
+				.cornerRadius(26)
 			
 			ShimmeringRectangle()
-				.frame(height: 40)
-				.cornerRadius(8)
-				.padding(.top, 20)
+				.frame(height: 100)
+				.cornerRadius(26)
 			
 			ShimmeringRectangle()
-				.frame(height: 40)
-				.cornerRadius(8)
-				.padding(.top, 20)
+				.frame(height: 100)
+				.cornerRadius(26)
 			
 			ShimmeringRectangle()
-				.frame(height: 40)
-				.cornerRadius(8)
-				.padding(.top, 20)
+				.frame(height: 100)
+				.cornerRadius(26)
             
             ShimmeringRectangle()
-                .frame(height: 40)
-                .cornerRadius(8)
-                .padding(.top, 20)
+                .frame(height: 100)
+                .cornerRadius(26)
             Spacer()
         }
-        .padding(.horizontal, 16)
     }
 }
 

@@ -10,43 +10,78 @@ struct PaymentRowView: View {
     let payment: PaymentRequestResponseDto
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
             // Сумма и статус
             HStack {
-                Text("Сумма: \(payment.amount ?? 0, specifier: "%.2f") ₽")
-                    .font(.headline)
-                    .foregroundColor(.headerText)
+                Text("\(payment.amount ?? 0, specifier: "%.2f") ₽")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.primary)
+                
                 Spacer()
-                Text(payment.paymentRequestStatus?.description ?? "Нет информации")
-                    .font(.subheadline)
-                    .foregroundColor(statusColor(for: payment.paymentRequestStatus))
+                
+                paymentStatusBadge(payment.paymentRequestStatus)
             }
-
-            // Дата
-            if let dueDate = payment.dueDate?.dateFromStringISO8601 {
-                Text("Срок оплаты: \(dueDate.toDisplayString)")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-            }
-
-            // Комментарий
-            if let comment = payment.comment, !comment.isEmpty {
-                Text("Комментарий: \(comment)")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-            }
-
-            // Профиль пользователя
-            if let userProfile = payment.userProfilePreview {
-                Text("Пользователь: \(userProfile.fullName ?? "Неизвестно")")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
+            
+            // Информационный блок
+            VStack(alignment: .leading, spacing: 8) {
+                // Дата платежа
+                if let dueDate = payment.dueDate?.dateFromStringISO8601 {
+                    infoRow(icon: "calendar", text: "Срок оплаты: \(dueDate.toDisplayString)")
+                }
+                
+                // Комментарий, если есть
+                if let comment = payment.comment, !comment.isEmpty {
+                    infoRow(icon: "text.bubble", text: comment)
+                }
+                
+                // Информация о пользователе
+                if let userProfile = payment.userProfilePreview {
+                    infoRow(icon: "person", text: userProfile.fullName ?? "Неизвестно")
+                }
             }
         }
-        .padding(.vertical, 8)
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(UIColor.secondarySystemBackground))
+        )
+        .padding(.vertical, 4)
     }
-
-    // Цвет текста в зависимости от статуса
+    
+    // MARK: - Компоненты интерфейса
+    
+    // Отображение статуса платежа
+    @ViewBuilder
+    private func paymentStatusBadge(_ status: PaymentRequestStatus?) -> some View {
+        Text(status?.description ?? "Нет информации")
+            .font(.system(size: 12, weight: .medium))
+            .foregroundColor(.white)
+            .padding(.vertical, 4)
+            .padding(.horizontal, 8)
+            .background(
+                Capsule()
+                    .fill(statusColor(for: status))
+            )
+    }
+    
+    // Строка с информацией
+    @ViewBuilder
+    private func infoRow(icon: String, text: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 12))
+                .foregroundColor(.secondary)
+                .frame(width: 16)
+            
+            Text(text)
+                .font(.system(size: 14))
+                .foregroundColor(.secondary)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+    
+    // Цвет статуса платежа
     private func statusColor(for status: PaymentRequestStatus?) -> Color {
         guard let status = status else { return .gray }
         switch status {
@@ -64,7 +99,6 @@ struct PaymentRowView: View {
     }
 }
 
-
 #Preview {
-	PaymentRowView(payment: PaymentRequestResponseDto())
+    PaymentRowView(payment: PaymentRequestResponseDto())
 }
