@@ -125,12 +125,12 @@ extension AuthSUIView {
         static let tgImageWidth = CGFloat(32)
 //        
 //#if DEBUG
-//        // для теста
-//        static let tgProdStand = "https://oauth.telegram.org/auth?bot_id=7585753405&origin=http%3A%2F%2F45.141.102.197&embed=1&return_to=http%3A%2F%2F45.141.102.197%2Fauth%2Fauthentication"
+        // для теста
+        static let tgProdStand = "https://oauth.telegram.org/auth?bot_id=7585753405&origin=http%3A%2F%2F45.141.102.197&embed=1&return_to=http%3A%2F%2F45.141.102.197%2Fauth%2Fauthentication"
 //#else
-        static let tgProdStand = "https://oauth.telegram.org/auth?bot_id=7088271693&origin=https%3A%2F%2Fappmastermind.ru&embed=1&return_to=http%3A%2F%2Fappmastermind.ru%2Fauth%2Fauthentication"
-        // для прода
-
+//        static let tgProdStand = "https://oauth.telegram.org/auth?bot_id=7088271693&origin=https%3A%2F%2Fappmastermind.ru&embed=1&return_to=http%3A%2F%2Fappmastermind.ru%2Fauth%2Fauthentication"
+//        // для прода
+//
 //#endif
 
 

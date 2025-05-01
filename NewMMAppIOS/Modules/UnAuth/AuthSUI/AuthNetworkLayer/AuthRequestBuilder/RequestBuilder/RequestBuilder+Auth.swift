@@ -19,7 +19,7 @@ extension APIFactory: AuthRequestProtocol {
             url: url,
             query: helper.query,
             method: helper.method,
-            tokenNeccessity: .mandatory
+            tokenNeccessity: .notNeeded
         )
         return urlRequest
     }

@@ -333,7 +333,6 @@ struct ProfileView: View {
             })
             Button("Выйти", action: {
                 viewModel.logout()
-                navigationManager.popToRoot()
                 appStateService.setNewState(.unAuthorized)
             })
         } label: {

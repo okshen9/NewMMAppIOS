@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-
+///  Текст с гипер ссылками
 struct LinkedText: View {
     enum LinkType {
         case terms, privacy

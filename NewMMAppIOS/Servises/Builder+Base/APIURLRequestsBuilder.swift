@@ -101,12 +101,11 @@ extension APIURLRequestsBuilder {
         switch tokenNeccessity {
         case .mandatory:
             
-
-            if let token = UserRepository.shared.jwt {
-                
-                request.setValue("Bearer \(token)", forHTTPHeaderField: HTTPHeader.authorization)
+            guard  let token =  UserRepository.shared.jwt else {
+                throw ResponseError.invalidToken // или другой тип ошибки
             }
-            print("\(request)")
+            request.setValue("Bearer \(token)", forHTTPHeaderField: HTTPHeader.authorization)
+            
         case .notNeeded:
             break
         case .upload:
@@ -124,15 +123,6 @@ extension APIURLRequestsBuilder {
 //            }
             break
         }
-
-        // device_id (wudid) для событий аналитики
-//        request.setValue(UIDevice.current.identifierForVendor?.uuidString ?? "", forHTTPHeaderField: HTTPHeader.wudid)
-
-        // TODO - Вынести extension с Bundle в Foundation и переписать на Bundle.main.buildVersionNumber ..
-//        let releaseVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? ""
-//        let buildVersion = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? ""
-//
-//        request.setValue("iOS/\(releaseVersion) (\(buildVersion))", forHTTPHeaderField: HTTPHeader.userAgent)
 
         requestDecorators.forEach { $0.decorate(&request) }
     }
