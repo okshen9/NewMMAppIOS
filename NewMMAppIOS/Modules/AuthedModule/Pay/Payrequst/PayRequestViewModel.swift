@@ -14,14 +14,16 @@ final class PayRequestViewModel: ObservableObject {
     
     @Published var isLoading = true
     @Published var payRequest: [PaymentRequestResponseDto]?
+	var loaded = false
     private let serviceNetwork = ServiceBuilder.shared
     private let userRepository = UserRepository.shared
     
     // MARK: - Public Methods
     func onApper() {
         Task {
-
-                await updateProfile()
+			if !loaded {
+				await updateProfile()
+			}
         }
     }
     
@@ -30,6 +32,7 @@ final class PayRequestViewModel: ObservableObject {
             let externalId = userRepository.externalId ?? -1
             await setIsLoading(true)
             guard let updatetedProfile = try await serviceNetwork.getPaymentPlan(id: externalId) else { return }
+			loaded = true
             await updateUI(profile: updatetedProfile)
         } catch {
             print("Neshko PayRequest \(error) - Ошибка загрзуки ")

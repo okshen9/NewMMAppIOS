@@ -11,7 +11,6 @@ struct ProfileView: View {
     
     @State private var selectedTab = 0 // Индекс текущей выбранной вкладки
     
-    
     init(externalId: Int) {
         print("init ProfileView with externalId: \(externalId)")
         _viewModel = StateObject(wrappedValue: ProfileViewModel(externalId: externalId))

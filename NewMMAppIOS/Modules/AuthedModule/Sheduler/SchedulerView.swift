@@ -77,22 +77,25 @@ struct SchedulerView: View {
                             }
                         }
                     } else {
-                        ShimmeringRectangle()
-                            .frame(width: .infinity, height: 450)
-                            .cornerRadius(44)
-                        
-                        ShimmeringRectangle()
-                            .frame(width: .infinity, height: 50)
-                            .cornerRadius(44)
-                        
-                        ShimmeringRectangle()
-                            .frame(width: .infinity, height: 50)
-                            .cornerRadius(44)
-                        
-                        ShimmeringRectangle()
-                            .frame(width: .infinity, height: 50)
-                            .cornerRadius(44)
-                        Spacer()
+						VStack {
+							ShimmeringRectangle()
+								.frame(height: 450)
+								.cornerRadius(44)
+							
+							ShimmeringRectangle()
+								.frame(height: 50)
+								.cornerRadius(44)
+							
+							ShimmeringRectangle()
+								.frame(height: 50)
+								.cornerRadius(44)
+							
+							ShimmeringRectangle()
+								.frame(height: 50)
+								.cornerRadius(44)
+							Spacer()
+						}
+						.padding(.horizontal, 16)
                     }
                 }
             }

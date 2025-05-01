@@ -38,7 +38,7 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
     // MARK: - Public Methods
     func onApper() {
         Task {
-            if scheduleListItems.isEmpty,
+            if scheduleListItems.isEmpty ||
                calendarComponetsItems.isEmpty {
                 await updateData()
             }

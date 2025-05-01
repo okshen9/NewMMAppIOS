@@ -22,7 +22,7 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
     @Published var paginatingLoading = false
     @Published var isAll = false
 
-
+	private var profileBaseEventSearch: [EventsQuery.QueryValue] = Constants.baseEventSearch
     var searchResponseDTO: SearchResponseDTO?
     @Published var selectedType: [EventType: Bool] = Dictionary(uniqueKeysWithValues: Constants.baseSelectedEventSearch.map { ($0, false) })
 
@@ -38,7 +38,9 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
 
     init() {
         print("init ProfileViewModel() без параметров")
-        self.externalId = userRepository.externalId
+		let profileId = userRepository.externalId
+        self.externalId = profileId
+		self.initBaseSearch(profileId)
     }
 
     convenience init(externalId: Int? = nil) {
@@ -46,6 +48,7 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
         print("init ProfileViewModel(externalId: \(externalId ?? -1))")
         if let externalId = externalId {
             self.externalId = externalId
+			initBaseSearch(externalId)
         }
     }
     
@@ -55,11 +58,19 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
         self.externalId = profile.externalId
         self.profile = profile
         self.groupedTargets = groupedTargets(profile)
+		initBaseSearch(externalId)
     }
     
     deinit {
         print("deinit ProfileViewModel === externalId: \(externalId ?? -1)")
     }
+	
+	func initBaseSearch(_ profileId: Int?) {
+		var baseEvent = Constants.baseEventSearch
+		guard let profileId  else { return }
+			baseEvent.append(.assigneeExternalIds([String(profileId)]))
+		profileBaseEventSearch = baseEvent
+	}
 
     func groupedTargets(_ profile: UserProfileResultDto?) -> [TargetCategory: [UserTargetDtoModel]] {
         let test = profile?.userTargets
@@ -76,11 +87,9 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
     // MARK: - Public Methods
     func onApper(onReset: Bool = false) {
         Task {
-            if let profileDto = userRepository.userProfile, externalId == nil, !onReset {
-                await updateUI(profile: profileDto)
-            } else {
-                await updateProfile()
-                await getNextEvents(resetSearch: onReset)
+            if profile == nil || externalId == nil || onReset {
+				await updateProfile()
+				await getNextEvents(resetSearch: onReset)
             }
         }
     }
