@@ -33,6 +33,8 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
     @State private var isExpanded: Bool = false
     /// переход на экаран редактирования
     @State private var isEditing: Bool = false
+    /// Показать алерт закрытия экрана редактирования
+    @State private var showDismissEditAlert: Bool = false
     /// Меняется статус цели
     @State private var isLoading = false
     /// Показать описание
@@ -190,6 +192,15 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
         }
         .sheet(isPresented: $isEditing) {
             TargetEditView<TargetsViewModel>(target: target, isCreateTarget: false)
+                .interactiveDismissDisabled(true) // Блокируем свайп
+                .alert("Закрыть?", isPresented: $showDismissEditAlert) {
+                    Button("Отмена", role: .cancel) {}
+                    Button("Выйти", role: .destructive) { 
+                        isEditing = false 
+                    }
+                } message: {
+                    Text("Все изменения будут потеряны.")
+                }
         }
     }
     

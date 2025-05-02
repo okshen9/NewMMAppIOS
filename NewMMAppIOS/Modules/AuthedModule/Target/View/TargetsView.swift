@@ -42,6 +42,7 @@ struct TargetsView: View {
             }
             .sheet(isPresented: $showAddTarget) {
                 TargetEditView<TargetsViewModel>(category: .money, isCreateTarget: true)
+                    .interactiveDismissDisabled(true)
             }
             .alert(isPresented: $showErrorAlert) {
                 Alert(
@@ -60,6 +61,7 @@ struct TargetsView: View {
         .onChange(of: viewModel.errorMessage) { _, newValue in
             showErrorAlert = newValue != nil
         }
+		
     }
     
     // MARK: - Empty State View

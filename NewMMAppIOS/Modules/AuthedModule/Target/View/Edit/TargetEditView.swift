@@ -17,6 +17,7 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
     @StateObject private var viewModel: TargetEditViewModel
     
     @State var isLoading = false
+    @State private var showDismissAlert = false
     
     var target: UserTargetDtoModel
     var isCreateTarget: Bool
@@ -96,9 +97,16 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
             } message: {
                 Text(validationMessage)
             }
+            .alert("Закрыть?", isPresented: $showDismissAlert) {
+                Button("Отмена", role: .cancel) {}
+                Button("Закрыть", role: .destructive) { dismiss() }
+            } message: {
+                Text("Все изменения будут потеряны.")
+            }
         }
         .navigationTitle(isCreateTarget ? "Создание цели" : "Редактирование цели")
         .navigationBarTitleDisplayMode(.inline)
+        .interactiveDismissDisabled(true) // Блокируем свайп
         .onAppear {
             viewModel.validateTarget()
             viewModel.validateSubTargets()
@@ -160,6 +168,12 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
     @ViewBuilder
     func headerView() -> some View {
         HStack {
+			Button(action: {
+				showDismissAlert = true
+			}) {
+				Image(systemName: "xmark")
+					.foregroundStyle(Color.mainRed)
+			}
             Text(isCreateTarget ? "Создание цели" : "Редактирование цели")
                 .font(Font.subheadline)
                 .foregroundStyle(Color.headerText)
@@ -175,6 +189,7 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                     saveTarget()
                 }, label: {
                     HStack(spacing: 0) {
+						Spacer()
                         Text("Готово")
                             .font(.caption.weight(.medium))
                             .foregroundColor(viewModel.isFormValid ? .mainRed : .gray)
