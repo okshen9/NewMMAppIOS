@@ -41,6 +41,13 @@ extension Binding where Value == String? {
             set: { wrappedValue = $0.toApiString }
         )
     }
+	
+	var asBindingEndDate: Binding<Date> {
+		Binding<Date>(
+			get: { (wrappedValue?.dateFromStringISO8601?.endOfDay) ?? Date().endOfDay },
+			set: { wrappedValue = $0.toApiString }
+		)
+	}
     
     var orEmptyBinding: Binding<String> {
         Binding<String>(

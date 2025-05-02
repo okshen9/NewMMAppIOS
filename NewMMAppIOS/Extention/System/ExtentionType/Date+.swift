@@ -93,4 +93,13 @@ extension Date {
     static func nowWith(plus days: Int) -> Date {
         return Date().addingTimeInterval(3600.0 * 24 * Double(days))
     }
+    
+    /// Возвращает дату с временем 23:59:59
+    var endOfDay: Date {
+        return Calendar.current.date(bySettingHour: 23, minute: 59, second: 59, of: self) ?? self
+    }
+	
+	static func endOfDay(_ dateString: String) -> Date {
+		return dateString.dateFromApiString.orNow.endOfDay
+	}
 }

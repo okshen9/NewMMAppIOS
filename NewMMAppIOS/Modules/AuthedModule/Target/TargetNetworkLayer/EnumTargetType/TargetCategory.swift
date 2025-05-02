@@ -53,3 +53,9 @@ enum TargetCategory: String, UnknownCasedEnum, JSONRepresentable, CaseIterable, 
         }
     }
 }
+
+extension TargetCategory? {
+	func orDefault(_ defaultValue: TargetCategory) -> TargetCategory {
+		self ?? defaultValue
+	}
+}

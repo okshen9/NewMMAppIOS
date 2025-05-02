@@ -20,6 +20,7 @@ struct PayRequestView: View {
                     List(payRequest, id: \.id) { payment in
                         PaymentRowView(payment: payment)
                     }
+					
                     .listStyle(.plain)
                     .navigationTitle("Платежи")
 					.refreshable {
