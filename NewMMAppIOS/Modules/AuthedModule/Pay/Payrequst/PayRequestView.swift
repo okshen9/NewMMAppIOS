@@ -20,8 +20,8 @@ struct PayRequestView: View {
                     List(payRequest, id: \.id) { payment in
                         PaymentRowView(payment: payment)
                     }
-					
                     .listStyle(.plain)
+					.listRowSeparator(.hidden)
                     .navigationTitle("Платежи")
 					.refreshable {
 						Task.detached {
