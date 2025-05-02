@@ -12,6 +12,8 @@ protocol TargetRowViewModelProtocol: ObservableObject {
     func closedTarget(target: UserTargetDtoModel)
     /// удлить цель
     func deleteTarget(target: UserTargetDtoModel)
+    /// Состояние для диалога подтверждения закрытия
+    var showDiscardChangesAlert: Bool { get set }
 }
 
 struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {

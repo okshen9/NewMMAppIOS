@@ -20,6 +20,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
     @Published var tasksItems: [TaskProgress] = []
     @Published var pieModels: [PieModel] = []
     @Published var groupedTargets: [TargetCategory: [UserTargetDtoModel]] = [:]
+	@Published var showDiscardChangesAlert = false
     
     // MARK: - Private Properties
     private let networkService = ServiceBuilder.shared
