@@ -385,30 +385,34 @@ struct ProfileView: View {
                     subTitle: streamStatus,
                     action: {})
             }
-            
-            if let userGroup = profile.userGroups,
-               let stream = profile.stream,
-               let owners = userGroup.owners,
-               let participants = userGroup.participants
-            {
-                NavigationLink(destination: {
-                    StreamProfileList(
-                        type: .stream(userGroup.title ?? "Подгруппа без названия"),
-                        status: stream.isActive ? .current : .ended,
-                        mentors: owners,
-                        participants: participants,
-                        dateStart: (profile.stream?.dateFrom?.dateFromStringISO8601) ?? Date.init(timeIntervalSince1970: 232),
-                        dateEnd: (profile.stream?.dateTo?.dateFromStringISO8601) ?? Date.now
-                    )}, label: {
-                        GroupButton(title: profile.userGroups?.title ?? "Подгруппа",
-                                    subTitle: (profile.userGroups?.title).isNil ? "Не названчена" : nil,
-                                    action: {})
-                    })
-            } else {
-                GroupButton(title: profile.userGroups?.title ?? "Подгруппа",
-                            subTitle: (profile.userGroups?.title).isNil ? "Не названчена" : nil,
-                            action: {})
-            }
+  
+			GroupButton(title: "Подгруппа",
+						subTitle: "Не названчена",
+						action: {})
+			// TODO: NESHKO
+//            if let userGroup = profile.userGroups,
+//               let stream = profile.stream,
+//               let owners = userGroup.owners,
+//               let participants = userGroup.participants
+//            {
+//                NavigationLink(destination: {
+//                    StreamProfileList(
+//                        type: .stream(userGroup.title ?? "Подгруппа без названия"),
+//                        status: stream.isActive ? .current : .ended,
+//                        mentors: owners,
+//                        participants: participants,
+//                        dateStart: (profile.stream?.dateFrom?.dateFromStringISO8601) ?? Date.init(timeIntervalSince1970: 232),
+//                        dateEnd: (profile.stream?.dateTo?.dateFromStringISO8601) ?? Date.now
+//                    )}, label: {
+//                        GroupButton(title: profile.userGroups?.title ?? "Подгруппа",
+//                                    subTitle: (profile.userGroups?.title).isNil ? "Не названчена" : nil,
+//                                    action: {})
+//                    })
+//            } else {
+//                GroupButton(title: profile.userGroups?.title ?? "Подгруппа",
+//                            subTitle: (profile.userGroups?.title).isNil ? "Не названчена" : nil,
+//                            action: {})
+//            }
             
         }
         .frame(height: 56)

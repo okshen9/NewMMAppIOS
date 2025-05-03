@@ -17,7 +17,8 @@ struct UserProfileResultDto: Codable, Equatable, Hashable {
     let isDeleted: Bool?
     let creationDateTime: String?
     let lastUpdatingDateTime: String?
-    let userGroups: UserGroupResultDto?
+	// TODO: Neshko
+//    let userGroups: UserGroupResultDto?
     let stream: StreamResultDto?
     let comment: String?
     let photoUrl: String?
@@ -43,7 +44,8 @@ struct UserProfileResultDto: Codable, Equatable, Hashable {
         self.isDeleted = isDeleted
         self.creationDateTime = creationDateTime
         self.lastUpdatingDateTime = lastUpdatingDateTime
-        self.userGroups = userGroups
+		//TODO: neshko
+//        self.userGroups = userGroups
         self.stream = stream
         self.comment = comment
         self.photoUrl = photoUrl
@@ -67,7 +69,8 @@ struct UserProfileResultDto: Codable, Equatable, Hashable {
         self.isDeleted = try container.decodeIfPresent(Bool.self, forKey: .isDeleted)
         self.creationDateTime = try container.decodeIfPresent(String.self, forKey: .creationDateTime)
         self.lastUpdatingDateTime = try container.decodeIfPresent(String.self, forKey: .lastUpdatingDateTime)
-        self.userGroups = try container.decodeIfPresent(UserGroupResultDto.self, forKey: .userGroups)
+		//TODO: neshko
+//        self.userGroups = try container.decodeIfPresent(UserGroupResultDto.self, forKey: .userGroups)
         self.stream = try container.decodeIfPresent(StreamResultDto.self, forKey: .stream)
         self.comment = try container.decodeIfPresent(String.self, forKey: .comment)
         self.photoUrl = try container.decodeIfPresent(String.self, forKey: .photoUrl)
