@@ -20,7 +20,16 @@ public class APIDataTasksBuilder {
         let config = URLSessionConfiguration.default
         config.waitsForConnectivity = true
         config.timeoutIntervalForRequest = 5
-        return URLSession(configuration: config)
+		var delegat: URLSessionDelegate? {
+			if AppStateSystemService.shared.prodServ != .prod {
+				return UnsafeSSLDelegate()
+			} else {
+				return nil
+			}
+		}
+		var session = URLSession(configuration: config, delegate: delegat, delegateQueue: .main)
+
+        return session
     }
     
 

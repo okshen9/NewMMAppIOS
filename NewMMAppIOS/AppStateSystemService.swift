@@ -11,7 +11,7 @@ final class AppStateSystemService: ObservableObject {
 	static let shared = AppStateSystemService()
 	private init() { }
 	
-	@Published var prodServ: AppSystemTarget = .prod
+	@Published var prodServ: AppSystemTarget = .test
 	
 
 }
