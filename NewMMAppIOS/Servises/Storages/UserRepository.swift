@@ -11,6 +11,25 @@ import WebKit
 //actor
 class UserRepository {
     static let shared = UserRepository()
+	
+	private var _nameStend: String?
+	var nameStend: String? {
+		get {
+			if let nameStend = UserDefaultsStorege.nameStend.getData(String.self) {
+				_nameStend = nameStend
+				return nameStend
+			}
+			return nil
+		}
+	}
+	func setNameStend(_ newValue: String) {
+		_nameStend = newValue
+		UserDefaultsStorege.nameStend.save(value: newValue)
+	}
+	func clearNameStend() {
+		UserDefaultsStorege.nameStend.clearDefaults()
+		_nameStend = nil
+	}
     
     // MARK: - authUser
     private(set) var authUser: AuthTGRequestModel?

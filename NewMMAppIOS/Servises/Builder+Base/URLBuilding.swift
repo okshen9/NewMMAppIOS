@@ -51,8 +51,6 @@ public extension URLBuilding {
 // MARK: - URLBuilding
 
 public struct APIURLBuilder: URLBuilding {
-//    #if DEBUG
-	
 	var baseUrl: String {
 		switch AppStateSystemService.shared.prodServ {
 		case .prod:

@@ -67,6 +67,7 @@ final class AuthSUIViewModel: NSObject, ObservableObject {
 
 
 extension AuthSUIViewModel: WKUIDelegate, WKNavigationDelegate {
+
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         if let url = navigationAction.request.url,
            let tgKey = validateWebRequest(url: url) {
@@ -80,10 +81,9 @@ extension AuthSUIViewModel: WKUIDelegate, WKNavigationDelegate {
     }
     
     func webViewDidClose(_ webView: WKWebView) {
-        webView.isHidden = true
-        webView.endEditing(true)
+		webView.endEditing(true)
         withAnimation {
-            showWebView = false
+			showWebView.toggle()
         }
     }
 }

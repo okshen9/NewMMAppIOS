@@ -39,6 +39,7 @@ struct AuthSUIView: View {
 				WebView(url: URL(string: RequestUrls.tgStand)!,
                         navigationDelegate: viewModel,
                         uiDelegate: viewModel)
+				.opacity(viewModel.showWebView ? 1 : 0)
                 .edgesIgnoringSafeArea(.all)
                 .transition(.opacity)
             }
@@ -101,7 +102,7 @@ struct AuthSUIView: View {
     private var telegramButton: some View {
         Button(action: {
             withAnimation {
-                viewModel.showWebView = true
+				viewModel.showWebView.toggle()
             }
         }) {
             HStack {

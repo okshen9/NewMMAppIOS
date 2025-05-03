@@ -14,6 +14,8 @@ extension UserRepository {
         case roles = "userRoles"
         /// Id
         case externalId = "externalId"
+		/// nameStand
+		case nameStend = "AppMasterMindNameStend"
         
         @discardableResult
         func save<T: Codable>(value: T) -> Bool {
