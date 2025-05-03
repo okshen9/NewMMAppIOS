@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 @MainActor
-class AppStateService: ObservableObject {
+class AppNavigationStateService: ObservableObject {
     @Published private(set) var state: AppState = .unAuthorized
 
     func setNewState(_ newState: AppState) {

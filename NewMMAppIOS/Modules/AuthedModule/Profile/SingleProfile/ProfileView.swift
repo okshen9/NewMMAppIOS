@@ -3,7 +3,7 @@ import Kingfisher
 //import Yamobaile
 
 struct ProfileView: View {
-    @EnvironmentObject var appStateService: AppStateService
+    @EnvironmentObject var appStateService: AppNavigationStateService
     @EnvironmentObject var navigationManager: NavigationManager<AuthRoute>
     @StateObject private var viewModel = ProfileViewModel()
     @State private var showMap = false

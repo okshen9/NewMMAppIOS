@@ -31,7 +31,9 @@ final class AuthSUIViewModel: NSObject, ObservableObject {
             print("Neshko telegramCallBack")
             let authQueryModel = AuthQueryModel(tgData: tgKey)
             guard let authModel = await getAuthProfile(authQueryModel: authQueryModel) else {
-                navPath = .authView
+				await MainActor.run {
+					navPath = .authView
+				}
                 return
             }
             UserRepository.shared.setAuthUser(authModel)

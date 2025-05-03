@@ -10,7 +10,7 @@ import SwiftUI
 @main
 struct NewMMAppIOSApp: App {
     // StateObject должны инициализироваться здесь
-    @StateObject private var appStateService = AppStateService()
+    @StateObject private var appStateService = AppNavigationStateService()
     @StateObject private var authNavigationManager: NavigationManager<AuthRoute> = .init()
     @State private var showDebugPanel: Bool = false
 
@@ -52,7 +52,7 @@ struct NewMMAppIOSApp: App {
                 ServiceBuilder.shared.setAppStateServise(appStateService)
 
                 // Установка начального состояния
-                let newState: AppStateService.AppState =
+                let newState: AppNavigationStateService.AppState =
                 ((UserRepository.shared.roles?.contains(Roles.user.rawValue)).orFalse ||
                 (UserRepository.shared.roles?.contains(Roles.admin.rawValue)).orFalse) &&
                 !UserRepository.shared.jwt.isEmptyOrNil && !UserRepository.shared.refreshJWT.isEmptyOrNil
@@ -64,7 +64,7 @@ struct NewMMAppIOSApp: App {
                 showDebugPanel = true
             }
             .sheet(isPresented: $showDebugPanel) {
-                TestScreenVC()
+				TestScreenVC(appStateService: appStateService)
             }
             .environmentObject(appStateService)
         }

@@ -22,7 +22,7 @@ import Foundation
 
 final class ServiceBuilder: AbstractService {
     private(set) var apiFactory: APIFactory //RequestCompositeProtocol
-    private var appState: AppStateService?
+    private var appState: AppNavigationStateService?
 
     /// Инициализатор
     /// - Parameters:
@@ -38,7 +38,7 @@ final class ServiceBuilder: AbstractService {
 
     static let shared: ServiceBuilder = .init()
 
-    func setAppStateServise(_ appState: AppStateService) {
+    func setAppStateServise(_ appState: AppNavigationStateService) {
         self.appState = appState
     }
 }

@@ -12,7 +12,7 @@ enum RequestUrls {
 //    static let baseUrl = "http://194.87.93.98:8080"
     static let prodBaseUrl = "https://appmastermind.ru/api"
     static let testBaseUrl = "https://45.141.102.197/api"
-//    static let baseUrl = "http://localhost:8080"
+    static let localhostBaseUrl = "http://localhost:8080"
     
     // MARK: - Работа с профилем
     
@@ -78,4 +78,19 @@ enum RequestUrls {
     static let paymentPlanForExternalId = "/payment-requests/externalId/me"
     
     
+	fileprivate static let tgTestStand = "https://oauth.telegram.org/auth?bot_id=7585753405&origin=http%3A%2F%2F45.141.102.197&embed=1&return_to=http%3A%2F%2F45.141.102.197%2Fauth%2Fauthentication"
+	fileprivate static let tgProdStaned = "https://oauth.telegram.org/auth?bot_id=7088271693&origin=https%3A%2F%2Fappmastermind.ru&embed=1&return_to=http%3A%2F%2Fappmastermind.ru%2Fauth%2Fauthentication"
+}
+
+
+extension RequestUrls {
+	// для теста
+	static var tgStand: String {
+		switch AppStateSystemService.shared.prodServ {
+		case .prod:
+			return RequestUrls.tgProdStaned
+		case .test:
+			return RequestUrls.tgTestStand
+		}
+	}
 }

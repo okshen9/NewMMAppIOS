@@ -10,7 +10,7 @@ import SwiftUI
 struct ProfileInfoView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var viewModel: ProfileInfoViewModel
-    @EnvironmentObject var appStateServise: AppStateService
+    @EnvironmentObject var appStateServise: AppNavigationStateService
     @State var isKeyboardVisible = false
 
     var body: some View {

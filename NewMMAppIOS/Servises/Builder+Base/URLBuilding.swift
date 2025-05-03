@@ -52,10 +52,15 @@ public extension URLBuilding {
 
 public struct APIURLBuilder: URLBuilding {
 //    #if DEBUG
-    let baseUrl = RequestUrls.testBaseUrl
-//    #else
-//    let baseUrl = RequestUrls.prodBaseUrl
-//    #endif
+	
+	var baseUrl: String {
+		switch AppStateSystemService.shared.prodServ {
+		case .prod:
+			return RequestUrls.prodBaseUrl
+		case .test:
+			return RequestUrls.testBaseUrl
+		}
+	}
     
     
     public func buildURL(path: String) throws -> URL {
