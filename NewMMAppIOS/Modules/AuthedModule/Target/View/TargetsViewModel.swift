@@ -180,7 +180,13 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
     
     private func editTarget(_ target: UserTargetDtoModel) async -> UserTargetDtoModel? {
         do {
-            let updatedTarget = try await networkService.updateTargetAll(model: target)
+			var minModel: UserTargetDtoModel
+			if let oldTarget = targets.first(where: {$0.id == target.id}) {
+				minModel = target.minimalChangeModel(oldModel: oldTarget)
+			} else {
+				minModel = target
+			}
+			let updatedTarget = try await networkService.updateTargetAll(model: minModel)
             await refreshTargetsData()
             return updatedTarget
         } catch {
@@ -266,57 +272,61 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
     }
     
     /// Закрывает последнюю подцель и при необходимости закрывает родительскую цель или создает новую подцель
-    func closedSubTargetWithParent(_ subTarget: UserSubTargetDtoModel, closeParent: Bool) {
-        errorMessage = nil
-        
-        var findedTarget: UserTargetDtoModel? = nil
-        
-        // Ищем TargetModel, содержащую нужный SubTarget
-        for (targetIndex, target) in targets.enumerated() {
-            if let subTargets = target.subTargets,
-               let subTargetIndex = subTargets.firstIndex(where: { $0.id == subTarget.id }) {
-                
-                findedTarget = targets[targetIndex]
-                
-                // Закрываем подцель
-                findedTarget?.subTargets?[subTargetIndex].targetStatus?.changeSelfStatus()
-                
-                // Если выбрано "Цель закрыта полностью", меняем статус цели на done/doneExpired
-                if closeParent {
-                    // Проверяем, просрочена ли цель
-                    let deadlineDate = findedTarget?.deadLineDateTime?.dateFromStringISO8601 ?? Date()
-                    let now = Date()
-                    
-                    if deadlineDate < now {
-                        findedTarget?.targetStatus = .doneExpired
-                    } else {
-                        findedTarget?.targetStatus = .done
-                    }
-                }
-            }
-        }
-        
-        guard let findedTarget else { return }
-        
-        Task { [weak self] in
-            do {
-                // Обновляем цель с новым статусом подцели и, возможно, цели
-                let updatedTarget = try await self?.networkService.updateTargetAll(model: findedTarget)
-                
-//                // Если выбрано НЕ закрывать цель полностью, добавляем новую подцель
-//                if !closeParent {
-//                    self?.addNewSubtarget(
-//                        to: findedTarget,
-//                        withName: "Завершить \(findedTarget.title ?? "цель")"
-//                    )
-//                } else {
-                    await self?.refreshTargetsData()
-//                }
-            } catch {
-                print("Ошибка при закрытии последней подцели: \(error.localizedDescription)")
-            }
-        }
-    }
+	func closedSubTargetWithParent(_ subTarget: UserSubTargetDtoModel, closeParent: Bool) {
+		errorMessage = nil
+		
+		var findedTarget: UserTargetDtoModel? = nil
+		
+		// Ищем TargetModel, содержащую нужный SubTarget
+		for (targetIndex, target) in targets.enumerated() {
+			if let subTargets = target.subTargets,
+			   let subTargetIndex = subTargets.firstIndex(where: { $0.id == subTarget.id }) {
+				
+				findedTarget = targets[targetIndex]
+				
+				// Закрываем подцель
+				findedTarget?.subTargets?[subTargetIndex].targetStatus?.changeSelfStatus()
+				
+				// Если выбрано "Цель закрыта полностью", меняем статус цели на done/doneExpired
+				if closeParent {
+					// Проверяем, просрочена ли цель
+					let deadlineDate = findedTarget?.deadLineDateTime?.dateFromStringISO8601 ?? Date()
+					let now = Date()
+					
+					if deadlineDate < now {
+						findedTarget?.targetStatus = .doneExpired
+					} else {
+						findedTarget?.targetStatus = .done
+					}
+				}
+			}
+		}
+		
+		guard
+			let findedTarget,
+			let oldModel = targets.first(where: {$0.id == findedTarget.id})
+		else { return }
+		let minimalModel = findedTarget.minimalChangeModel(oldModel: oldModel)
+		
+		Task { [weak self] in
+			do {
+				// Обновляем цель с новым статусом подцели и, возможно, цели
+				let updatedTarget = try await self?.networkService.updateTargetAll(model: minimalModel)
+				
+				//                // Если выбрано НЕ закрывать цель полностью, добавляем новую подцель
+				//                if !closeParent {
+				//                    self?.addNewSubtarget(
+				//                        to: findedTarget,
+				//                        withName: "Завершить \(findedTarget.title ?? "цель")"
+				//                    )
+				//                } else {
+				await self?.refreshTargetsData()
+				//                }
+			} catch {
+				print("Ошибка при закрытии последней подцели: \(error.localizedDescription)")
+			}
+		}
+	}
     
     /// Добавляет новую подцель к указанной цели
     func addNewSubtarget(to parentTarget: UserTargetDtoModel, withName name: String) {
@@ -359,6 +369,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
         }
     }
     
+	/// Закрывает цель
     func closedTarget(target: UserTargetDtoModel) {
         isLoading = true
         var tempTarget = target
@@ -367,7 +378,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
         
         Task { [weak self] in
             do {
-                let updatedTarget = try await self?.networkService.updateTargetAll(model: tempTarget)
+				let updatedTarget = try await self?.networkService.updateTargetAll(model: tempTarget.minimalChangeModel(oldModel: target))
                 
                 await self?.refreshTargetsData()
                 await MainActor.run {

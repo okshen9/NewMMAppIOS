@@ -9,8 +9,11 @@ import SwiftUI
 import Combine
 
 protocol SubTargetRowViewModelProtocol: ObservableObject {
+	/// Закрывает подцель
     func closedSubTarget(_ target: UserSubTargetDtoModel)
+	/// Закрывает последнюю подцель и при необходимости закрывает родительскую цель или создает новую подцель
     func closedSubTargetWithParent(_ subTarget: UserSubTargetDtoModel, closeParent: Bool)
+	/// Добавляет новую подцель к указанной цели
     func addNewSubtarget(to parentTarget: UserTargetDtoModel, withName name: String)
 }
 
@@ -105,7 +108,7 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
         .onChange(of: subTarget, {
             isLoading = false
         })
-        .alert("Завершить подцель?", isPresented: $showConfirmationDialog) {
+		.alert((subTarget.targetStatus?.isDone).orFalse ? "Переоткрыть подцель?" : "Завершить подцель?", isPresented: $showConfirmationDialog) {
             Button("Да") {
                 isLoading = true
 //                viewModelEnvironment.closedSubTarget(subTarget)
@@ -125,7 +128,8 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
             description: "Тестовое описание подцели",
             targetSubStatus: .done
         ),
-        parentTarget: .init(title: "Parent Target")
+		parentTarget: .init(id: 0,
+							title: "Parent Target")
     )
     .environmentObject(TargetsViewModel())
 }

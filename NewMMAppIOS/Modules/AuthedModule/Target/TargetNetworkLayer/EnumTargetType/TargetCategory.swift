@@ -18,23 +18,6 @@ enum TargetCategory: String, UnknownCasedEnum, JSONRepresentable, CaseIterable, 
     case unknown = "unknown"
     
     var id: String { rawValue }
-    
-//    var color: Color {
-//        switch self {
-//        case .money:
-//                .yellow
-//        case .personal:
-//                .blue
-//        case .family:
-//                .mainRed
-//        case .health:
-//                .green
-//        case .unknown:
-//                .purple
-//        case .other:
-//                .cyan
-//        }
-//    }
 
     var color: Color {
         switch self {

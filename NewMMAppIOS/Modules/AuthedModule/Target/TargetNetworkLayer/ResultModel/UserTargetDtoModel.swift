@@ -26,6 +26,8 @@ struct UserTargetDtoModel: Codable, JSONRepresentable, Identifiable, Hashable {
     var streamId: Int?
     /// Статус цели
     var targetStatus: TargetStatus?
+	/// Статус модерации цели
+	var targetModerationStatus: TargetModerationStatus?
     /// Подцели для выполнения цели
     var subTargets: [UserSubTargetDtoModel]?
     /// Признак (флаг) удаления цели (true - удалена, false - нет)
@@ -52,20 +54,21 @@ struct UserTargetDtoModel: Codable, JSONRepresentable, Identifiable, Hashable {
         self.targetStatus = sattus
     }
     
-    init(id: Int? = nil, title: String? = nil, description: String? = nil, userExternalId: Int? = nil, percentage: Double? = nil, deadLineDateTime: String? = nil, streamId: Int? = nil, targetStatus: TargetStatus? = nil, subTargets: [UserSubTargetDtoModel]? = nil, isDeleted: Bool? = nil, creationDateTime: String? = nil, lastUpdatingDateTime: String? = nil, category: TargetCategory? = nil) {
-        self.id = id
-        self.title = title.orEmpty
-        self.description = description.orEmpty
-        self.userExternalId = userExternalId ?? UserRepository.shared.externalId
-        self.percentage = percentage ?? 0
-        self.deadLineDateTime = deadLineDateTime ?? Date().toApiString
-        self.streamId = streamId ?? 0
-        self.targetStatus = targetStatus ?? .draft
-        self.subTargets = subTargets ?? .none
-        self.isDeleted = isDeleted ?? false
-        self.creationDateTime = creationDateTime ?? deadLineDateTime ?? Date.nowWith(plus: .random(in: 0...10)).toApiString
-        self.lastUpdatingDateTime = lastUpdatingDateTime ?? deadLineDateTime ?? Date.nowWith(plus: .random(in: 0...10)).toApiString
-        self.category = category ?? .money
+    init(id: Int?, title: String? = nil, description: String? = nil, userExternalId: Int? = nil, percentage: Double? = nil, deadLineDateTime: String? = nil, streamId: Int? = nil, targetStatus: TargetStatus? = nil, targetModerationStatus: TargetModerationStatus? = nil, subTargets: [UserSubTargetDtoModel]? = nil, isDeleted: Bool? = nil, creationDateTime: String? = nil, lastUpdatingDateTime: String? = nil, category: TargetCategory? = nil) {
+		self.id = id
+        self.title = title
+        self.description = description
+        self.userExternalId = userExternalId
+        self.percentage = percentage
+        self.deadLineDateTime = deadLineDateTime
+        self.streamId = streamId
+        self.targetStatus = targetStatus
+        self.subTargets = subTargets
+        self.isDeleted = isDeleted
+        self.creationDateTime = creationDateTime
+        self.lastUpdatingDateTime = lastUpdatingDateTime
+        self.category = category
+		self.targetModerationStatus = targetModerationStatus
     }
     
     init(from decoder: any Decoder) throws {
@@ -78,6 +81,7 @@ struct UserTargetDtoModel: Codable, JSONRepresentable, Identifiable, Hashable {
         self.deadLineDateTime = try container.decodeIfPresent(String.self, forKey: .deadLineDateTime)
         self.streamId = try container.decodeIfPresent(Int.self, forKey: .streamId)
         self.targetStatus = try container.decodeIfPresent(TargetStatus.self, forKey: .targetStatus)
+		self.targetModerationStatus = try container.decodeIfPresent(TargetModerationStatus.self, forKey: .targetModerationStatus)
         self.subTargets = try container.decodeIfPresent([UserSubTargetDtoModel].self, forKey: .subTargets)
         self.isDeleted = try container.decodeIfPresent(Bool.self, forKey: .isDeleted)
         self.creationDateTime = try container.decodeIfPresent(String.self, forKey: .creationDateTime)
@@ -114,6 +118,7 @@ extension UserTargetDtoModel: Equatable {
         lhs.streamId == rhs.streamId &&
         lhs.targetStatus == rhs.targetStatus &&
         lhs.subTargets == rhs.subTargets &&
+		lhs.targetModerationStatus == rhs.targetModerationStatus &&
         lhs.isDeleted == rhs.isDeleted &&
         lhs.creationDateTime == rhs.creationDateTime &&
         lhs.lastUpdatingDateTime == rhs.lastUpdatingDateTime &&
@@ -123,6 +128,101 @@ extension UserTargetDtoModel: Equatable {
 
 
 extension UserTargetDtoModel {
+	func getStatusDescription(status: TargetStatus? = nil) -> String {
+		guard let status = status ?? self.targetStatus else { return TargetStatus.unknown.title }
+		switch status {
+			case .inProgress:
+			return "\(status.title) + \(Int(self.percentage ?? 0))%"
+		default:
+			return status.title
+		}
+	}
+	
+	/// Создает модель, содержащую только ID и измененные поля по сравнению с предыдущей моделью
+	/// - Parameter oldModel: Предыдущая модель для сравнения
+	/// - Returns: Минимальная модель с измененными полями
+	func minimalChangeModel(oldModel: UserTargetDtoModel) -> UserTargetDtoModel {
+		// Создаем новую модель только с ID
+		var minimalModel = UserTargetDtoModel(id: self.id)
+		
+		// Сравниваем каждое поле и добавляем только те, которые изменились
+		if title != oldModel.title {
+			minimalModel.title = title
+		}
+		
+		if description != oldModel.description {
+			minimalModel.description = description
+		}
+		
+		if userExternalId != oldModel.userExternalId {
+			minimalModel.userExternalId = userExternalId
+		}
+		
+		if percentage != oldModel.percentage {
+			minimalModel.percentage = percentage
+		}
+		
+		if deadLineDateTime != oldModel.deadLineDateTime {
+			minimalModel.deadLineDateTime = deadLineDateTime
+		}
+		
+		if streamId != oldModel.streamId {
+			minimalModel.streamId = streamId
+		}
+		
+		if targetStatus != oldModel.targetStatus {
+			minimalModel.targetStatus = targetStatus
+		}
+		
+		if targetModerationStatus != oldModel.targetModerationStatus {
+			minimalModel.targetModerationStatus = targetModerationStatus
+		}
+		
+		if let newSubTargets = subTargets, let oldSubTargets = oldModel.subTargets {
+			// Если размеры массивов разные, считаем что массив изменился
+			var tempArray: [UserSubTargetDtoModel] = []
+			if newSubTargets.count != oldSubTargets.count {
+				minimalModel.subTargets = newSubTargets
+			} else {
+				// Проверяем, есть ли различия в подцелях
+				zip(newSubTargets, oldSubTargets).forEach { newTarget, oldTarget in
+					if newTarget != oldTarget {
+						tempArray.append(newTarget.minimalChangeModel(oldModel: oldTarget))
+					}
+				}
+
+				
+				if !tempArray.isEmpty {
+					minimalModel.subTargets = tempArray
+				}
+			}
+		} else if (subTargets == nil && oldModel.subTargets != nil) || 
+				  (subTargets != nil && oldModel.subTargets == nil) {
+			// Если один из массивов nil, а другой нет, считаем что изменился
+			minimalModel.subTargets = subTargets
+		}
+		
+		if isDeleted != oldModel.isDeleted {
+			minimalModel.isDeleted = isDeleted
+		}
+		
+		if creationDateTime != oldModel.creationDateTime {
+			minimalModel.creationDateTime = creationDateTime
+		}
+		
+		if lastUpdatingDateTime != oldModel.lastUpdatingDateTime {
+			minimalModel.lastUpdatingDateTime = lastUpdatingDateTime
+		}
+		
+		if category != oldModel.category {
+			minimalModel.category = category
+		}
+		
+		return minimalModel
+	}
+	
+	
+	
     static func getBaseTarget(withOutSub: Bool = false, withOutDesc: Bool = false) -> UserTargetDtoModel {
         let subTargets = [
             UserSubTargetDtoModel(

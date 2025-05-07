@@ -37,7 +37,7 @@ enum TargetSubStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable,
     
     var isDone: Bool {
         return switch self {
-        case .done:
+		case .done:
             true
         case .notDone, .unknown:
             false

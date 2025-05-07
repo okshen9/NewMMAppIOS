@@ -27,9 +27,8 @@ struct CategorySectionView: View {
             
             // Список целей
             targetList()
-
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 8)
         .padding(.vertical, 12)
         .background(Color(.systemGroupedBackground))
         .cornerRadius(cornerRadius)
@@ -86,98 +85,52 @@ struct CategorySectionView: View {
 
     /// Список целей
     @ViewBuilder
-    func targetList() -> some View {
-        VStack(spacing: 16) {
-            ForEach(targets) { target in
-                VStack {
-                    HStack(alignment: .top, spacing: 12) {
-                        // Индикатор цели
-                        VStack(spacing: 6) {
-                            indicatorTargetView(target)
-                            if let subTargets = target.subTargets,
-                               !subTargets.isEmpty {
-                                subTasksLabel(subTargets)
-                            }
-                        }
-                        .offset(.init(width: 0, height: 12))
+	func targetList() -> some View {
+		VStack(spacing: 16) {
+			ForEach(targets) { target in
+						TargetRowView<TargetsViewModel>(
+							myTarget: myTarget,
+							target: target
+						)
 
-                        // Основной контент цели
-                        TargetRowView<TargetsViewModel>(
-                            myTarget: myTarget,
-                            target: target
-                        )
-                    }
-
-                }
-                .padding()
-                .background(Color(.white))
-                .cornerRadius(cornerRadius)
-                .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-                .swipeActions(edge: .trailing) {
-                    if myTarget {
-                        Button(role: .destructive) {
-                            withAnimation {
-                                viewModel.deleteTarget(target: target)
-                            }
-                        } label: {
-                            Label("Удалить", systemImage: "trash")
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    @ViewBuilder
-    func indicatorTargetView(_ target: UserTargetDtoModel) -> some View {
-        ZStack {
-            Circle()
-                .fill(category.color.opacity(0.15))
-                .frame(width: targetIndicatorSize, height: targetIndicatorSize)
-
-            // Прогресс-кольцо с градиентом
-            Circle()
-                .trim(from: 0, to: CGFloat((target.percentage ?? 0) / 100))
-                .stroke(
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            category.color,
-                            category.color.opacity(0.7)
-                        ]),
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    style: StrokeStyle(lineWidth: 3, lineCap: .round)
-                )
-                .frame(width: targetIndicatorSize - 4, height: targetIndicatorSize - 4)
-                .rotationEffect(.degrees(-90))
-
-            // Иконка цели
-            Image(systemName: getTargetIcon(for: target))
-                .font(.system(size: 14, weight: .medium))
-                .foregroundColor(category.color)
-        }
-    }
-    
-    @ViewBuilder
-    private func subTasksLabel(_ subTargets: [UserSubTargetDtoModel]) -> some View {
-        let done = subTargets.filter({ $0.targetStatus == .done }).count
-        let total = subTargets.count
-        
-        HStack(spacing: 4) {
-            Image(systemName: "checklist")
-                .font(.system(size: 8))
-            Text("\(done)/\(total)")
-                .font(.caption)
-        }
-        .foregroundColor(.blue)
-        .padding(.vertical, 3)
-        .padding(.horizontal, 6)
-        .background(
-            Capsule()
-                .fill(Color.blue.opacity(0.1))
-        )
-    }
+						
+				.background(Color(.white))
+				.cornerRadius(cornerRadius)
+				.shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+				.swipeActions(edge: .trailing) {
+					if myTarget {
+						Button(role: .destructive) {
+							withAnimation {
+								viewModel.deleteTarget(target: target)
+							}
+						} label: {
+							Label("Удалить", systemImage: "trash")
+						}
+					}
+				}
+//				.contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+//				.contextMenu {
+//					Button(action: {
+////								showCloseTaskDialog = true
+//					}, label: {
+//						Text((target.targetStatus?.isDone).orFalse ? "Переоткрыть цель" : "Закрыть цель")
+//					})
+//		
+//					Button(action: {
+////								isEditing = true
+//					}, label: {
+//						Text("Изменить цель")
+//					})
+//		
+//					Button(action: {
+////								showDeleteTaskDialog = true
+//					}, label: {
+//						Text("Удалить цель")
+//					})
+//				}
+			}
+		}
+	}
 
     // Получение инициалов категории
     private func getCategoryInitials(_ title: String) -> String {
@@ -186,22 +139,6 @@ struct CategorySectionView: View {
             return String(words[0].first!).uppercased() + String(words[1].first!).uppercased()
         }
         return String(title.prefix(2)).uppercased()
-    }
-    
-    // Получение иконки для цели
-    private func getTargetIcon(for target: UserTargetDtoModel) -> String {
-        guard let status = target.targetStatus else { return "star" }
-        
-        switch status {
-        case .inProgress:
-            return "star"
-        case .done, .doneExpired:
-            return "star.fill"
-        case .expired:
-            return "exclamationmark.circle"
-        default:
-            return "star"
-        }
     }
 }
 
@@ -212,12 +149,15 @@ struct CategorySectionView: View {
         targets: [
             UserTargetDtoModel(
                 id: 1,
-                title: "Test Target",
-                description: "Description",
+//                title: "Test Tarsdf sdf sdf sdfdsfsdfsdfds fsdf sd fdfds fdsf sdf sdf sdfds f sdf sdf sdfsd fsd fget",
+//				title: "Task ee",
+				title: "Task eep[ooopopopopopopiiopopioipopi opiopi opi opi opi opi piopioopiopopopiopiiop l dg g dgfd fg dfgdgf gfddfgdfgnjuimimiioiiiklkj",
+                description: "Description d dsf gdfgdfg fdg dgdfg dsfg dsf gdfg sdf gds dfsg dfg",
                 percentage: 75,
-                subTargets: [.init(id: 1, title: "Subtarget 1"),
-                             .init(id: 2, title: "Subtarget 2")],
-                category: .money
+				targetStatus: .inProgress,
+				subTargets: [.init(id: 1, title: "Subtarget 1", description: "sdfsdfdsdf sdfsd fsd sfds fdsgdgsdfg dfg dfg dfs dfdfg dfdhds dsffssdf hsdfhdsfhsdhgdh"),
+													   .init(id: 2, title: "Subtarget 2")],
+				category: .money
             )
         ],
         onEdit: {}

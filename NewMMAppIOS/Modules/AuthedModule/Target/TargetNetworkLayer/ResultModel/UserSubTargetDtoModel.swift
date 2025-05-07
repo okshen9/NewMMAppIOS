@@ -29,7 +29,7 @@ struct UserSubTargetDtoModel: Codable, JSONRepresentable, Identifiable, Hashable
     /// Срок выполнения подцели
     var deadLineDateTime: String?
     
-    init(id: Int? = nil, title: String? = "", description: String? = nil, subTargetPercentage: Double? = 0.0, targetSubStatus: TargetSubStatus? = .notDone, rootTargetId: Int? = nil, isDeleted: Bool? = nil, creationDateTime: String? = nil, lastUpdatingDateTime: String? = nil, deadLineDateTime: String? = nil) {
+    init(id: Int? = nil, title: String? = nil, description: String? = nil, subTargetPercentage: Double? = nil, targetSubStatus: TargetSubStatus? = nil, rootTargetId: Int? = nil, isDeleted: Bool? = nil, creationDateTime: String? = nil, lastUpdatingDateTime: String? = nil, deadLineDateTime: String? = nil) {
         self.id = id
         self.title = title
         self.description = description
@@ -69,5 +69,54 @@ extension UserSubTargetDtoModel: Equatable {
         lhs.creationDateTime == rhs.creationDateTime &&
         lhs.lastUpdatingDateTime == rhs.lastUpdatingDateTime &&
         lhs.deadLineDateTime == rhs.deadLineDateTime
+    }
+}
+
+extension UserSubTargetDtoModel {
+    /// Создает модель, содержащую только ID и измененные поля по сравнению с предыдущей моделью подцели
+    /// - Parameter oldModel: Предыдущая модель подцели для сравнения
+    /// - Returns: Минимальная модель с измененными полями
+    func minimalChangeModel(oldModel: UserSubTargetDtoModel) -> UserSubTargetDtoModel {
+        // Создаем новую модель только с ID
+        var minimalModel = UserSubTargetDtoModel(id: self.id)
+        
+        // Сравниваем каждое поле и добавляем только те, которые изменились
+        if title != oldModel.title {
+            minimalModel.title = title
+        }
+        
+        if description != oldModel.description {
+            minimalModel.description = description
+        }
+        
+        if subTargetPercentage != oldModel.subTargetPercentage {
+            minimalModel.subTargetPercentage = subTargetPercentage
+        }
+        
+        if targetStatus != oldModel.targetStatus {
+            minimalModel.targetStatus = targetStatus
+        }
+        
+        if rootTargetId != oldModel.rootTargetId {
+            minimalModel.rootTargetId = rootTargetId
+        }
+        
+        if isDeleted != oldModel.isDeleted {
+            minimalModel.isDeleted = isDeleted
+        }
+        
+        if creationDateTime != oldModel.creationDateTime {
+            minimalModel.creationDateTime = creationDateTime
+        }
+        
+        if lastUpdatingDateTime != oldModel.lastUpdatingDateTime {
+            minimalModel.lastUpdatingDateTime = lastUpdatingDateTime
+        }
+        
+        if deadLineDateTime != oldModel.deadLineDateTime {
+            minimalModel.deadLineDateTime = deadLineDateTime
+        }
+        
+        return minimalModel
     }
 }

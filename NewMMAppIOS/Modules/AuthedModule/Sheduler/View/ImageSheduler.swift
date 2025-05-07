@@ -113,7 +113,7 @@ extension ImageSheduler {
                         event: CalendatItem(
                             user: .getTestUser(),
                             title: "Цель в процессе",
-                            type: .target(UserTargetDtoModel(targetStatus: .inProgress)),
+							type: .target(UserTargetDtoModel(id: 0, targetStatus: .inProgress)),
                             date: Date(),
                             category: .family
                         ),

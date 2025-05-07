@@ -32,7 +32,8 @@ struct TextEditorWithPalceHolder: View {
 
 #Preview {
     Group {
-        TargetEditView<TargetsViewModel>(target: .init(title: "Test",
+		TargetEditView<TargetsViewModel>(target: .init(id: 0,
+													   title: "Test",
                                                    targetStatus: .inProgress,
                                                    subTargets: [.init(title: "TestSub", targetSubStatus: .notDone, creationDateTime: Date.now.toApiString)]
                                                   ), isCreateTarget: false)
