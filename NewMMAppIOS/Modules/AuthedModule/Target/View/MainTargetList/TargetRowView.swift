@@ -48,6 +48,10 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 	@State private var showDescription: Bool = false
 	/// Показать инструкцию для статусов целей
 	@State private var showHelpStatusTooltip = false
+	/// Показать инструкцию для статусов целей
+	@State private var showHelpModerationStatusTooltip = false
+	
+	@State private var showHelpStatusTooltip2 = false
 	
 	private let categoryIndicatorSize: CGFloat = 36
 	
@@ -139,7 +143,6 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 				descriptionView
 				if let moderationStatus = target.targetModerationStatus,
 				   moderationStatus != .APPROVED {
-					Text("sdsd")
 					HStack {
 						Spacer()
 						moderationStatusView(moderationStatus)
@@ -159,16 +162,10 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 	
 	private var headerContentView: some View {
 		VStack(alignment: .leading, spacing: 6) {
-			HStack(alignment: .firstTextBaseline) {
+			HStack(alignment: .top) {
 				// Индикатор цели
-				VStack(spacing: 6) {
-					targetIndicatorWhithDesription(target)
-					
-					if let subTargets = target.subTargets,
-					   !subTargets.isEmpty {
-						subTasksLabel(subTargets)
-					}
-				}
+				targetIndicatorWhithDesription(target)
+					.offset(CGSize(width: 0, height: 4))
 				
 				Text(target.title.orEmpty)
 					.font(.system(size: 16, weight: .semibold))
@@ -205,6 +202,11 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 					let isDone = (target.targetStatus?.isDone ?? false)
 					let textPercent = isDone ? "Выполнил!" : "\(Int(percentage))%"
 					
+					
+					if let subTargets = target.subTargets,
+					   !subTargets.isEmpty {
+						subTasksLabel(subTargets)
+					}
 					Text(textPercent)
 						.font(.system(size: 14, weight: .medium))
 						.foregroundColor((percentage == 100 || isDone) ? .green : .gray)
@@ -214,7 +216,6 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 			let percentTarget: Double = (target.subTargets.isEmptyOrNil) ?
 			(((target.targetStatus?.isDone) ?? false) ? 100.0 : 0.0) :
 			target.percentage ?? 0.0
-			
 			ProgressView(value: percentTarget, total: 100)
 				.tint(percentTarget == 100 ? .green : .mainRed)
 				.background(Color.gray.opacity(0.1))
@@ -240,17 +241,53 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 	
 	@ViewBuilder
 	private func moderationStatusView(_ moderationStatus: TargetModerationStatus) -> some View {
-		
 		HStack {
-			let moderationColor = moderationStatus == .REJECTED ? Color.red : Color.orange
 			Spacer()
-			Text(moderationStatus == .REJECTED ? "Отклонена" : "На модерации")
+			Text(moderationStatus.title)
 				.font(.caption.bold())
-				.foregroundStyle(moderationColor)
+				.foregroundStyle(moderationStatus.color)
 				.padding(2)
-				.background(moderationColor.opacity(0.1))
+				.background(moderationStatus.color.opacity(0.1))
 				.cornerRadius(6)
+			/// Обучалка
+				.onTapGesture(perform:  {
+					showHelpModerationStatusTooltip.toggle()
+				})
+				.popover(isPresented: $showHelpModerationStatusTooltip) {
+					VStack(alignment: .leading, spacing: 8) {
+						HStack {
+							ZStack {
+								moderationStatus.color
+									.opacity(0.1)
+									.frame(width: 24, height: 24)
+									.cornerRadius(12)
+								Image(systemName: moderationStatus.image)
+									.resizable()
+									.frame(width: 12, height: 14)
+									.foregroundColor(moderationStatus.color)
+								
+							}
+							Text(moderationStatus.title)
+								.foregroundStyle(Color.headerText)
+								.font(.headline)
+						}
+						Text(moderationStatus.description())
+							.foregroundStyle(Color.headerText)
+							.font(.subheadline)
+							.multilineTextAlignment(.leading)
+							.fixedSize(horizontal: false, vertical: true)
+							.frame(maxWidth: .infinity, alignment: .leading)
+					}
+					/// указываем размер взависимости всплывающего окна от размера экрана
+					.frame(width: UIScreen.main.bounds.width - 150)
+					.presentationCompactAdaptation(.popover)
+					.padding()
+				}
 		}
+		
+		
+		
+		
 	}
 	
 	@ViewBuilder
@@ -289,7 +326,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 				.font(.caption)
 		}
 		.foregroundColor(.blue)
-		.padding(.vertical, 3)
+		.padding(.vertical, 1)
 		.padding(.horizontal, 6)
 		.background(
 			Capsule()
@@ -297,7 +334,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 		)
 	}
 	
-	/// Индикатор со вписком целей
+	/// Индикатор со вписком целей (НЕ ИСПОЛЬЗУЕТСЯ)
 	@ViewBuilder
 	func targetIndicatorWhithList(_ target: UserTargetDtoModel) -> some View {
 		StatusTargetIndicatorView(target)
@@ -315,6 +352,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 													  enable: isCurrentStatus)
 							Text(status.title)
 								.foregroundStyle(isCurrentStatus ? .black : .secondary)
+								.font(.headline)
 						}
 					}
 				}
@@ -324,7 +362,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 			}
 	}
 	
-	/// Индикатор со вписком целей
+	/// Индикатор со вписком целей (ИСПОЛЬЗУЕТСЯ)
 	@ViewBuilder
 	func targetIndicatorWhithDesription(_ target: UserTargetDtoModel) -> some View {
 		StatusTargetIndicatorView(target)
@@ -335,13 +373,44 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 				let status = target.targetStatus ?? .unknown
 				let category = target.category ?? .unknown
 				VStack(alignment: .leading, spacing: 8) {
-					HStack {
+					HStack(alignment: .center) {
 						StatusTargetIndicatorView(category: category,
 												  percentage: target.percentage ?? 0,
 												  status: status)
 						Text(status.title)
 							.foregroundStyle(Color.headerText)
+							.font(.headline)
+						
+						Image(systemName: "info.circle")
+							.resizable()
+							.frame(width: 12, height: 12)
+//							.imageScale(.small)
+							.foregroundColor(.gray)
+							.offset(.init(width: 0, height: 1))
+							.onTapGesture {
+								showHelpStatusTooltip2.toggle()
+							}
+							.popover(isPresented: $showHelpStatusTooltip2) {
+								VStack(alignment: .leading) {
+									ForEach(TargetStatus.valueCases, id: \.self) { status in
+										let isCurrentStatus = target.targetStatus == status
+										HStack {
+											StatusTargetIndicatorView(category: target.category ?? .unknown,
+																	  percentage: target.percentage ?? 0,
+																	  status: status,
+																	  enable: isCurrentStatus)
+											Text(status.title)
+												.foregroundStyle(isCurrentStatus ? .black : .secondary)
+												.font(.headline)
+										}
+									}
+								}
+								.frame(width: UIScreen.main.bounds.width - 150)
+								.presentationCompactAdaptation(.popover)
+								.padding()
+							}
 					}
+
 					Text(status.description)
 						.foregroundStyle(Color.headerText)
 						.font(.subheadline)
@@ -349,6 +418,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 						.fixedSize(horizontal: false, vertical: true)
 						.frame(maxWidth: .infinity, alignment: .leading)
 				}
+				/// указываем размер взависимости всплывающего окна от размера экрана
 				.frame(width: UIScreen.main.bounds.width - 150)
 				.presentationCompactAdaptation(.popover)
 				.padding()
@@ -383,7 +453,7 @@ extension TargetRowView {
     }
 }
 
-#Preview {
+#Preview("TargetRowView") {
     TargetRowView<TargetsViewModel>(target: .init(
 //        title: "Test",
 		id: 0,
@@ -392,9 +462,23 @@ extension TargetRowView {
         percentage: 10,
 		targetStatus: .inProgress,
 		targetModerationStatus: .REJECTED,
-        subTargets: [.init(title: "Test", description: "dssds",targetSubStatus: .notDone)]
+        subTargets: [.init(title: "Test", description: "dssds",targetSubStatus: .notDone)],
+		category: .family
     ))
     .environmentObject(TargetsViewModel())
+	
+	TargetRowView<TargetsViewModel>(target: .init(
+//        title: "Test",
+		id: 0,
+		title: "Testsdfdsfdsdsfsdfsd fsdf sdfdsfsdfsfsdfsdgsdfgsd sdfgdsfgdfgdfgdf gdfg dfgdfgdfgsdfsdfsddsfsd fsd fdsf sdfsdfdsfsdfd",
+		description: "Тестовое описание цели khbsdafsdfdsf sf ds fdsfsd fdsf dsf dsf sdf dsfhhjbkjhkghjvkgvkgvkgvcgc,hgvm kgk kv jghvlvhj,,b",
+		percentage: 10,
+		targetStatus: .inProgress,
+		targetModerationStatus: .DRAFT,
+		subTargets: [.init(title: "Test", description: "dssds",targetSubStatus: .notDone)],
+		category: .family
+	))
+	.environmentObject(TargetsViewModel())
 }
 
 #Preview("section") {

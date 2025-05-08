@@ -31,7 +31,6 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
     // Инициализатор для создания новой цели с опциональной категорией
     init(category: TargetCategory? = nil, isCreateTarget: Bool = true) {
         let newEmptyTarget = UserTargetDtoModel(
-			id: 0,
             title: "",
             description: "",
             userExternalId: UserRepository.shared.externalId,
@@ -235,8 +234,7 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
 
 #Preview {
     Group {
-        TargetEditView<TargetsViewModel>(target: .init(id: 0,
-													   title: "Test",
+        TargetEditView<TargetsViewModel>(target: .init(title: "Test",
                                                    targetStatus: .inProgress,
                                                    subTargets: [.init(title: "TestSub", targetSubStatus: .notDone, creationDateTime: Date.now.toApiString)]
                                                   ), isCreateTarget: false)

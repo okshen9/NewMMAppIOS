@@ -27,7 +27,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
     
     // MARK: - Initialization
     init(targets: [UserTargetDtoModel] = [], isLoading: Bool = false, errorMessage: String? = nil) {
-        self.targets = targets.sorted { ($0.id ?? 0 < $1.id  ?? 1) }
+		self.targets = targets.sorted { ($0.id ?? 0 < $1.id  ?? 1) }
         self.isLoading = isLoading
         setupTargetsObserver()
         updateTaskProgressItems()
@@ -144,7 +144,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
                 let userExternalId = UserRepository.shared.userProfile?.externalId ?? 0
                 let result = try await self.networkService.getUserTargets(externalId: userExternalId)
                 
-                if let targets = result.userTargets {
+				if let targets = result.userTargets {
                     self.targets = targets.sorted { ($0.id ?? 0 < $1.id  ?? 1) }
                 }
                 self.isLoading = false
@@ -186,7 +186,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
 			} else {
 				minModel = target
 			}
-			let updatedTarget = try await networkService.updateTargetAll(model: minModel)
+			let updatedTarget = try await networkService.updateTargetAll(model: target)
             await refreshTargetsData()
             return updatedTarget
         } catch {

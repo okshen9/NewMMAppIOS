@@ -223,12 +223,22 @@ final class TargetEditViewModel: ObservableObject {
     /// - Returns: Модель UserTargetDtoModel для сохранения или отправки.
     func createTargetModel() -> UserTargetDtoModel {
         // Равномерное распределение процентов между подцелями
-        let subTargetModels = subTargets.isEmpty ? nil : subTargets.map { subTarget -> UserSubTargetDtoModel in
+		var subTargetModels = subTargets.isEmpty ? nil : subTargets.map { subTarget -> UserSubTargetDtoModel in
             var model = subTarget.toSubTargetModel(rootTargetId: originalTarget?.id)
             model.subTargetPercentage = subTargets.isEmpty ? 0 : 100.0 / Double(subTargets.count)
             return model
         }
-        
+		
+		let newIds = subTargetModels?.compactMap(\.id) ?? []
+        let oldIds = originalTarget?.subTargets?.compactMap(\.id) ?? []
+		let deletedIds = oldIds.filter { !newIds.contains($0) }
+		for id in deletedIds {
+			if var deletedModel = originalTarget?.subTargets?.first(where: { $0.id == id }) {
+				deletedModel.isDeleted = true
+				subTargetModels?.append(deletedModel)
+			}
+		}
+		
         return UserTargetDtoModel(
             id: originalTarget?.id,
             title: targetTitle.trimmingCharacters(in: .whitespacesAndNewlines),

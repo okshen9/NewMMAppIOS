@@ -11,9 +11,11 @@ import Foundation
 /// Модель формы подцели с данными и сообщениями об ошибках.
 struct SubTargetFormModel: Identifiable, Equatable {
     let id: String
+	let originalModel: UserSubTargetDtoModel?
     var title: String = ""
     var description: String = ""
 	var deadline: Date = Date().endOfDay
+	var isDeleted: Bool = false
     
     var titleError: String? = nil
     var descriptionError: String? = nil
@@ -36,6 +38,7 @@ struct SubTargetFormModel: Identifiable, Equatable {
         self.titleError = titleError
         self.descriptionError = descriptionError
         self.deadlineError = deadlineError
+		self.originalModel = nil
     }
     
     /// Инициализирует модель подцели из существующего UserSubTargetDtoModel.
@@ -47,6 +50,7 @@ struct SubTargetFormModel: Identifiable, Equatable {
     ///   - deadlineError: Сообщение об ошибке дедлайна (при наличии).
     init(id: String, model: UserSubTargetDtoModel, titleError: String? = nil, descriptionError: String? = nil, deadlineError: String? = nil) {
         self.id = id
+		self.originalModel = model
         self.title = model.title.orEmpty
         self.description = model.description.orEmpty
         
@@ -67,15 +71,15 @@ struct SubTargetFormModel: Identifiable, Equatable {
     /// - Returns: UserSubTargetDtoModel, заполнённый данными формы.
     func toSubTargetModel(rootTargetId: Int?) -> UserSubTargetDtoModel {
         UserSubTargetDtoModel(
-            id: nil,
+			id: originalModel?.id,
             title: title.trimmingCharacters(in: .whitespacesAndNewlines),
             description: description.trimmingCharacters(in: .whitespacesAndNewlines),
             subTargetPercentage: 0.0,
-            targetSubStatus: .notDone,
+			targetSubStatus: originalModel?.targetStatus ?? .notDone,
             rootTargetId: rootTargetId,
-            isDeleted: nil,
-            creationDateTime: Date.now.toApiString,
-            lastUpdatingDateTime: nil,
+			isDeleted: originalModel?.isDeleted,
+			creationDateTime: originalModel?.creationDateTime ?? Date.now.toApiString,
+            lastUpdatingDateTime: Date.now.toApiString,
 			deadLineDateTime: deadline.endOfDay.toApiString
         )
     }

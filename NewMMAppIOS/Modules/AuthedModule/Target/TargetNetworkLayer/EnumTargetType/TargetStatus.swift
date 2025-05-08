@@ -32,6 +32,17 @@ enum TargetStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable, Eq
 	
 	/// Цель просрочена.
 	case expired = "EXPIRED"
+	
+	init(from decoder: any Decoder) throws {
+		let container = try decoder.singleValueContainer()
+		let tampValue = try container.decode(String.self)
+		if tampValue == Self.draft.rawValue {
+			self = .inProgress
+		} else {
+			self = Self(rawValue: tampValue)
+		}
+			
+	}
 }
 
 extension TargetStatus {
