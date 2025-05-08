@@ -130,6 +130,6 @@ extension TargetStatus {
     }
 	
 	static var valueCases: [TargetStatus] {
-		return [.draft, .inProgress, .done, .expired, .doneExpired, .cancelled, .failed]
+		return [.inProgress, .done, .expired, .doneExpired, .cancelled, .failed]
 	}
 }

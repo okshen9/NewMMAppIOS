@@ -162,10 +162,10 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 	
 	private var headerContentView: some View {
 		VStack(alignment: .leading, spacing: 6) {
-			HStack(alignment: .top) {
+			HStack(alignment: .firstTextBaseline) {
 				// Индикатор цели
 				targetIndicatorWhithDesription(target)
-					.offset(CGSize(width: 0, height: 4))
+					
 				
 				Text(target.title.orEmpty)
 					.font(.system(size: 16, weight: .semibold))
@@ -243,12 +243,20 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 	private func moderationStatusView(_ moderationStatus: TargetModerationStatus) -> some View {
 		HStack {
 			Spacer()
-			Text(moderationStatus.title)
-				.font(.caption.bold())
-				.foregroundStyle(moderationStatus.color)
-				.padding(2)
-				.background(moderationStatus.color.opacity(0.1))
-				.cornerRadius(6)
+			HStack(alignment: .center, spacing: 2) {
+				Text(moderationStatus.title)
+					.font(.caption.bold())
+					.foregroundStyle(moderationStatus.color)
+				Image(systemName: "info.circle")
+					.resizable()
+					.frame(width: 8, height: 8)
+					.foregroundStyle(moderationStatus.color)
+					.offset(CGSize(width: 0, height: 0.5))
+			}
+			.padding(2)
+			.padding(.horizontal, 2)
+			.background(moderationStatus.color.opacity(0.1))
+			.cornerRadius(8)
 			/// Обучалка
 				.onTapGesture(perform:  {
 					showHelpModerationStatusTooltip.toggle()
@@ -384,7 +392,6 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 						Image(systemName: "info.circle")
 							.resizable()
 							.frame(width: 12, height: 12)
-//							.imageScale(.small)
 							.foregroundColor(.gray)
 							.offset(.init(width: 0, height: 1))
 							.onTapGesture {
@@ -470,7 +477,7 @@ extension TargetRowView {
 	TargetRowView<TargetsViewModel>(target: .init(
 //        title: "Test",
 		id: 0,
-		title: "Testsdfdsfdsdsfsdfsd fsdf sdfdsfsdfsfsdfsdgsdfgsd sdfgdsfgdfgdfgdf gdfg dfgdfgdfgsdfsdfsddsfsd fsd fdsf sdfsdfdsfsdfd",
+		title: "Tdfd",
 		description: "Тестовое описание цели khbsdafsdfdsf sf ds fdsfsd fdsf dsf dsf sdf dsfhhjbkjhkghjvkgvkgvkgvcgc,hgvm kgk kv jghvlvhj,,b",
 		percentage: 10,
 		targetStatus: .inProgress,
@@ -489,7 +496,20 @@ extension TargetRowView {
 				id: 1,
 //                title: "Test Tarsdf sdf sdf sdfdsfsdfsdfds fsdf sd fdfds fdsf sdf sdf sdfds f sdf sdf sdfsd fsd fget",
 //				title: "Task ee",
-				title: "Task eep[ooopopopopopopiiopopioipopi opiopi opi opi opi opi piopioopiopopopiopiiop l dg g dgfd fg dfgdgf gfddfgdfgnjuimimiioiiiklkj",
+				title: "Task 5eep[ooopopopopopopiiopopioipopi opiopi opi opi opi opi piopioopiopopopiopiiop l dg g dgfd fg dfgdgf gfddfgdfgnjuimimiioiiiklkj",
+				description: "Description d dsf gdfgdfg fdg dgdfg dsfg dsf gdfg sdf gds dfsg dfg",
+				percentage: 75,
+				targetStatus: .draft,
+				targetModerationStatus: .DRAFT,
+				subTargets: [.init(id: 1, title: "Subtarget 1", description: "sdfsdfdsdf sdfsd fsd sfds fdsgdgsdfg dfg dfg dfs dfdfg dfdhds dsffssdf hsdfhdsfhsdhgdh"),
+													   .init(id: 2, title: "Subtarget 2")],
+				category: .money
+			),
+			UserTargetDtoModel(
+				id: 2,
+//                title: "Test Tarsdf sdf sdf sdfdsfsdfsdfds fsdf sd fdfds fdsf sdf sdf sdfds f sdf sdf sdfsd fsd fget",
+//				title: "Task ee",
+				title: "Tasknn",
 				description: "Description d dsf gdfgdfg fdg dgdfg dsfg dsf gdfg sdf gds dfsg dfg",
 				percentage: 75,
 				targetStatus: .draft,
