@@ -24,7 +24,7 @@ struct ValidatedTextField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(.headline)
+                .font(MMFonts.title)
                 .foregroundStyle(Color.headerText)
             TextField("", text: $text)
                 .foregroundColor(Color.headerText)
@@ -33,7 +33,7 @@ struct ValidatedTextField: View {
             if let error = error {
                 Text(error)
                     .foregroundColor(.red)
-                    .font(.caption)
+                    .font(MMFonts.caption)
             }
         }
     }

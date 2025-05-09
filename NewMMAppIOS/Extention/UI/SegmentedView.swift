@@ -22,7 +22,7 @@ struct SegmentedView: View {
                 VStack {
 
                     Text(segment)
-                        .font(.body)
+                        .font(MMFonts.body)
                         .fontWeight(.medium)
                         .foregroundColor(selected == currentSegnemtIndex ? textColor : Color(uiColor: .systemGray))
                     ZStack {

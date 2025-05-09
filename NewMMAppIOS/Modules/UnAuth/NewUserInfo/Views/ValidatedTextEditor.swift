@@ -15,7 +15,7 @@ struct ValidatedTextEditor: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(.headline)
+                .font(MMFonts.title)
                 .foregroundColor(Color.headerText)
             TextEditor(text: $text)
                 .foregroundColor(Color.headerText)
@@ -24,7 +24,7 @@ struct ValidatedTextEditor: View {
             if let error = error {
                 Text(error)
                     .foregroundColor(.headerText)
-                    .font(.caption)
+                    .font(MMFonts.caption)
             }
         }
     }

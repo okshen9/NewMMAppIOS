@@ -34,7 +34,7 @@ struct MapView: View {
                     {
                         Image(systemName: "mappin.circle.fill")
                             .foregroundColor(.red)
-                            .font(.title)
+                            .font(MMFonts.title)
                     }
                 }
                 .frame(width: geometry.size.width,

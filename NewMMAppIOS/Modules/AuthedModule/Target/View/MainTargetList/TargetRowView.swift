@@ -168,7 +168,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 					
 				
 				Text(target.title.orEmpty)
-					.font(.system(size: 16, weight: .semibold))
+					.font(MMFonts.body)
 					.foregroundColor(.headerText)
 					.multilineTextAlignment(.leading)
 					.fixedSize(horizontal: false, vertical: true)
@@ -193,7 +193,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 					.imageScale(.small)
 				
 				Text((target.deadLineDateTime?.dateFromApiString ?? Date.now).toDisplayString)
-					.font(.system(size: 14))
+					.font(MMFonts.caption)
 					.foregroundColor(.gray)
 					.lineLimit(1)
 				
@@ -208,7 +208,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 						subTasksLabel(subTargets)
 					}
 					Text(textPercent)
-						.font(.system(size: 14, weight: .medium))
+						.font(MMFonts.caption)
 						.foregroundColor((percentage == 100 || isDone) ? .green : .gray)
 				}
 			}
@@ -229,7 +229,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 		if let description = target.description,
 		   !description.isEmpty {
 			Text(description)
-				.font(.system(size: 14))
+				.font(MMFonts.caption)
 				.foregroundColor(.secondary)
 				.lineLimit(showDescription ? nil : 2)
 				.frame(maxWidth: .infinity, alignment: .leading)
@@ -245,7 +245,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 			Spacer()
 			HStack(alignment: .center, spacing: 2) {
 				Text(moderationStatus.title)
-					.font(.caption.bold())
+					.font(MMFonts.caption)
 					.foregroundStyle(moderationStatus.color)
 				Image(systemName: "info.circle")
 					.resizable()
@@ -277,11 +277,11 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 							}
 							Text(moderationStatus.title)
 								.foregroundStyle(Color.headerText)
-								.font(.headline)
+								.font(MMFonts.title)
 						}
 						Text(moderationStatus.description())
 							.foregroundStyle(Color.headerText)
-							.font(.subheadline)
+							.font(MMFonts.subTitle)
 							.multilineTextAlignment(.leading)
 							.fixedSize(horizontal: false, vertical: true)
 							.frame(maxWidth: .infinity, alignment: .leading)
@@ -304,7 +304,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 			Divider()
 			
 			Text("Подцели")
-				.font(.system(size: 14, weight: .medium))
+				.font(MMFonts.caption)
 				.foregroundColor(.headerText)
 				.padding(.top, 4)
 			
@@ -329,9 +329,9 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 		
 		HStack(spacing: 4) {
 			Image(systemName: "checklist")
-				.font(.system(size: 8))
+				.font(MMFonts.subCaption)
 			Text("\(done)/\(total)")
-				.font(.caption)
+				.font(MMFonts.caption)
 		}
 		.foregroundColor(.blue)
 		.padding(.vertical, 1)
@@ -360,7 +360,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 													  enable: isCurrentStatus)
 							Text(status.title)
 								.foregroundStyle(isCurrentStatus ? .black : .secondary)
-								.font(.headline)
+								.font(MMFonts.title)
 						}
 					}
 				}
@@ -387,7 +387,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 												  status: status)
 						Text(status.title)
 							.foregroundStyle(Color.headerText)
-							.font(.headline)
+							.font(MMFonts.title)
 						
 						Image(systemName: "info.circle")
 							.resizable()
@@ -408,7 +408,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 																	  enable: isCurrentStatus)
 											Text(status.title)
 												.foregroundStyle(isCurrentStatus ? .black : .secondary)
-												.font(.headline)
+												.font(MMFonts.title)
 										}
 									}
 								}
@@ -420,7 +420,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 
 					Text(status.description)
 						.foregroundStyle(Color.headerText)
-						.font(.subheadline)
+						.font(MMFonts.subTitle)
 						.multilineTextAlignment(.leading)
 						.fixedSize(horizontal: false, vertical: true)
 						.frame(maxWidth: .infinity, alignment: .leading)

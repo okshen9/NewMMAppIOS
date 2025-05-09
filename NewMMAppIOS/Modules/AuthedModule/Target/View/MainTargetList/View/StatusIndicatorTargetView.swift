@@ -60,7 +60,7 @@ struct StatusTargetIndicatorView: View {
 			
 			// Иконка цели
 			Image(systemName: status.targetIcon)
-				.font(.system(size: 14, weight: .medium))
+				.font(MMFonts.caption)
 				.foregroundColor(categoryColor)
 		}
 	}

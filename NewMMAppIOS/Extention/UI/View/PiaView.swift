@@ -40,15 +40,15 @@ struct CategoryPieChartView: View {
                 VStack {
                     if let selected = tasks.first(where: { $0.id == selectedSlice }) {
                         Text(selected.name)
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(MMFonts.body)
                         Text("\(Int(selected.progress * 100))%")
-                            .font(.system(size: 14))
+                            .font(MMFonts.caption)
                             .foregroundColor(.secondary)
                     } else {
                         Text("Всего целей")
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(MMFonts.body)
                         Text("\(tasks.count)")
-                            .font(.system(size: 14))
+                            .font(MMFonts.caption)
                             .foregroundColor(.secondary)
                     }
                 }
@@ -68,12 +68,12 @@ struct CategoryPieChartView: View {
                             .frame(width: 12, height: 12)
                         
                         Text(task.name)
-                            .font(.system(size: 14))
+                            .font(MMFonts.caption)
                         
                         Spacer()
                         
                         Text("\(Int(task.progress * 100))%")
-                            .font(.system(size: 14, weight: .semibold))
+                            .font(MMFonts.caption)
                             .foregroundColor(task.color)
                     }
                     .padding(.horizontal)

@@ -14,7 +14,7 @@ struct BarChartView: View {
                     ForEach([0.25, 0.5, 0.75, 1.0].reversed(), id: \.self) { line in
                         HStack {
                             Text("\(Int(line * 100))%")
-                                .font(.system(size: 10))
+                                .font(MMFonts.subCaption)
                                 .foregroundColor(.secondary)
                                 .frame(width: 25, alignment: .trailing)
                             
@@ -38,7 +38,7 @@ struct BarChartView: View {
                             
                             // Название
                             Text(task.name)
-                                .font(.system(size: 12))
+                                .font(MMFonts.subCaption)
                                 .foregroundColor(.secondary)
                                 .lineLimit(2)
                                 .multilineTextAlignment(.center)
@@ -69,7 +69,7 @@ struct EnhancedBarChartView: View {
                 ForEach(tasks) { task in
                     VStack {
                         Text("\(Int(task.progress * 100))%")
-                            .font(.caption)
+                            .font(MMFonts.caption)
                             .foregroundColor(task.color)
                         
                         RoundedRectangle(cornerRadius: 6)
@@ -77,7 +77,7 @@ struct EnhancedBarChartView: View {
                             .frame(height: geometry.size.height * 0.6 * task.progress)
                         
                         Text(task.name)
-                            .font(.caption)
+                            .font(MMFonts.caption)
                             .foregroundColor(.secondary)
                     }
                     .frame(maxWidth: .infinity)

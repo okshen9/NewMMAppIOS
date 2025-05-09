@@ -43,13 +43,13 @@ struct CustomAlert<AlertContent: View>: ViewModifier {
                 VStack(spacing: 16) {
                     // Заголовок
                     Text(title)
-                        .font(.headline)
+                        .font(MMFonts.title)
                         .multilineTextAlignment(.center)
                     
                     // Сообщение (если есть)
                     if let message = message {
                         Text(message)
-                            .font(.subheadline)
+                            .font(MMFonts.subTitle)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                     }

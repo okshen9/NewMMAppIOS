@@ -34,7 +34,7 @@ struct SchedulerView: View {
                             // Легенда категорий
                             VStack(alignment: .leading, spacing: 12) {
                                 Text("События и категории")
-                                    .font(.headline)
+                                    .font(MMFonts.title)
                                     .foregroundColor(.primary)
                                     .padding(.horizontal, 24)
                                 
@@ -45,7 +45,7 @@ struct SchedulerView: View {
                                             .foregroundStyle(Color.green)
                                             .frame(width: 12, height: 12)
                                         Text("Цели")
-                                            .font(.subheadline)
+                                            .font(MMFonts.subTitle)
                                     }
                                     
                                     HStack(spacing: 8) {
@@ -53,14 +53,14 @@ struct SchedulerView: View {
                                             .foregroundStyle(Color.mainRed)
                                             .frame(width: 12, height: 12)
                                         Text("Платежи")
-                                            .font(.subheadline)
+                                            .font(MMFonts.subTitle)
                                     }
                                 }
                                 .padding(.horizontal, 24)
                             }
                             if !viewModel.scheduleListItems.isEmpty {
                                 Text("События")
-                                    .font(.headline)
+                                    .font(MMFonts.title)
                                     .foregroundColor(.primary)
                                     .padding(.horizontal, 24)
                                     .padding(.top, 8)
@@ -71,7 +71,7 @@ struct SchedulerView: View {
                             } else {
                                 Spacer()
                                 Text("У вас нет событий")
-                                    .font(.headline)
+                                    .font(MMFonts.title)
                                     .foregroundColor(.headerText)
                                 Spacer()
                             }
@@ -147,17 +147,17 @@ struct SchedulerView: View {
     private var noEventsForSelectedDate: some View {
         VStack(spacing: 16) {
             Image(systemName: "calendar.badge.exclamationmark")
-                .font(.system(size: 40))
+                .font(MMFonts.title)
                 .foregroundStyle(Color.secondary)
             
             if let date = selectedDate {
                 Text("Нет событий на \(formattedDateHeader(date).lowercased())")
-                    .font(.headline)
+                    .font(MMFonts.title)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(Color.secondary)
             } else {
                 Text("Нет событий в календаре")
-                    .font(.headline)
+                    .font(MMFonts.title)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(Color.secondary)
             }
@@ -170,7 +170,7 @@ struct SchedulerView: View {
                     }
                 } label: {
                     Text("Показать за все время")
-                        .font(.subheadline.weight(.medium))
+                        .font(MMFonts.subTitle)
                         .foregroundStyle(Color.mainRed)
                 }
                 .buttonStyle(.borderless)
@@ -197,13 +197,13 @@ struct SchedulerView: View {
             // Заголовок с датой
             HStack {
                 Text(formattedDateHeader(date))
-                    .font(.title3.weight(.bold))
+                    .font(MMFonts.title)
                     .foregroundStyle(Color.primary)
                 
                 Spacer()
                 
                 Text(dateString(date))
-                    .font(.subheadline)
+                    .font(MMFonts.subTitle)
                     .foregroundStyle(Color.secondary)
             }
             .padding(.horizontal)

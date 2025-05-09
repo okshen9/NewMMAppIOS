@@ -415,7 +415,7 @@ struct NewPieDiagram: View {
                                 .frame(width: 22, height: 22)
                                 .overlay {
                                     Image(systemName: "chevron.down")
-                                        .font(.system(size: 12, weight: .bold))
+                                        .font(MMFonts.subCaption)
                                         .foregroundColor(entry.model.color)
                                         .rotationEffect(.radians(midAngle.radians - .pi/2))
                                 }
@@ -457,7 +457,7 @@ struct NewPieDiagram: View {
                                     .frame(width: 26, height: 26)
                                     .overlay {
                                         Image(systemName: "arrow.up")
-                                            .font(.system(size: 14, weight: .bold))
+                                            .font(MMFonts.caption)
                                             .foregroundColor(.blue)
                                     }
                                     .shadow(color: .black.opacity(0.2), radius: 1)
@@ -467,7 +467,7 @@ struct NewPieDiagram: View {
                         
                         // Название текущего уровня
                         Text(currentLevel == 0 ? diagramTitle : currentTitle)
-                            .font(.system(size: 16, weight: .medium))
+                            .font(MMFonts.body)
                             .foregroundColor(.primary)
                             .lineLimit(2)
                             .multilineTextAlignment(.center)
@@ -509,7 +509,7 @@ struct NewPieDiagram: View {
                             
                             // Инициалы или небольшая иконка для категории
                             Text(categoryInitials(of: entry.model.title))
-                                .font(.system(size: 10, weight: .bold))
+                                .font(MMFonts.subCaption)
                                 .foregroundColor(.white)
                         }
                         .position(x: xPos, y: yPos)
@@ -592,19 +592,19 @@ struct NewPieDiagram: View {
                     .frame(width: 24, height: 24)
                 
                 Text(categoryInitials(of: slice.title))
-                    .font(.system(size: 10, weight: .bold))
+                    .font(MMFonts.subCaption)
                     .foregroundColor(.white)
             }
             
             // Заголовок
             Text(slice.title)
-                .font(.system(size: 13))
+                .font(MMFonts.caption)
                 .lineLimit(1)
                 .truncationMode(.tail)
             
             // Процент выполнения
             Text("\(Int(slice.currentValue * 100))%")
-                .font(.system(size: 12, weight: .medium))
+                .font(MMFonts.subCaption)
         }
         .padding(.vertical, 4)
         .padding(.horizontal, 8)

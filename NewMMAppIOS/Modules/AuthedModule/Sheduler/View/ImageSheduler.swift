@@ -104,7 +104,7 @@ extension ImageSheduler {
         HStack(spacing: 30) {
             // Цели
             VStack {
-                Text("Цели").font(.caption)
+                Text("Цели").font(MMFonts.caption)
                 ZStack {
                     Circle()
                         .fill(Color.green.opacity(0.15))
@@ -124,7 +124,7 @@ extension ImageSheduler {
             
             // Платежи
             VStack {
-                Text("Платежи").font(.caption)
+                Text("Платежи").font(MMFonts.caption)
                 ZStack {
                     Circle()
                         .fill(Color.red.opacity(0.15))

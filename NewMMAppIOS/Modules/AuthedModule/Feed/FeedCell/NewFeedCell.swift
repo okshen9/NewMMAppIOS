@@ -34,12 +34,12 @@ extension BasicEventCell {
             VStack(alignment: .leading) {
                 Text((event.userProfile?.fullName) ?? "Пользователь без имени")
                     .foregroundStyle(Color.headerText)
-                    .font(.body.bold())
+                    .font(MMFonts.body)
                     .frame(alignment: .leading)
 
                 Text((event.type?.feedActionName).orEmpty)
                     .foregroundStyle(Color.headerText)
-                    .font(.body.bold())
+                    .font(MMFonts.body)
                     .frame(alignment: .leading)
             }
             Spacer()
@@ -54,7 +54,7 @@ extension BasicEventCell {
             Spacer()
             let displayString = event.displayDate?.dateFromApiString?.toDisplayString ?? Date().toDisplayString
             Text(displayString)
-                .font(.body)
+                .font(MMFonts.body)
                 .foregroundStyle(Color.headerText)
         }
     }
@@ -88,13 +88,13 @@ struct NewFeedCell: BasicEventCell {
         VStack(alignment: .leading, spacing: 6) {
             Text(event.title ?? "Описание не указано")
                 .foregroundStyle(Color.headerText)
-                .font(.body.bold())
+                .font(MMFonts.body)
                 .multilineTextAlignment(.leading)
 
 
             Text(event.description ?? "Описание не указано")
                 .foregroundStyle(Color.subtitleText)
-                .font(.subheadline)
+                .font(MMFonts.subTitle)
                 .multilineTextAlignment(.leading)
         }
     }

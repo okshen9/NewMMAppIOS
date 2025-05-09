@@ -68,26 +68,26 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
 					if let titleError = viewModel.titleError {
 						Text(titleError)
 							.foregroundColor(.red)
-							.font(.caption)
+							.font(MMFonts.caption)
 					}
 					
 					if let descriptionError = viewModel.descriptionError {
 						Text(descriptionError)
 							.foregroundColor(.red)
-							.font(.caption)
+							.font(MMFonts.caption)
 					}
 					
 					if let deadlineError = viewModel.deadlineError {
 						Text(deadlineError)
 							.foregroundColor(.red)
-							.font(.caption)
+							.font(MMFonts.caption)
 					}
                 }
                 
 
                 
                 Section(header: Text("Подцели")
-                    .font(.headline)
+                    .font(MMFonts.title)
                     .foregroundStyle(Color.black.opacity(0.9))) {
                     subTargetsSection()
                 }
@@ -123,7 +123,7 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                 if let titleError = viewModel.subTargets[index].titleError {
                     Text(titleError)
                         .foregroundColor(.red)
-                        .font(.caption)
+                        .font(MMFonts.caption)
                 }
                 
                 TextEditorWithPalceHolder(palceHolder: "Описание", textBinding: $viewModel.subTargets[index].description)
@@ -132,7 +132,7 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                 if let descriptionError = viewModel.subTargets[index].descriptionError {
                     Text(descriptionError)
                         .foregroundColor(.red)
-                        .font(.caption)
+                        .font(MMFonts.caption)
                 }
                 
                 DatePicker("Срок выполнения", selection: $viewModel.subTargets[index].deadline, displayedComponents: .date)
@@ -142,7 +142,7 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                 if let deadlineError = viewModel.subTargets[index].deadlineError {
                     Text(deadlineError)
                         .foregroundColor(.red)
-                        .font(.caption)
+                        .font(MMFonts.caption)
                 }
             }
             .padding(.vertical)
@@ -175,7 +175,7 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
 					.foregroundStyle(Color.mainRed)
 			}
             Text(isCreateTarget ? "Создание цели" : "Редактирование цели")
-                .font(Font.subheadline)
+                .font(MMFonts.subTitle)
                 .foregroundStyle(Color.headerText)
             Spacer()
             if isLoading {
@@ -191,7 +191,7 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                     HStack(spacing: 0) {
 						Spacer()
                         Text("Готово")
-                            .font(.caption.weight(.medium))
+                            .font(MMFonts.caption)
                             .foregroundColor(viewModel.isFormValid ? .mainRed : .gray)
                         Image(systemName: "checkmark")
                             .resizable()

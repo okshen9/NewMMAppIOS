@@ -61,7 +61,7 @@ struct CircularProgressView: View {
             
             // Текст с процентами
             Text("\(Int(progress * 100))%")
-                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                .font(MMFonts.body)
                 .foregroundColor(.black.opacity(0.7))
                 .scaleEffect(isPulsing ? 1.1 : 1.0)
                 .animation(

@@ -20,13 +20,13 @@ struct GlobalAlertView: View {
             VStack(spacing: 16) {
                 // Заголовок
                 Text(alertManager.title)
-                    .font(.headline)
+                    .font(MMFonts.title)
                     .multilineTextAlignment(.center)
                 
                 // Сообщение (если есть)
                 if let message = alertManager.message {
                     Text(message)
-                        .font(.subheadline)
+                        .font(MMFonts.subTitle)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                 }

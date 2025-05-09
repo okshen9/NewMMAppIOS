@@ -21,20 +21,20 @@ struct GroupButton: View {
 //            }, label: {
                 VStack {
                     Text(title)
-                        .font(.headline)
+						.font(MMFonts.subTitle)
                         .foregroundColor(Color.headerText)
                     if let subTitle{
                         Text(subTitle)
-                            .font(.subheadline)
+							.font(MMFonts.body)
                             .foregroundColor(Color.headerText)
                     }
                 }
+				.padding(8)
                 .frame(width: geometry.size.width,
                        height: 46)
                 .background(Color(hex: "F9F9F9"))
-//                .background(Color.mainRed)
-
-                .cornerRadius(16)
+				.cornerRadius(16)
+                
                 
 //            })
             
@@ -45,5 +45,6 @@ struct GroupButton: View {
 }
 
 #Preview {
-    GroupButton(title: "dfdf", subTitle: "nil", action: {})
+    GroupButton(title: "Gjnjr Fdssdffsfsdfsdf", subTitle: "nil", action: {})
+		.frame(width: 180)
 }

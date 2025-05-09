@@ -63,19 +63,19 @@ struct CategorySectionView: View {
 
                 // Инициалы категории
                 Text(getCategoryInitials(category.rawValue))
-                    .font(.system(size: 16, weight: .bold))
+                    .font(MMFonts.body)
                     .foregroundColor(.white)
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(category.rawValue)
-                    .font(.title2)
+                    .font(MMFonts.title)
                     .bold()
                     .foregroundColor(.headerText)
 
                 // Добавляем количество целей
                 Text("\(targets.count) \(targets.count == 1 ? "цель" : "целей")")
-                    .font(.subheadline)
+                    .font(MMFonts.subTitle)
                     .foregroundColor(.secondary)
             }
 

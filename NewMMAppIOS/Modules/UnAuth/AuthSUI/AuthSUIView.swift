@@ -67,7 +67,7 @@ struct AuthSUIView: View {
     private var contentView: some View {
         VStack(spacing: 16) {
             Text("Добро Пожаловать")
-                .font(.system(size: 18, weight: .bold))
+                .font(MMFonts.subTitle)
                 .foregroundColor(.headerText)
 
             telegramButton
@@ -87,7 +87,7 @@ struct AuthSUIView: View {
                     }
                 }
             )
-            .font(.system(size: 12))
+            .font(MMFonts.subCaption)
 
             .foregroundColor(.subtitleText)
             .multilineTextAlignment(.center)

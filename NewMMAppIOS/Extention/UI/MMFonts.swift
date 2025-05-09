@@ -29,3 +29,26 @@ enum MMFonts {
 		.custom("SangBleuSunrise-Light-WebXL", size: 12)
 	}
 }
+
+
+//enum MMFonts {
+//	static var title: Font {
+//		.custom("SangBleu Sunrise Bold", size: 22)
+//	}
+//	
+//	static var subTitle: Font {
+//		.custom("SangBleu Sunrise Medium", size: 18)
+//	}
+//	
+//	static var body: Font {
+//		.custom("SangBleu Sunrise Regular", size: 16)
+//	}
+//	
+//	static var caption: Font {
+//		.custom("SangBleu Sunrise Regular", size: 14)
+//	}
+//	
+//	static var subCaption: Font {
+//		.custom("SangBleu Sunrise Light", size: 12)
+//	}
+//}

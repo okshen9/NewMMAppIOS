@@ -14,7 +14,7 @@ struct PaymentRowView: View {
             // Сумма и статус
             HStack {
                 Text("\(payment.amount ?? 0, specifier: "%.2f") ₽")
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(MMFonts.body)
                     .foregroundColor(.primary)
                 
                 Spacer()
@@ -54,7 +54,7 @@ struct PaymentRowView: View {
     @ViewBuilder
     private func paymentStatusBadge(_ status: PaymentRequestStatus?) -> some View {
         Text(status?.description ?? "Нет информации")
-            .font(.system(size: 12, weight: .medium))
+            .font(MMFonts.subCaption)
             .foregroundColor(.white)
             .padding(.vertical, 4)
             .padding(.horizontal, 8)
@@ -69,12 +69,12 @@ struct PaymentRowView: View {
     private func infoRow(icon: String, text: String) -> some View {
         HStack(spacing: 8) {
             Image(systemName: icon)
-                .font(.system(size: 12))
+                .font(MMFonts.subCaption)
                 .foregroundColor(.secondary)
                 .frame(width: 16)
             
             Text(text)
-                .font(.system(size: 14))
+                .font(MMFonts.caption)
                 .foregroundColor(.secondary)
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)

@@ -70,17 +70,17 @@ struct TargetsView: View {
         VStack {
             Spacer()
             Image(systemName: "checkmark.circle.badge.xmark")
-                .font(.system(size: 60))
+                .font(MMFonts.title)
                 .foregroundColor(.secondary)
                 .padding(.bottom, 20)
             
             Text("У вас пока нет целей")
-                .font(.headline)
+                .font(MMFonts.title)
                 .foregroundColor(.headerText)
                 .padding(.bottom, 4)
             
             Text("Создайте свою первую цель, чтобы отслеживать прогресс")
-                .font(.subheadline)
+                .font(MMFonts.subTitle)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 20)
@@ -133,7 +133,7 @@ struct TargetsView: View {
     private func statisticsView() -> some View {
         VStack(alignment: .center, spacing: 10) {
             Text("Статистика по категориям")
-                .font(.headline)
+                .font(MMFonts.title)
                 .foregroundColor(.headerText)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading, 8)

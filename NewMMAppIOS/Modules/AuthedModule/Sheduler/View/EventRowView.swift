@@ -31,7 +31,7 @@ struct EventRowView: View {
                     // Данные события
                     VStack(alignment: .leading, spacing: 4) {
                         Text(event.title)
-                            .font(.subheadline.weight(.medium))
+                            .font(MMFonts.subTitle)
                             .foregroundColor(.primary)
                             .lineLimit(isExpanded ? nil : 3)
                             .fixedSize(horizontal: false, vertical: true)
@@ -69,7 +69,7 @@ struct EventRowView: View {
                                (target.description != nil && !target.description.isEmptyOrNil) ||
                                (target.subTargets != nil && !target.subTargets!.isEmpty) {
                                 Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                                    .font(.caption)
+                                    .font(MMFonts.caption)
                                     .foregroundColor(.secondary)
                                     .padding(.leading, 4)
                             }
@@ -98,10 +98,10 @@ struct EventRowView: View {
                         if let description = event.target?.description, !description.isEmptyOrNil {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("Описание")
-                                    .font(.caption)
+                                    .font(MMFonts.caption)
                                     .foregroundColor(.secondary)
                                 Text(description)
-                                    .font(.caption)
+                                    .font(MMFonts.caption)
                                     .foregroundColor(.primary)
                                     .lineLimit(nil)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -118,13 +118,13 @@ struct EventRowView: View {
                             
                             HStack {
                                 Text("Подзадачи")
-                                    .font(.caption)
+                                    .font(MMFonts.caption)
                                     .foregroundColor(.secondary)
                                 
                                 Spacer()
                                 
                                 Text("\(subTargets.filter({ $0.targetStatus == .done }).count)/\(subTargets.count)")
-                                    .font(.caption)
+                                    .font(MMFonts.caption)
                                     .foregroundColor(.secondary)
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
@@ -144,7 +144,7 @@ struct EventRowView: View {
                                         .frame(width: 18, height: 18)
                                         .overlay(
                                             Image(systemName: subTarget.targetStatus == .done ? "checkmark" : "circle")
-                                                .font(.system(size: 10))
+                                                .font(MMFonts.subCaption)
                                                 .foregroundColor(subTarget.targetStatus == .done ? .white : .secondary)
                                         )
                                         .padding(.leading, 44)
@@ -154,7 +154,7 @@ struct EventRowView: View {
                                     VStack(alignment: .leading, spacing: 2) {
                                         HStack(alignment: .top) {
                                             Text(subTarget.title ?? "Подзадача")
-                                                .font(.caption)
+                                                .font(MMFonts.caption)
                                                 .foregroundColor(.primary)
                                                 .lineLimit(2)
                                                 .fixedSize(horizontal: false, vertical: true)
@@ -168,7 +168,7 @@ struct EventRowView: View {
                                                         .fill(subStatusColor(for: status))
                                                         .frame(width: 6, height: 6)
                                                     Text(subStatusText(for: status))
-                                                        .font(.caption2)
+                                                        .font(MMFonts.subCaption)
                                                         .foregroundColor(subStatusColor(for: status))
                                                 }
                                                 .padding(.vertical, 2)
@@ -182,7 +182,7 @@ struct EventRowView: View {
                                         
                                         if let desc = subTarget.description, !desc.isEmpty {
                                             Text(desc)
-                                                .font(.caption2)
+                                                .font(MMFonts.subCaption)
                                                 .foregroundColor(.secondary)
                                                 .lineLimit(3)
                                                 .fixedSize(horizontal: false, vertical: true)
@@ -209,7 +209,7 @@ struct EventRowView: View {
                 .fill(category.color)
                 .frame(width: 8, height: 8)
             Text(category.rawValue)
-                .font(.caption)
+                .font(MMFonts.caption)
                 .foregroundColor(category.color)
                 .lineLimit(1)
         }
@@ -225,9 +225,9 @@ struct EventRowView: View {
     private func paymentLabel(_ amount: Double) -> some View {
         HStack(spacing: 4) {
             Image(systemName: "creditcard.fill")
-                .font(.system(size: 8))
+                .font(MMFonts.subCaption)
             Text("\(Int(amount)) ₽")
-                .font(.caption)
+                .font(MMFonts.caption)
         }
         .foregroundColor(.mainRed)
         .padding(.vertical, 3)
@@ -245,9 +245,9 @@ struct EventRowView: View {
         
         HStack(spacing: 4) {
             Image(systemName: "checklist")
-                .font(.system(size: 8))
+                .font(MMFonts.subCaption)
             Text("\(done)/\(total)")
-                .font(.caption)
+                .font(MMFonts.caption)
         }
         .foregroundColor(.blue)
         .padding(.vertical, 3)
@@ -266,7 +266,7 @@ struct EventRowView: View {
                 .frame(width: 36, height: 36)
             
             ImageSheduler(event: event)
-                .font(.system(size: 16))
+                .font(MMFonts.body)
         }
     }
     
@@ -274,12 +274,12 @@ struct EventRowView: View {
     private func dateStatusView(_ date: Date) -> some View {
         VStack(spacing: 2) {
             Text(relativeDateString(date))
-                .font(.caption)
+                .font(MMFonts.caption)
                 .foregroundColor(isOverdue(date) ? .red : .secondary)
                 .lineLimit(1)
             
             Text(dateString(date))
-                .font(.caption2)
+                .font(MMFonts.subCaption)
                 .foregroundColor(.secondary)
                 .lineLimit(1)
         }

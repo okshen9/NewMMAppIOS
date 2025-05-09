@@ -22,11 +22,11 @@ struct StreamProfileList: View {
                     let dateStr1 = DateFormatter.localizedString(from: dateStart, dateStyle: .short, timeStyle: .none)
                     let dateStr2 = DateFormatter.localizedString(from: dateEnd, dateStyle: .short, timeStyle: .none)
                     Text(dateStr1 + " - " + dateStr2)
-                        .font(.body)
+                        .font(MMFonts.body)
                         .bold()
                     Spacer()
                     Text(status.name)
-                        .font(.subheadline)
+                        .font(MMFonts.subTitle)
                         .foregroundColor(.white)
                         .padding(6)
                         .background(status.color)
@@ -36,7 +36,7 @@ struct StreamProfileList: View {
                 
                 List {
                     if !mentors.isEmpty {
-                        Section(header: Text("Менторы").font(.headline)) {
+                        Section(header: Text("Менторы").font(MMFonts.title)) {
                             ForEach(mentors) { mentor in
                                 UserRow(user: mentor)
                             }
@@ -44,7 +44,7 @@ struct StreamProfileList: View {
                     }
                     
                     if !participants.isEmpty {
-                        Section(header: Text("Участники").font(.headline)) {
+                        Section(header: Text("Участники").font(MMFonts.title)) {
                             ForEach(participants) { participant in
                                 UserRow(user: participant)
                             }
@@ -74,12 +74,12 @@ struct UserRow: View {
             HStack {
                 VStack(alignment: .leading) {
                     Text(user.fullName ?? "Неизвестный пользователь")
-                        .font(.body)
+                        .font(MMFonts.body)
                         .foregroundColor(.headerText)
                         .bold()
                     if let username = user.username {
                         Text(username)
-                            .font(.subheadline)
+                            .font(MMFonts.subTitle)
                             .foregroundColor(.gray)
                     }
                 }

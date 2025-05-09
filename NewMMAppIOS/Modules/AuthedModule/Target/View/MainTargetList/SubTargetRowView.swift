@@ -68,7 +68,7 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
                         Text(subTarget.title.orEmpty)
-                            .font(.system(size: 15, weight: .medium))
+                            .font(MMFonts.body)
                             .foregroundColor(.headerText)
                             .fixedSize(horizontal: false, vertical: true)
                             .lineLimit(2)
@@ -82,7 +82,7 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
                             .imageScale(.small)
 
                         Text((subTarget.deadLineDateTime?.dateFromApiString ?? Date.now).toDisplayString)
-                            .font(.system(size: 13))
+                            .font(MMFonts.caption)
                             .foregroundColor(.gray)
                             .lineLimit(1)
                     }
@@ -92,7 +92,7 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
             if showDescription {
                 if let description = subTarget.description, !description.isEmpty {
                     Text(description)
-                        .font(.system(size: 13))
+                        .font(MMFonts.caption)
                         .foregroundColor(.secondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .fixedSize(horizontal: false, vertical: true)

@@ -19,7 +19,7 @@ struct ProfileStatsView: View {
                 .frame(height: 60)
             Text(title)
                 .multilineTextAlignment(.center)
-                .font(.caption)
+                .font(MMFonts.caption)
                 .foregroundStyle(Color.headerText)
         }
         .frame(width: 85)

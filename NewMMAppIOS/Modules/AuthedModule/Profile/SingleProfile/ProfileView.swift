@@ -85,7 +85,7 @@ struct ProfileView: View {
                                 
                                 Text(profile.fullName ?? "Имя не указано")
                                     .multilineTextAlignment(.center)
-                                    .font(.title.bold())
+                                    .font(MMFonts.title)
                                     .foregroundColor(.headerText)
                             }
                             
@@ -110,7 +110,7 @@ struct ProfileView: View {
                                 Image(systemName: "mappin.and.ellipse")
                                     .foregroundColor(.gray)
                                 Text(profile.location ?? "Не указано")
-                                    .font(.subheadline)
+                                    .font(MMFonts.subTitle)
                                     .foregroundColor(.gray)
                             }
                             .padding(.horizontal, 12)
@@ -229,11 +229,11 @@ struct ProfileView: View {
             // Род деятельности
             VStack(alignment: .leading, spacing: 8) {
                 Text("Род деятельности")
-                    .font(.headline)
+                    .font(MMFonts.title)
                     .foregroundColor(.gray)
                 
                 Text((profile.activitySphere ?? Constants.activitySphereText).lowercased())
-                    .font(.title3.bold())
+                    .font(MMFonts.title)
                     .foregroundColor(.headerText)
             }
             .padding(.horizontal, 16)
@@ -244,11 +244,11 @@ struct ProfileView: View {
             // О себе
             VStack(alignment: .leading, spacing: 8) {
                 Text("О себе")
-                    .font(.headline)
+                    .font(MMFonts.title)
                     .foregroundColor(.gray)
                 
                 Text(profile.biography ?? Constants.biographyText)
-                    .font(.body)
+                    .font(MMFonts.body)
                     .foregroundColor(.headerText)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -344,10 +344,10 @@ struct ProfileView: View {
     @ViewBuilder
     func descriptionView(_ key: String, _ value: String) -> some View {
         Text(key)
-            .font(.title3.bold())
+            .font(MMFonts.title)
             .foregroundColor(.headerText) +
         Text(value)
-            .font(.subheadline)
+            .font(MMFonts.subTitle)
             .foregroundColor(.headerText)
     }
     

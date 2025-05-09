@@ -218,10 +218,10 @@ struct PiaView: View {
                     
                     VStack {
                         Text(nameFract)
-                            .font(.headline)
+                            .font(MMFonts.title)
                             .foregroundColor(.headerText)
                         Text("\(status) \(current) / \(all)")
-                            .font(.subheadline)
+                            .font(MMFonts.subTitle)
                             .foregroundColor(.subtitleText)
                     }
                     .zIndex(102.0)
@@ -238,10 +238,10 @@ struct PiaView: View {
                     )
                     VStack {
                         Text("По всем категориям")
-                            .font(.headline)
+                            .font(MMFonts.title)
                             .foregroundColor(.headerText)
                         Text("выполнено \(current) / \(all)")
-                            .font(.subheadline)
+                            .font(MMFonts.subTitle)
                             .foregroundColor(.subtitleText)
                     }
                     .zIndex(102.0)

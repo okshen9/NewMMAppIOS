@@ -14,7 +14,7 @@ struct PhoneNumberTextField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Номер телефона")
-                .font(.headline)
+                .font(MMFonts.title)
                 .foregroundColor(Color.headerText)
             TextField("+X XXX XXX-XX-XX", text: $phoneNumber)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -31,7 +31,7 @@ struct PhoneNumberTextField: View {
             if let error = error {
                 Text(error)
                     .foregroundColor(.red)
-                    .font(.caption)
+                    .font(MMFonts.caption)
             }
         }
     }
