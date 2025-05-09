@@ -11,5 +11,19 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>SangBleuSunrise-Air-WebXL.otf</string>
+		<string>SangBleuSunrise-AirItalic-WebXL.otf</string>
+		<string>SangBleuSunrise-Bold-WebXL.otf</string>
+		<string>SangBleuSunrise-BoldItalic-WebXL.otf</string>
+		<string>SangBleuSunrise-Light-WebXL.otf</string>
+		<string>SangBleuSunrise-LightItalic-WebXL.otf</string>
+		<string>SangBleuSunrise-Livre-WebXL.otf</string>
+		<string>SangBleuSunrise-Medium-WebXL.otf</string>
+		<string>SangBleuSunrise-MediumItalic-WebXL.otf</string>
+		<string>SangBleuSunrise-Regular-WebXL.otf</string>
+		<string>SangBleuSunrise-RegularItalic-WebXL.otf</string>
+	</array>
 </dict>
 </plist>
