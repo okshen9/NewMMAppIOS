@@ -385,8 +385,8 @@ struct ProfileView: View {
                     subTitle: streamStatus,
                     action: {})
             }
-  
-			GroupButton(title: "Подгруппа",
+			// Группы человека
+			GroupButton(title: "Группы",
 						subTitle: "Не названчена",
 						action: {})
 			// TODO: NESHKO

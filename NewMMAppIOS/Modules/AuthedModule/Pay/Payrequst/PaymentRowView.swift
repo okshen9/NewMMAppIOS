@@ -75,7 +75,7 @@ struct PaymentRowView: View {
             
             Text(text)
                 .font(MMFonts.caption)
-                .foregroundColor(.secondary)
+				.foregroundColor(.headerText)
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)
         }

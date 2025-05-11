@@ -45,25 +45,31 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
         _viewModel = StateObject(wrappedValue: TargetEditViewModel(target: newEmptyTarget, isCreateTarget: isCreateTarget))
     }
     
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section(header: headerView()) {
-                    TextField("Название", text: $viewModel.targetTitle)
-                        .foregroundStyle(Color.headerText)
-                    TextEditorWithPalceHolder(palceHolder: "Описание подцели", textBinding: $viewModel.targetDescription)
-                        .foregroundStyle(Color.headerText)
-                    Picker("Категория цели", selection: $viewModel.targetCategory) {
-                        ForEach(TargetCategory.allCases.filter({ $0 != .unknown })) { category in
-                            Text(category.rawValue).tag(category)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .tint(.mainRed)
-
-                    DatePicker("Срок выполнения", selection: $viewModel.targetDeadline, displayedComponents: .date)
-                        .tint(.mainRed)
-                        .foregroundStyle(Color.headerText)
+	var body: some View {
+		NavigationStack {
+			Form {
+				Section(header: headerView()) {
+					TextField("Название", text: $viewModel.targetTitle)
+						.foregroundStyle(Color.headerText)
+					TextEditorWithPalceHolder(palceHolder: "Описание подцели", textBinding: $viewModel.targetDescription)
+						.foregroundStyle(Color.headerText)
+					Picker(
+//						label: {
+//							Text("Категория цели")
+//						},
+						"Категория цели",
+						selection: $viewModel.targetCategory) {
+							ForEach(TargetCategory.allCases.filter({ $0 != .unknown })) { category in
+								Text(category.rawValue).tag(category)
+							}
+						}
+						.pickerStyle(.menu)
+						.tint(.mainRed)
+						.foregroundStyle(Color.headerText)
+					
+					DatePicker("Срок выполнения", selection: $viewModel.targetDeadline, displayedComponents: .date)
+						.tint(.mainRed)
+						.foregroundStyle(Color.headerText)
 					
 					if let titleError = viewModel.titleError {
 						Text(titleError)
@@ -82,36 +88,37 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
 							.foregroundColor(.red)
 							.font(MMFonts.caption)
 					}
-                }
-                
-
-                
-                Section(header: Text("Подцели")
-                    .font(MMFonts.title)
-                    .foregroundStyle(Color.black.opacity(0.9))) {
-                    subTargetsSection()
-                }
-            }
-            .alert("Ошибка", isPresented: $showValidationAlert) {
-                Button("OK", role: .cancel) { }
-            } message: {
-                Text(validationMessage)
-            }
-            .alert("Закрыть?", isPresented: $showDismissAlert) {
-                Button("Отмена", role: .cancel) {}
-                Button("Закрыть", role: .destructive) { dismiss() }
-            } message: {
-                Text("Все изменения будут потеряны.")
-            }
-        }
-        .navigationTitle(isCreateTarget ? "Создание цели" : "Редактирование цели")
-        .navigationBarTitleDisplayMode(.inline)
-        .interactiveDismissDisabled(true) // Блокируем свайп
-        .onAppear {
-            viewModel.validateTarget()
-            viewModel.validateSubTargets()
-        }
-    }
+				}
+				
+				
+				
+				Section(header: Text("Подцели")
+					.font(MMFonts.body)
+					.foregroundStyle(Color.black.opacity(0.9))) {
+						subTargetsSection()
+					}
+			}
+			.scrollDismissesKeyboard(.interactively)
+			.alert("Ошибка", isPresented: $showValidationAlert) {
+				Button("OK", role: .cancel) { }
+			} message: {
+				Text(validationMessage)
+			}
+			.alert("Закрыть?", isPresented: $showDismissAlert) {
+				Button("Отмена", role: .cancel) {}
+				Button("Закрыть", role: .destructive) { dismiss() }
+			} message: {
+				Text("Все изменения будут потеряны.")
+			}
+		}
+		.navigationTitle(isCreateTarget ? "Создание" : "Редактирование")
+		.navigationBarTitleDisplayMode(.inline)
+		.interactiveDismissDisabled(true) // Блокируем свайп
+		.onAppear {
+			viewModel.validateTarget()
+			viewModel.validateSubTargets()
+		}
+	}
     
     @ViewBuilder
     func subTargetsSection() -> some View {
@@ -174,8 +181,8 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
 				Image(systemName: "xmark")
 					.foregroundStyle(Color.mainRed)
 			}
-            Text(isCreateTarget ? "Создание цели" : "Редактирование цели")
-                .font(MMFonts.subTitle)
+            Text(isCreateTarget ? "Создание" : "Редактирование")
+				.font(MMFonts.body)
                 .foregroundStyle(Color.headerText)
             Spacer()
             if isLoading {
@@ -210,26 +217,27 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
     @State private var showValidationAlert: Bool = false
     @State private var validationMessage: String = ""
     
-    private func saveTarget() {
-        // Используем ViewModel для создания модели цели
-        let targetModel = viewModel.createTargetModel()
-        
-        isLoading = true
-        Task {
-            if await viewModelEnvironment.saveTarget(targetModel, isCreateTarget: isCreateTarget) != nil {
-                isLoading = false
-                await ToastManager.shared.show(
-                    ToastModel(message: isCreateTarget ? "Цель успешно создана" : "Цель успешно отредактирована", icon: "checkmark.circle", duration: 2)
-                )
-                dismiss()
-            } else {
-                await ToastManager.shared.show(
-                    ToastModel(message: "Ошибка сохранения цели", icon: "xmark", duration: 2)
-                )
-                isLoading = false
-            }
-        }
-    }
+	private func saveTarget() {
+		// Используем ViewModel для создания модели цели
+		let targetModel = viewModel.createTargetModel()
+		
+		isLoading = true
+		Task {
+			if let target = await viewModelEnvironment.saveTarget(targetModel, isCreateTarget: isCreateTarget),
+			   target != nil {
+				isLoading = false
+				await ToastManager.shared.show(
+					ToastModel(message: isCreateTarget ? "Цель успешно создана" : "Цель успешно отредактирована", icon: "checkmark.circle", duration: 2)
+				)
+				dismiss()
+			} else {
+				await ToastManager.shared.show(
+					ToastModel(message: "Ошибка сохранения цели", icon: "xmark", duration: 2)
+				)
+				isLoading = false
+			}
+		}
+	}
 }
 
 #Preview {

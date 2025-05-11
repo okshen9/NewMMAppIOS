@@ -277,11 +277,11 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 							}
 							Text(moderationStatus.title)
 								.foregroundStyle(Color.headerText)
-								.font(MMFonts.title)
+								.font(MMFonts.subTitle)
 						}
 						Text(moderationStatus.description())
 							.foregroundStyle(Color.headerText)
-							.font(MMFonts.subTitle)
+							.font(MMFonts.body)
 							.multilineTextAlignment(.leading)
 							.fixedSize(horizontal: false, vertical: true)
 							.frame(maxWidth: .infinity, alignment: .leading)
@@ -387,7 +387,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 												  status: status)
 						Text(status.title)
 							.foregroundStyle(Color.headerText)
-							.font(MMFonts.title)
+							.font(MMFonts.subTitle)
 						
 						Image(systemName: "info.circle")
 							.resizable()
@@ -408,7 +408,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 																	  enable: isCurrentStatus)
 											Text(status.title)
 												.foregroundStyle(isCurrentStatus ? .black : .secondary)
-												.font(MMFonts.title)
+												.font(MMFonts.subTitle)
 										}
 									}
 								}
@@ -420,7 +420,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 
 					Text(status.description)
 						.foregroundStyle(Color.headerText)
-						.font(MMFonts.subTitle)
+						.font(MMFonts.body)
 						.multilineTextAlignment(.leading)
 						.fixedSize(horizontal: false, vertical: true)
 						.frame(maxWidth: .infinity, alignment: .leading)

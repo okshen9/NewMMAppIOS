@@ -115,7 +115,7 @@ final class TargetEditViewModel: ObservableObject {
     func validateTarget() {
         // Валидация названия
         if targetTitle.trimmingCharacters(in: .whitespacesAndNewlines).count < 3 {
-            titleError = "Название не может менее 3 символов"
+            titleError = "Название не может быть менее 3 символов"
         } else {
             titleError = nil
         }
@@ -166,8 +166,8 @@ final class TargetEditViewModel: ObservableObject {
 			
 			if subtargetDateDay > targetDateDay {
 				validatedSubTargets[index].deadlineError = "Дата подцели не может быть позже основной цели"
-			} else if subtargetDateDay < today {
-				validatedSubTargets[index].deadlineError = "Дата не может быть раньше текущей"
+//			} else if subtargetDateDay < today {
+//				validatedSubTargets[index].deadlineError = "Дата не может быть раньше текущей"
 			} else {
 				validatedSubTargets[index].deadlineError = nil
 			}
