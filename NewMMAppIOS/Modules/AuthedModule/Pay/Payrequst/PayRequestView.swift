@@ -8,26 +8,47 @@
 import SwiftUI
 
 struct PayRequestView: View {
-    @StateObject private var viewModel = PayRequestViewModel()
+	@StateObject var viewModel = PayRequestViewModel()
     
     var body: some View {
         NavigationView {
             VStack {
                 if let payRequest = viewModel.payRequest, !viewModel.isLoading {
-                    if payRequest.isEmpty {
-                        Text("У вас нет платежей - все ок!")
-                    }
-                    List(payRequest, id: \.id) { payment in
-                        PaymentRowView(payment: payment)
-                    }
-                    .listStyle(.plain)
-					.listRowSeparator(.hidden)
-                    .navigationTitle("Платежи")
-					.refreshable {
-						Task.detached {
-							await viewModel.updateProfile()
+					if true {
+                        VStack(spacing: 16) {
+                            Image(systemName: "checkmark.circle")
+                                .font(.system(size: 80))
+                                .foregroundColor(.green)
+                                .padding(.bottom, 16)
+                            
+                            Text("У вас нет платежей")
+                                .font(.title2)
+								.foregroundColor(.headerText)
+                                .fontWeight(.bold)
+                            
+                            Text("Можно спать спокойно")
+                                .font(.body)
+								.foregroundColor(.headerText)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 32)
+                            
+                            Spacer()
+                        }
+                        .padding(.top, 80)
+                        .frame(maxWidth: .infinity)
+                    } else {
+                        List(payRequest, id: \.id) { payment in
+                            PaymentRowView(payment: payment)
+                        }
+                        .listStyle(.plain)
+                        .listRowSeparator(.hidden)
+						.refreshable {
+							Task.detached {
+								await viewModel.updateProfile()
+							}
 						}
-					}
+                    }
+
                 } else {
                     shimerState()
                 }
@@ -70,7 +91,17 @@ struct PayRequestView: View {
 }
 
 #Preview {
-    PayRequestView()
+	@Previewable @StateObject var viewModel = PayRequestViewModel()
+	viewModel.payRequest = .init()
+	viewModel.isLoading = false
+	return PayRequestView(viewModel: viewModel)
 }
 
+
+#Preview("2") {
+	Text("У вас нет платежей")
+		.font(.title2)
+		.fontWeight(.bold)
+		.foregroundColor(.secondary)
+}
 

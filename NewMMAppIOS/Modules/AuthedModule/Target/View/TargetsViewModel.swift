@@ -162,6 +162,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
         print("Ошибка Target: \(error.localizedDescription)")
     }
     
+	/// Сохраняет изменения или создает новый таргет
     @MainActor
     func saveTarget(_ target: UserTargetDtoModel, isCreateTarget: Bool) async -> UserTargetDtoModel? {
         isLoading = true
@@ -178,6 +179,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
         }
     }
     
+	/// Сохраняет изменения таргета
     private func editTarget(_ target: UserTargetDtoModel) async -> UserTargetDtoModel? {
         do {
 			var minModel: UserTargetDtoModel
@@ -195,6 +197,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
         }
     }
     
+	/// Создает таргет
     private func createTarget(_ target: UserTargetDtoModel) async -> UserTargetDtoModel? {
         do {
             let createSubTarget = target.subTargets?.map { CreateSubTargetBodyModel(
