@@ -36,6 +36,7 @@ struct ProfileView: View {
                 }
             }
         }
+		
         .toolbarBackground(.hidden, for: .navigationBar)
         .onAppear {
             viewModel.onApper()
@@ -50,17 +51,41 @@ struct ProfileView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 // Карта
-                MapView(canInteactive: showMap,
-                        viewModel: .init(nameCity: viewModel.profile?.location ?? "Москва",
-                                         nameUser: viewModel.profile?.fullName ?? "Пользователь без имени"))
-                .padding(.horizontal, -16)
-                .frame(height: showMap ? 800 : 240)
-                .cornerRadius(20)
-                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
-                .onTapGesture {
-                    withAnimation(.spring()) {
-                        showMap.toggle()
-                    }
+                ZStack {
+                    MapView(canInteactive: showMap,
+                            withSgift: !showMap,
+                            viewModel: .init(nameCity: viewModel.profile?.location ?? "Москва",
+                                             nameUser: viewModel.profile?.fullName ?? "Пользователь без имени"))
+                    .padding(.horizontal, -16)
+                    .frame(height: showMap ? 600 : 240)
+                    .cornerRadius(20)
+                    .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+					.onTapGesture {
+						if !showMap {
+							// Предварительно снимаем фокус с клавиатуры
+							UIApplication.shared.endEditing()
+							
+							// Используем более простую анимацию
+							withAnimation(.easeInOut(duration: 0.3)) {
+								showMap.toggle()
+							}
+						}
+					}
+					.overlay(
+						Image(systemName: "chevron.up.circle.fill")
+							.resizable()
+							.foregroundColor(.mainRed)
+							.onTapGesture {
+								UIApplication.shared.endEditing()
+								withAnimation(.easeInOut(duration: 0.3)) {
+									showMap.toggle()
+								}
+							}
+							.frame(width: 34, height: 34)
+							.padding(16)
+							.opacity(showMap ? 1 : 0),
+						alignment: .bottomTrailing
+					)
                 }
                 
                 // Профиль
@@ -489,5 +514,12 @@ extension ProfileView {
 //    ProfileView().profileTabs(profile: UserProfileResultDto.getTestUser())
     NavigationStack {
         ProfileView().contentState(profile: UserProfileResultDto.getTestUser())
+    }
+}
+
+// Добавьте расширение UIApplication для закрытия клавиатуры
+extension UIApplication {
+    func endEditing() {
+        sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
