@@ -13,8 +13,10 @@ struct MapView: View {
     var withSgift: Bool = true
     @StateObject var viewModel: MapViewModel
     
-    // State для региона, чтобы не перестраивать его при каждой перерисовке
-    @State private var region: MKCoordinateRegion?
+    // Используем MapCameraPosition вместо региона для лучшего контроля
+    @State private var cameraPosition: MapCameraPosition = .automatic
+    @State private var originalPosition: MapCameraPosition = .automatic
+    
     // Состояние для отслеживания загрузки карты
     @State private var isMapLoaded = false
     
@@ -24,22 +26,41 @@ struct MapView: View {
                 if let coordinateRaw = viewModel.coordinateRaw,
                    let coordinatePoint = viewModel.coordinatePoint {
                     
-                    // Используем сохраненный регион или создаем новый
-                    let mapRegion = region ?? MKCoordinateRegion(
-                        center: coordinateRaw,
-                        span: MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
-                    )
-                    
-                    // Упрощаем структуру, убираем вложенность
-                    MapContent(
-                        region: mapRegion,
-                        canInteractive: canInteactive,
-                        cityName: viewModel.cityForDisplay,
-                        userName: viewModel.nameUser,
-                        coordinate: withSgift ? coordinatePoint : coordinateRaw
-                    )
+                    // Создаем карту с управляемой позицией камеры
+                    Map(position: Binding(
+                        get: { cameraPosition },
+                        set: { newPosition in
+                            if canInteactive {
+                                cameraPosition = newPosition
+                            }
+                        }
+                    ), interactionModes: canInteactive ? [.pitch, .zoom, .pan] : [])
+                    {
+                        // Основная отметка профиля
+                        Annotation("\(viewModel.cityForDisplay)\n\(viewModel.nameUser)",
+                                   coordinate: withSgift ? coordinatePoint : coordinateRaw)
+                        {
+                            Image(systemName: "mappin.circle.fill")
+                                .foregroundColor(.red)
+                                .font(MMFonts.title)
+                        }
+                        
+                        // Дополнительная отметка текущего пользователя, если она отличается
+                        if let userCoord = viewModel.currentUserCoordinate, 
+                           let userLocation = viewModel.currentUserLocation,
+                           userLocation != viewModel.cityForDisplay {
+                            Annotation("Вы здесь\n\(userLocation)",
+                                      coordinate: userCoord)
+                            {
+                                Image(systemName: "person.circle.fill")
+                                    .foregroundColor(.blue)
+                                    .font(MMFonts.title)
+                            }
+                        }
+                    }
                     .frame(width: geometry.size.width, height: geometry.size.height)
                     .cornerRadius(20)
+                    .animation(.easeInOut(duration: 0.3), value: canInteactive)
                     
                 } else {
                     ShimmeringRectangle()
@@ -52,22 +73,33 @@ struct MapView: View {
         .onAppear {
             loadMapData()
         }
+        .onChange(of: canInteactive) { oldValue, newValue in
+            if oldValue && !newValue {
+                // При закрытии карты возвращаемся к исходной позиции
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    cameraPosition = originalPosition
+                }
+            }
+        }
     }
     
     private func loadMapData() {
         // Загрузка с приоритетом
         Task(priority: .userInitiated) {
             await viewModel.getCoordinates()
-            // Сохраняем регион после получения координат
+            // Настраиваем камеру после получения координат
             if let coordinateRaw = viewModel.coordinateRaw {
-                let newRegion = MKCoordinateRegion(
+                let initialRegion = MKCoordinateRegion(
                     center: coordinateRaw,
                     span: MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
                 )
                 
                 // Обновляем UI в главном потоке
                 DispatchQueue.main.async {
-                    region = newRegion
+                    let position = MapCameraPosition.region(initialRegion)
+                    cameraPosition = position
+                    originalPosition = position
+                    
                     // Даем время для отображения и включаем высокое качество
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         viewModel.highQualityEnabled = true
@@ -76,30 +108,6 @@ struct MapView: View {
                 }
             }
         }
-    }
-}
-
-// Выносим Map в отдельную структуру для улучшения производительности
-struct MapContent: View {
-    let region: MKCoordinateRegion
-    let canInteractive: Bool
-    let cityName: String
-    let userName: String
-    let coordinate: CLLocationCoordinate2D
-    
-    var body: some View {
-        Map(position: .constant(.region(region)),
-            interactionModes: canInteractive ? [.pitch, .zoom, .pan] : [])
-        {
-            Annotation("\(cityName)\n\(userName)",
-                       coordinate: coordinate)
-            {
-                Image(systemName: "mappin.circle.fill")
-                    .foregroundColor(.red)
-                    .font(MMFonts.title)
-            }
-        }
-        .animation(.easeInOut(duration: 0.3), value: canInteractive)
     }
 }
 

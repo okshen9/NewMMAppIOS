@@ -52,41 +52,45 @@ struct ProfileView: View {
             VStack(alignment: .leading, spacing: 16) {
                 // Карта
                 ZStack {
-                    MapView(canInteactive: showMap,
-                            withSgift: !showMap,
-                            viewModel: .init(nameCity: viewModel.profile?.location ?? "Москва",
-                                             nameUser: viewModel.profile?.fullName ?? "Пользователь без имени"))
-                    .padding(.horizontal, -16)
-                    .frame(height: showMap ? 600 : 240)
-                    .cornerRadius(20)
-                    .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
-					.onTapGesture {
-						if !showMap {
-							// Предварительно снимаем фокус с клавиатуры
-							UIApplication.shared.endEditing()
-							
-							// Используем более простую анимацию
-							withAnimation(.easeInOut(duration: 0.3)) {
-								showMap.toggle()
-							}
-						}
-					}
-					.overlay(
-						Image(systemName: "chevron.up.circle.fill")
-							.resizable()
-							.foregroundColor(.mainRed)
-							.onTapGesture {
-								UIApplication.shared.endEditing()
-								withAnimation(.easeInOut(duration: 0.3)) {
-									showMap.toggle()
-								}
-							}
-							.frame(width: 34, height: 34)
-							.padding(16)
-							.opacity(showMap ? 1 : 0),
-						alignment: .bottomTrailing
-					)
+                    GeometryReader { geo in
+                        MapView(canInteactive: showMap,
+                                withSgift: !showMap,
+                                viewModel: .init(nameCity: viewModel.profile?.location ?? "Москва",
+                                                 nameUser: viewModel.profile?.fullName ?? "Пользователь без имени"))
+                        .padding(.horizontal, -16)
+                        .frame(height: showMap ? geo.size.height : Constants.heightMiniMap)
+                        .cornerRadius(20)
+                        .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+                        .onTapGesture {
+                            if !showMap {
+                                // Предварительно снимаем фокус с клавиатуры
+                                UIApplication.shared.endEditing()
+                                
+                                // Используем более плавную анимацию при закрытии
+                                withAnimation(.easeInOut(duration: 0.5)) {
+                                    showMap.toggle()
+                                }
+                            }
+                        }
+                        .overlay(
+                            Image(systemName: "chevron.up.circle.fill")
+                                .resizable()
+                                .foregroundColor(.mainRed)
+                                .onTapGesture {
+                                    UIApplication.shared.endEditing()
+                                    // Используем более плавную анимацию при закрытии
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        showMap.toggle()
+                                    }
+                                }
+                                .frame(width: 34, height: 34)
+                                .padding(16)
+                                .opacity(showMap ? 1 : 0),
+                            alignment: .bottomTrailing
+                        )
+                    }
                 }
+				.frame(height: showMap ? UIScreen.main.bounds.height - Constants.offestBigMap : Constants.heightMiniMap)
                 
                 // Профиль
                 HStack(alignment: .bottom) {
@@ -478,6 +482,8 @@ extension ProfileView {
         static let imageUrl = URL(string: "https://t.me/i/userpic/320/yrCHD_HRHDVktpQhLHeDQ6TsYP-1SgldytAKXBHlux0.jpg")
         static let biographyText: String = "Этот пользователь пока не рассказал ничего о себе"
         static let activitySphereText: String = "на чиле, на расслабоне"
+		static let heightMiniMap = 240.0
+		static let offestBigMap = 220.0
     }
 
 }
@@ -511,10 +517,19 @@ extension ProfileView {
 }
 
 #Preview("tabView") {
+	TabView(content: {
+		ProfileView().contentState(profile: UserProfileResultDto.getTestUser())
+			.tabItem {
+				Image(.MM)
+					.renderingMode(.template)
+				Text("Главная")
+			}
+			.tag(0)
+	})
 //    ProfileView().profileTabs(profile: UserProfileResultDto.getTestUser())
-    NavigationStack {
-        ProfileView().contentState(profile: UserProfileResultDto.getTestUser())
-    }
+//	TabBarView {
+//        ProfileView().contentState(profile: UserProfileResultDto.getTestUser())
+//    }
 }
 
 // Добавьте расширение UIApplication для закрытия клавиатуры

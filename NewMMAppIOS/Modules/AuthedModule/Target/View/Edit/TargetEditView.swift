@@ -111,7 +111,6 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
 				Text("Все изменения будут потеряны.")
 			}
 		}
-		.navigationTitle(isCreateTarget ? "Создание" : "Редактирование")
 		.navigationBarTitleDisplayMode(.inline)
 		.interactiveDismissDisabled(true) // Блокируем свайп
 		.onAppear {
@@ -184,6 +183,7 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
             Text(isCreateTarget ? "Создание" : "Редактирование")
 				.font(MMFonts.body)
                 .foregroundStyle(Color.headerText)
+				.lineLimit(1)
             Spacer()
             if isLoading {
                 ProgressView()
@@ -196,7 +196,6 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                     saveTarget()
                 }, label: {
                     HStack(spacing: 0) {
-						Spacer()
                         Text("Готово")
                             .font(MMFonts.caption)
                             .foregroundColor(viewModel.isFormValid ? .mainRed : .gray)

@@ -7,11 +7,13 @@
 
 import Foundation
 import CoreLocation
+import MapKit
 
 final class MapViewModel: ObservableObject {
     let nameCity: String
     let nameUser: String
-
+    let currentUserLocation: String?
+    
     var cityForDisplay: String {
         hasError ? "Москва" : nameCity
     }
@@ -21,25 +23,27 @@ final class MapViewModel: ObservableObject {
 
     @Published var coordinateRaw: CLLocationCoordinate2D? = nil
     @Published var coordinatePoint: CLLocationCoordinate2D? = nil
+    @Published var currentUserCoordinate: CLLocationCoordinate2D? = nil
     @Published var hasError: Bool = false
     
     // Очередь для операций с геокодированием
     private let geocoderQueue = DispatchQueue(label: "com.mmapp.geocoder", qos: .userInitiated)
     
-    init(nameCity: String, nameUser: String) {
+    init(nameCity: String, nameUser: String, currentUserLocation: String? = nil) {
         self.nameCity = nameCity
         self.nameUser = nameUser
+        self.currentUserLocation = currentUserLocation ?? UserRepository.shared.userProfile?.location
     }
     
     /// Полчение координат города по названию
     func getCoordinates(for city: String? = nil) async {
         // Защита от повторных запросов, если координаты уже есть
-        if coordinateRaw != nil && coordinatePoint != nil {
+        if coordinateRaw != nil && coordinatePoint != nil && (currentUserLocation == nil || currentUserCoordinate != nil) {
             return
         }
         
-        // Запускаем запрос на выделенной очереди
-        return await withCheckedContinuation { continuation in
+        // Запускаем запрос на выделенной очереди для профиля
+        await withCheckedContinuation { continuation in
             geocoderQueue.async { [weak self] in
                 guard let self = self else {
                     continuation.resume()
@@ -60,6 +64,17 @@ final class MapViewModel: ObservableObject {
                                 longitude: location.coordinate.longitude
                             )
                             self.coordinatePoint = location.coordinate
+                            
+                            // Если у нас есть локация текущего пользователя и она отличается от nameCity, 
+                            // запускаем второй геокодер для получения координат текущего пользователя
+                            if let userLocation = self.currentUserLocation, 
+                               userLocation != self.nameCity,
+                               self.currentUserCoordinate == nil {
+                                Task {
+                                    await self.getUserLocationCoordinates(userLocation)
+                                }
+                            }
+                            
                             continuation.resume()
                         } else {
                             if city != "Москва" {
@@ -70,6 +85,33 @@ final class MapViewModel: ObservableObject {
                             self.hasError = true
                             continuation.resume()
                         }
+                    }
+                }
+            }
+        }
+    }
+    
+    /// Получение координат для локации текущего пользователя
+    func getUserLocationCoordinates(_ location: String) async {
+        await withCheckedContinuation { continuation in
+            geocoderQueue.async { [weak self] in
+                guard let self = self else {
+                    continuation.resume()
+                    return
+                }
+                
+                let geocoder = CLGeocoder()
+                geocoder.geocodeAddressString(location) { [weak self] (placemarks, error) in
+                    guard let self = self else {
+                        continuation.resume()
+                        return
+                    }
+                    
+                    DispatchQueue.main.async {
+                        if let location = placemarks?.first?.location {
+                            self.currentUserCoordinate = location.coordinate
+                        }
+                        continuation.resume()
                     }
                 }
             }
