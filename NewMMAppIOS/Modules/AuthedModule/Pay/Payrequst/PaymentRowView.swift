@@ -44,9 +44,8 @@ struct PaymentRowView: View {
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(UIColor.secondarySystemBackground))
-        )
-        .padding(.vertical, 4)
-    }
+		)
+	}
     
     // MARK: - Компоненты интерфейса
     
@@ -100,5 +99,5 @@ struct PaymentRowView: View {
 }
 
 #Preview {
-    PaymentRowView(payment: PaymentRequestResponseDto())
+	PaymentRowView(payment: PaymentRequestResponseDto(paymentRequestStatus: .wait))
 }

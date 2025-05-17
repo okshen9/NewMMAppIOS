@@ -12,8 +12,10 @@ struct ProfileInfoView: View {
     @ObservedObject var viewModel: ProfileInfoViewModel
     @EnvironmentObject var appStateServise: AppNavigationStateService
     @State var isKeyboardVisible = false
+    @State private var showDismissAlert = false
 
     var body: some View {
+        NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
                     ValidatedTextField(
@@ -81,28 +83,64 @@ struct ProfileInfoView: View {
                 .onChange(of: viewModel.userProfile) {
                     viewModel.validate()
                 }
+                .scrollDismissesKeyboard(.interactively)
+                .onChange(of: viewModel.navPath) { oldPath, newPath in
+                    switch newPath {
+                    case .toInfoView:
+                        break
+                    case .toMinView:
+                        appStateServise.setNewState(.authorized)
+                    case .dismiss:
+                        dismiss()
+                    }
+                }
+                .disabled(viewModel.isLoaded) // Блокируем взаимодействие с формой при загрузке
+            }
             .scrollDismissesKeyboard(.interactively)
             .navigationTitle("Данные профиля")
-            .onChange(of: viewModel.navPath) { oldPath, newPath in
-                switch newPath {
-                case .toInfoView:
-                    break
-                case .toMinView:
-                    appStateServise.setNewState(.authorized)
-                case .dismiss:
-                    dismiss()
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        showDismissAlert = true
+                    }) {
+                        Image(systemName: "xmark")
+                            .foregroundStyle(Color.mainRed)
+                    }
                 }
             }
-            .disabled(viewModel.isLoaded) // Блокируем взаимодействие с формой при загрузке
+            .alert("Закрыть?", isPresented: $showDismissAlert) {
+                Button("Отмена", role: .cancel) {}
+                Button("Закрыть", role: .destructive) { dismiss() }
+            } message: {
+                Text("Все изменения будут потеряны.")
+            }
+            .interactiveDismissDisabled(true) // Блокируем свайп
+			.navigationBarBackButtonHidden()
         }
-            .scrollDismissesKeyboard(.interactively)
-
-
-
     }
 }
 
 
-//#Preview {
-//    ProfileInfoView(viewModel: ProfileInfoViewModel(profileModel: <#UserProfileResultDto?#>, authModel: <#AuthUserDtoResult?#>), isKeyboardVisible: false)
-//}
+#Preview {
+	@Previewable @State var isPresented: Bool = false
+	let view = ProfileInfoView(viewModel: ProfileInfoViewModel(profileModel: .getTestUser(),
+															   authModel: AuthUserDtoResult(id: 123, telegramId: nil, authDate: nil, hash: nil, lastName: nil, firstName: nil, username: nil, enabled: true, authStatus: nil, roles: nil),
+															   isEditProfile: false,
+															   needUpdateAction: {}))
+	NavigationStack {
+		NavigationLink("sdvsd", destination:
+						view
+					   
+		)
+		Text("Sheet")
+			.onTapGesture {
+				isPresented.toggle()
+			}
+			.sheet(isPresented: $isPresented) {
+				view
+			}
+		
+		
+	}
+}

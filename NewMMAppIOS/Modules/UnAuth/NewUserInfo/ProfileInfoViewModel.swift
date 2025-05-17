@@ -56,11 +56,11 @@ class ProfileInfoViewModel: ObservableObject {
             errors["telegramUsername"] =  userProfile.telegramUsername.isEmpty || userProfile.telegramUsername.count > 3 ? nil : "Имя пользователя в Telegram не может быть менее 3 символов"
             errors["occupation"] =  userProfile.occupation.isEmpty || userProfile.occupation.count > 3 ? nil : "Род деятельности не может быть менее 3 символов"
             errors["city"] =  userProfile.city.isEmpty || userProfile.city.count > 3 ? nil : "Город проживания не может быть менее 3 символов"
-            errors["about"] =  userProfile.about.isEmpty || userProfile.about.count > 3 ? nil : "Поле 'О себе' не может быть 3 символов"
+            errors["about"] =  userProfile.about.isEmpty || userProfile.about.count > 3 ? nil : "Поле 'О себе' не может быть менее 3-х символов"
             errors["phoneNumber"] =  (userProfile.phoneNumber.isEmpty || isValidPhoneNumber(userProfile.phoneNumber))  ? nil : "Некорректный номер телефона"
             
             // поля не должны быть пустыми
-            let anyEmpty = userProfile.firstName.isEmpty || userProfile.telegramUsername.isEmpty || userProfile.occupation.isEmpty || userProfile.city.isEmpty || userProfile.about.isEmpty || userProfile.phoneNumber.isEmpty
+            let anyEmpty = userProfile.firstName.isEmpty || userProfile.telegramUsername.isEmpty || userProfile.occupation.isEmpty || userProfile.city.isEmpty || userProfile.phoneNumber.isEmpty
             print("neshko777 isValid \(isValid) anyEmpty \(anyEmpty)")
             isValid = errors.isEmpty && !anyEmpty
         }

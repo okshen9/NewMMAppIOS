@@ -9,46 +9,16 @@ import SwiftUI
 
 struct PayRequestView: View {
 	@StateObject var viewModel = PayRequestViewModel()
-    
-    var body: some View {
+	
+	var body: some View {
         NavigationView {
             VStack {
                 if let payRequest = viewModel.payRequest, !viewModel.isLoading {
-					if true {
-                        VStack(spacing: 16) {
-                            Image(systemName: "checkmark.circle")
-                                .font(.system(size: 80))
-                                .foregroundColor(.green)
-                                .padding(.bottom, 16)
-                            
-                            Text("У вас нет платежей")
-                                .font(.title2)
-								.foregroundColor(.headerText)
-                                .fontWeight(.bold)
-                            
-                            Text("Можно спать спокойно")
-                                .font(.body)
-								.foregroundColor(.headerText)
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, 32)
-                            
-                            Spacer()
-                        }
-                        .padding(.top, 80)
-                        .frame(maxWidth: .infinity)
+					if payRequest.isEmpty {
+						emptyPayment
                     } else {
-                        List(payRequest, id: \.id) { payment in
-                            PaymentRowView(payment: payment)
-                        }
-                        .listStyle(.plain)
-                        .listRowSeparator(.hidden)
-						.refreshable {
-							Task.detached {
-								await viewModel.updateProfile()
-							}
-						}
+						paymentList(payRequest)
                     }
-
                 } else {
                     shimerState()
                 }
@@ -63,8 +33,8 @@ struct PayRequestView: View {
     
     // MARK: - ViewBuilder
     @ViewBuilder
-    func shimerState() -> some View {
-        VStack(spacing: 20) {
+	fileprivate func shimerState() -> some View {
+        VStack(spacing: 16) {
 			ShimmeringRectangle()
 				.frame(height: 40)
 				.cornerRadius(8)
@@ -88,6 +58,46 @@ struct PayRequestView: View {
         }
         .padding(.horizontal, 16)
     }
+	
+	@ViewBuilder
+	fileprivate var emptyPayment: some View {
+		VStack(spacing: 16) {
+			Image(systemName: "checkmark.circle")
+				.font(.system(size: 80))
+				.foregroundColor(.green)
+				.padding(.bottom, 16)
+			
+			Text("У вас нет платежей")
+				.font(MMFonts.title)
+				.foregroundColor(.headerText)
+				.fontWeight(.bold)
+			
+			Text("Можно спать спокойно")
+				.font(MMFonts.body)
+				.foregroundColor(.headerText)
+				.multilineTextAlignment(.center)
+				.padding(.horizontal, 32)
+			
+			Spacer()
+		}
+		.padding(.top, 80)
+		.frame(maxWidth: .infinity)
+	}
+	
+	@ViewBuilder
+	fileprivate func paymentList(_ payRequest: [PaymentRequestResponseDto]) -> some View {
+		List(payRequest, id: \.id) { payment in
+			PaymentRowView(payment: payment)
+				.listRowSeparator(.hidden)
+		}
+		.listRowSpacing(-12)
+		.listStyle(.plain)
+		.refreshable {
+			Task.detached {
+				await viewModel.updateProfile()
+			}
+		}
+	}
 }
 
 #Preview {
@@ -103,5 +113,19 @@ struct PayRequestView: View {
 		.font(.title2)
 		.fontWeight(.bold)
 		.foregroundColor(.secondary)
+}
+
+#Preview("list") {
+	PayRequestView().paymentList([
+		PaymentRequestResponseDto(id: 1, amount: 3000, dueDate: Date.tomorrow.toApiString, paymentRequestStatus: .overdue),
+		PaymentRequestResponseDto(id: 2, amount: 200, dueDate: Date.tomorrow.toApiString, paymentRequestStatus: .canceled),
+		PaymentRequestResponseDto(id: 3, amount: 300, dueDate: Date.tomorrow.toApiString, paymentRequestStatus: .fullPaid),
+		PaymentRequestResponseDto(id: 4, amount: 300, dueDate: Date.tomorrow.toApiString, paymentRequestStatus: .wait)
+	])
+}
+
+#Preview("empty") {
+	PayRequestView()
+		.emptyPayment
 }
 

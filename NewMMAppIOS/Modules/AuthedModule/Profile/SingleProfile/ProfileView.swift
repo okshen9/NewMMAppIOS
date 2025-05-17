@@ -67,7 +67,7 @@ struct ProfileView: View {
                                 UIApplication.shared.endEditing()
                                 
                                 // Используем более плавную анимацию при закрытии
-                                withAnimation(.easeInOut(duration: 0.5)) {
+                                withAnimation(.easeInOut(duration: 0.3)) {
                                     showMap.toggle()
                                 }
                             }
@@ -254,35 +254,36 @@ struct ProfileView: View {
     
     @ViewBuilder
     func profileInfo(profile: UserProfileResultDto) -> some View {
-        VStack(alignment: .leading, spacing: 24) {
-            // Род деятельности
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Род деятельности")
-                    .font(MMFonts.title)
-                    .foregroundColor(.gray)
-                
-                Text((profile.activitySphere ?? Constants.activitySphereText).lowercased())
-                    .font(MMFonts.title)
-                    .foregroundColor(.headerText)
-            }
-            .padding(.horizontal, 16)
-            
-            Divider()
-                .padding(.horizontal, 16)
-            
-            // О себе
-            VStack(alignment: .leading, spacing: 8) {
-                Text("О себе")
-                    .font(MMFonts.title)
-                    .foregroundColor(.gray)
-                
-                Text(profile.biography ?? Constants.biographyText)
-                    .font(MMFonts.body)
-                    .foregroundColor(.headerText)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .padding(.horizontal, 16)
-        }
+		VStack(alignment: .leading, spacing: 24) {
+			// Род деятельности
+			VStack(alignment: .leading, spacing: 8) {
+				Text("Род деятельности")
+					.font(MMFonts.body)
+					.foregroundColor(.headerText)
+				
+				Text((profile.activitySphere ?? Constants.activitySphereText).lowercased())
+					.font(MMFonts.subTitle)
+					.foregroundColor(.headerText)
+			}
+			.padding(.horizontal, 16)
+			Divider()
+				.padding(.horizontal, 16)
+			
+			// О себе
+			let biography = profile.biography.isEmptyOrNil ? Constants.biographyText : profile.biography.orEmpty
+			VStack(alignment: .leading, spacing: 8) {
+				Text("О себе")
+					.font(MMFonts.body)
+					.foregroundColor(.headerText)
+				
+				Text(biography)
+					.font(MMFonts.subTitle)
+					.foregroundColor(.headerText)
+					.fixedSize(horizontal: false, vertical: true)
+			}
+			.padding(.horizontal, 16)
+			.padding(.bottom, 8)
+		}
         .padding(.vertical, 6)
         .background(Color.white)
         .cornerRadius(16)
@@ -481,7 +482,7 @@ extension ProfileView {
         static let title = "Выберите карту"
         static let imageUrl = URL(string: "https://t.me/i/userpic/320/yrCHD_HRHDVktpQhLHeDQ6TsYP-1SgldytAKXBHlux0.jpg")
         static let biographyText: String = "Этот пользователь пока не рассказал ничего о себе"
-        static let activitySphereText: String = "на чиле, на расслабоне"
+        static let activitySphereText: String = "Информация не указана"
 		static let heightMiniMap = 240.0
 		static let offestBigMap = 220.0
     }

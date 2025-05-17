@@ -25,6 +25,7 @@ struct ValidatedTextEditor: View {
                 Text(error)
                     .foregroundColor(.headerText)
                     .font(MMFonts.caption)
+					.foregroundStyle(Color.mainRed)
             }
         }
     }
