@@ -11,6 +11,15 @@ struct EventRowView: View {
     let event: CalendatItem
     @Environment(\.colorScheme) var colorScheme
     @State private var isExpanded = false
+    
+    var isSubTarget: Bool {
+        if case let .target(target) = event.type,
+           let subTargets = target.subTargets,
+           subTargets.count == 1 && event.title.hasPrefix("Подцель:") {
+            return true
+        }
+        return false
+    }
 
     var body: some View {
         let subTargets = event.target?.subTargets
@@ -30,11 +39,19 @@ struct EventRowView: View {
                     
                     // Данные события
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(event.title)
-                            .font(MMFonts.subTitle)
-                            .foregroundColor(.primary)
-                            .lineLimit(isExpanded ? nil : 3)
-                            .fixedSize(horizontal: false, vertical: true)
+                        HStack(spacing: 4) {
+                            if isSubTarget {
+                                Image(systemName: "arrow.turn.down.right")
+                                    .font(MMFonts.subCaption)
+                                    .foregroundColor(.secondary)
+                            }
+                            
+                            Text(event.title)
+                                .font(MMFonts.subTitle)
+                                .foregroundColor(.primary)
+                                .lineLimit(isExpanded ? nil : 3)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                         
                         // Компактная информация о событии
                         HStack {
@@ -265,8 +282,19 @@ struct EventRowView: View {
                 .fill(eventColor.opacity(0.15))
                 .frame(width: 36, height: 36)
             
-            ImageSheduler(event: event)
-                .font(MMFonts.body)
+            if isSubTarget {
+                ZStack {
+                    ImageSheduler(event: event)
+                        .font(MMFonts.body)
+                    
+                    Circle()
+                        .strokeBorder(Color.secondary.opacity(0.5), lineWidth: 1.5)
+                        .frame(width: 36, height: 36)
+                }
+            } else {
+                ImageSheduler(event: event)
+                    .font(MMFonts.body)
+            }
         }
     }
     

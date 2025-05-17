@@ -5,6 +5,8 @@ struct SchedulerView: View {
     @State private var selectedDate: Date?
     @State private var hashebleDate: Int? = Date().hashValue
     @State private var isDateSelected = false
+	
+	@State private var showCalendar: Bool = false
     
     // Категории для карусели
     private let categories: [TargetCategory] = [
@@ -14,69 +16,26 @@ struct SchedulerView: View {
         .health,
         .other
     ]
-    
-    var body: some View {
-        NavigationStack {
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(alignment: .leading) {
-                    if viewModel.isLoading == false {
-                        VStack(alignment: .leading) {
-                            // Календарь с возможностью снятия выбора
-                            CalendarViewUIKit(
-                                selectedDate: $selectedDate,
-                                events: viewModel.calendarComponetsItems,
-                                canDeselectSameDate: true
-                            )
-                            .adaptiveHeight()
-                            .tint(Color.red)
-                            .frame(height: 500)
-                            
-                            // Легенда категорий
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text("События и категории")
-                                    .font(MMFonts.title)
-                                    .foregroundColor(.primary)
-                                    .padding(.horizontal, 24)
-                                
-                                // Типы событий - компактно в одной строке
-                                HStack(spacing: 16) {
-                                    HStack(spacing: 8) {
-                                        Circle()
-                                            .foregroundStyle(Color.green)
-                                            .frame(width: 12, height: 12)
-                                        Text("Цели")
-                                            .font(MMFonts.subTitle)
-                                    }
-                                    
-                                    HStack(spacing: 8) {
-                                        Circle()
-                                            .foregroundStyle(Color.mainRed)
-                                            .frame(width: 12, height: 12)
-                                        Text("Платежи")
-                                            .font(MMFonts.subTitle)
-                                    }
-                                }
-                                .padding(.horizontal, 24)
-                            }
-                            if !viewModel.scheduleListItems.isEmpty {
-                                Text("События")
-                                    .font(MMFonts.title)
-                                    .foregroundColor(.primary)
-                                    .padding(.horizontal, 24)
-                                    .padding(.top, 8)
-                                
-                                eventList2()
-                                    .padding()
-                                Spacer()
-                            } else {
-                                Spacer()
-                                Text("У вас нет событий")
-                                    .font(MMFonts.title)
-                                    .foregroundColor(.headerText)
-                                Spacer()
-                            }
-                        }
-                    } else {
+	
+	var body: some View {
+		NavigationStack {
+			ScrollView(.vertical, showsIndicators: false) {
+				VStack(alignment: .leading) {
+					if viewModel.isLoading == false {
+						VStack(alignment: .leading) {
+							if !viewModel.scheduleListItems.isEmpty {
+								eventList2()
+									.padding()
+								Spacer()
+							} else {
+								Spacer()
+								Text("У вас нет событий")
+									.font(MMFonts.title)
+									.foregroundColor(.headerText)
+								Spacer()
+							}
+						}
+					} else {
 						VStack {
 							ShimmeringRectangle()
 								.frame(height: 450)
@@ -96,52 +55,73 @@ struct SchedulerView: View {
 							Spacer()
 						}
 						.padding(.horizontal, 16)
-                    }
-                }
-            }
-            .navigationBarTitle(Text("Расписание"), displayMode: .inline)
-            .scrollPosition(id: $hashebleDate.animation(.easeIn(duration: 0.3)), anchor: .top)
-            .refreshable {
-                Task.detached {
-                    await viewModel.updateData()
-                }
-            }
-        }
-        .onChange(of: selectedDate) { oldState, newState in
-            print("change eventsCalendar: \(newState)")
-            hashebleDate = newState?.hashValue
-            isDateSelected = newState != nil
-        }
-        .onAppear {
-            viewModel.onApper()
-        }
-    }
+					}
+				}
+				
+			}
+			.navigationBarTitleDisplayMode(.inline)
+			.toolbar {
+				ToolbarItem(placement: .principal) {
+					HStack {
+						Text("Расписание")
+							.font(.largeTitle.bold())
+							.foregroundStyle(Color.headerText)
+						Spacer()
+						hederCalendar()
+					}
+					.offset(y: -4)
+				}
+			}
+			
+			
+			.scrollPosition(id: $hashebleDate.animation(.easeIn(duration: 0.3)), anchor: .top)
+			.refreshable {
+				for family in UIFont.familyNames.sorted() {
+					let _ = print("Family: \(family)")
+					let names = UIFont.fontNames(forFamilyName: family)
+					for name in names {
+						let _ = print("   Font: \(name)")
+					}
+				}
+				Task.detached {
+					await viewModel.updateData()
+				}
+			}
+		}
+		.onChange(of: selectedDate) { oldState, newState in
+			hashebleDate = newState?.hashValue
+			showCalendar = false
+			isDateSelected = newState != nil
+		}
+		.onAppear {
+			viewModel.onApper()
+		}
+	}
     
     @ViewBuilder
-    private func eventList2() -> some View {
-        // MARK: - Events List
-        let filteredEvents = viewModel.scheduleListItems.filter { dateAndEvents in
-            if selectedDate == nil {
-                // Если нет выбранной даты, показываем все события
-                return true
-            } else {
-                // Используем startOfDay для сравнения только по дате, без учета времени
-                let selectedStartOfDay = Calendar.current.startOfDay(for: selectedDate!)
-                let entryStartOfDay = Calendar.current.startOfDay(for: dateAndEvents.key)
-                
-                // Сравниваем даты
-                return selectedStartOfDay == entryStartOfDay
-            }
-        }
-        
-//        Group {
-            if filteredEvents.isEmpty {
-                noEventsForSelectedDate
-            } else {
-                eventsListContent(filteredEvents)
-            }
-//        }
-    }
+	private func eventList2() -> some View {
+		// MARK: - Events List
+		let filteredEvents = viewModel.scheduleListItems.filter { dateAndEvents in
+			if selectedDate == nil {
+				// Если нет выбранной даты, показываем все события
+				return true
+			} else {
+				// Используем startOfDay для сравнения только по дате, без учета времени
+				let selectedStartOfDay = Calendar.current.startOfDay(for: selectedDate!)
+				let entryStartOfDay = Calendar.current.startOfDay(for: dateAndEvents.key)
+				
+				// Сравниваем даты
+				return selectedStartOfDay == entryStartOfDay
+			}
+		}
+		
+		//        Group {
+		if filteredEvents.isEmpty {
+			noEventsForSelectedDate
+		} else {
+			eventsListContent(filteredEvents)
+		}
+	}
     
     // MARK: - No Events View
     private var noEventsForSelectedDate: some View {
@@ -179,6 +159,83 @@ struct SchedulerView: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 40)
     }
+	
+	@ViewBuilder
+	fileprivate func hederLine() -> some View {
+		HStack {
+			Text("События")
+				.font(MMFonts.title)
+				.foregroundColor(.primary)
+				.padding(.horizontal, 24)
+				.padding(.top, 8)
+			Spacer()
+			hederCalendar()
+		}
+		.padding(.horizontal, 16)
+	}
+	
+	@ViewBuilder
+	fileprivate func hederCalendar() -> some View {
+		ZStack {
+			Color.mainRed
+				.frame(width: 46, height: 46)
+				.cornerRadius(12)
+				.shadow(color: .mainRed, radius: 4)
+			if let selectedDate {
+				let date = MMDateFormatter.string(from: selectedDate, format: .dayD)
+				let month = MMDateFormatter.string(from: selectedDate, format: .monthMMM)
+				VStack {
+					Text(date)
+						.font(MMFonts.caption)
+						.foregroundStyle(.white)
+					Text(month)
+						.font(MMFonts.caption)
+						.foregroundStyle(.white)
+				}
+			} else {
+				Image(systemName: "calendar")
+					.foregroundStyle(.white)
+					.font(.system(size: 18))
+			}
+		}
+		.onTapGesture {
+			showCalendar.toggle()
+		}
+		.popover(isPresented: $showCalendar, content: {
+			VStack(spacing: 4) {
+				CalendarViewUIKit(
+					selectedDate: $selectedDate,
+					events: viewModel.calendarComponetsItems,
+					canDeselectSameDate: true
+				)
+				.tint(Color.red)
+				Divider()
+					.offset(x: 0, y: -10)
+				
+				// Типы событий - компактно в одной строке
+				HStack(spacing: 16) {
+					HStack(spacing: 8) {
+						Circle()
+							.foregroundStyle(Color.green)
+							.frame(width: 12, height: 12)
+						Text("Цели")
+							.font(MMFonts.body)
+					}
+					
+					HStack(spacing: 8) {
+						Circle()
+							.foregroundStyle(Color.mainRed)
+							.frame(width: 12, height: 12)
+						Text("Платежи")
+							.font(MMFonts.body)
+					}
+				}
+				.padding(.horizontal, 24)
+			}
+			.padding()
+			.presentationCompactAdaptation(.popover)
+		})
+	}
     
     // MARK: - Events List Content
     private func eventsListContent(_ events: [Date: [CalendatItem]]) -> some View {
@@ -292,41 +349,46 @@ extension SchedulerView {
                     id: 3,
                     externalId: 3,
                     amount: 3000.0,
-                    dueDate: Date.nowWith(plus: 2).toApiString,
+                    dueDate: Date.nowWith(plus: 10).toApiString,
                     comment: "Оплата за материалы",
                     paymentRequestStatus: .canceled,
                     userProfilePreview: .getTestUser()
                 )
             ],
-            targets: [
-                // Цели на сегодня
-                UserTargetDtoModel(
-                    id: 1,
-                    title: "Изучить SwiftUI",
-                    description: "Освоить основы SwiftUI и создать первое приложение",
-                    deadLineDateTime: Date().toApiString,
-                    targetStatus: .inProgress,
-                    category: .personal
-                ),
-                // Цели на завтра
-                UserTargetDtoModel(
-                    id: 2,
-                    title: "Прочитать книгу по архитектуре",
-                    description: "Изучить паттерны проектирования",
-                    deadLineDateTime: Date.nowWith(plus: 1).toApiString,
-                    targetStatus: .done,
-                    category: .money
-                ),
-                // Цели на следующую неделю
-                UserTargetDtoModel(
-                    id: 3,
-                    title: "Подготовить презентацию",
-                    description: "Создать презентацию для команды",
-                    deadLineDateTime: Date.nowWith(plus: 7).toApiString,
-                    targetStatus: .expired,
-                    category: .health
-                )
-            ]
+			            targets: [
+							UserTargetDtoModel.getBaseTarget(),
+//							UserTargetDtoModel.getBaseTarget()
+							]
+//            targets: [
+//				
+//                // Цели на сегодня
+//                UserTargetDtoModel(
+//                    id: 1,
+//                    title: "Изучить SwiftUI",
+//                    description: "Освоить основы SwiftUI и создать первое приложение",
+//                    deadLineDateTime: Date().toApiString,
+//                    targetStatus: .inProgress,
+//                    category: .personal
+//                ),
+//                // Цели на завтра
+//                UserTargetDtoModel(
+//                    id: 2,
+//                    title: "Прочитать книгу по архитектуре",
+//                    description: "Изучить паттерны проектирования",
+//                    deadLineDateTime: Date.nowWith(plus: 1).toApiString,
+//                    targetStatus: .done,
+//                    category: .money
+//                ),
+//                // Цели на следующую неделю
+//                UserTargetDtoModel(
+//                    id: 3,
+//                    title: "Подготовить презентацию",
+//                    description: "Создать презентацию для команды",
+//                    deadLineDateTime: Date.nowWith(plus: 7).toApiString,
+//                    targetStatus: .expired,
+//                    category: .health
+//                )
+//            ]
         ))
         .preferredColorScheme(.light)
     }

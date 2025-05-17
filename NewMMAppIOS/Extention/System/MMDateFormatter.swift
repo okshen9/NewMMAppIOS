@@ -414,13 +414,29 @@ extension MMDateFormatter {
         case date
         /// Отображение только месяца и числа: "28.04"
         case shortDateWithoutYear
-        /// Отображение дня недели: "Monday"
-        case dayOfTheWeek
         /// Отображение только месяца и числа с обрезанными словами + время: "6 февр. в 10:07"
         case cutWordsDateWithTime(LocaleFormat)
         /// Отображение только года
         case year
+		/// Отображение месяца Декабрь
+		case monthMMMM
+		/// Отображение месяца Дек
+		case monthMMM
+		/// Отображение месяца 01
+		case monthMM
+		/// Отображение месяца 1
+		case monthM
+		/// Отображение только дня 01
+		case dayDD
+		/// Отображение только дня 1
+		case dayD
+		/// Отображение только дня недели ср
+		case weekDayEE
+		/// Отображение только дня недели среда
+		case weekDayEEEE
 
+		
+		
         var rawValue: String {
             switch self {
             case .cutZeroShortDate:
@@ -459,9 +475,6 @@ extension MMDateFormatter {
             case .shortDateWithoutYear:
                 return "dd.MM"
 
-            case .dayOfTheWeek:
-                return "eeee"
-
             case .cutWordsDateWithTime(let localeFormat):
                 switch localeFormat {
                 case .eng: return "d MMM at HH:mm"
@@ -470,7 +483,23 @@ extension MMDateFormatter {
 
             case .year:
                 return "yyyy"
-            }
+			case .monthMMMM:
+				return "MMMM"
+			case .monthMMM:
+				return "MMM"
+			case .monthMM:
+				return "MM"
+			case .monthM:
+				return "M"
+			case .dayDD:
+				return "dd"
+			case .dayD:
+				return "d"
+			case .weekDayEE:
+				return "EE"
+			case .weekDayEEEE:
+				return "EEEE"
+			}
         }
     }
 }

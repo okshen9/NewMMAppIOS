@@ -75,15 +75,28 @@ struct CalendarViewUIKit: UIViewRepresentable {
                     // Проверяем какие типы событий присутствуют
                     let hasPayment = colors.contains { $0 == UIColor(Color.mainRed) }
                     let hasTarget = colors.contains { $0 == UIColor.systemGreen }
+                    let hasSubTarget = colors.contains { $0 == UIColor.systemBlue }
                     
                     // Выбираем иконку на основе типов событий и соответствующий цвет
                     var iconImageName = "circle.fill"
                     var iconColor = UIColor.gray
                     
-                    if hasPayment && hasTarget {
+                    if hasPayment && hasTarget && hasSubTarget {
+                        // Есть платеж, цель и подцель
+                        iconImageName = "calendar.badge.exclamationmark"
+                        iconColor = UIColor(Color.mainRed) // Приоритет у платежей
+                    } else if hasPayment && hasTarget {
                         // Есть и платеж и цель - используем комбинированную иконку из AppIcons
                         iconImageName = "calendar.badge.exclamationmark" // Соответствует AppIcons.combined
                         iconColor = UIColor(Color.mainRed) // Приоритет у платежей
+                    } else if hasPayment && hasSubTarget {
+                        // Есть платеж и подцель
+                        iconImageName = "calendar.badge.exclamationmark"
+                        iconColor = UIColor(Color.mainRed) // Приоритет у платежей
+                    } else if hasTarget && hasSubTarget {
+                        // Есть цель и подцель
+                        iconImageName = "star.circle"
+                        iconColor = UIColor.systemGreen
                     } else if hasPayment {
                         // Только платеж - используем иконку платежа из AppIcons
                         iconImageName = "creditcard.fill" // Соответствует AppIcons.Payment.default
@@ -92,6 +105,10 @@ struct CalendarViewUIKit: UIViewRepresentable {
                         // Только цель - используем иконку цели из AppIcons
                         iconImageName = "star.fill" // Соответствует AppIcons.Target.completed
                         iconColor = UIColor.systemGreen
+                    } else if hasSubTarget {
+                        // Только подцель - используем специальную иконку для подцелей
+                        iconImageName = "checkmark.circle"
+                        iconColor = UIColor.systemBlue
                     }
                     
                     // Создаем иконку

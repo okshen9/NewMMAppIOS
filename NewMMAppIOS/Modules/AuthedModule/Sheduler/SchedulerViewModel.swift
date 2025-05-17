@@ -132,6 +132,28 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
             var eventsCurrent = rawTempScheduleListItems[startOfDay] ?? []
             eventsCurrent.append(.init(user: user, title: title, type: .target(targetWithDetails), date: deadlineDate, category: category))
             rawTempScheduleListItems[startOfDay] = eventsCurrent
+            
+            // Добавляем подцели как отдельные события в календарь
+            if let subTargets = target.subTargets {
+                for subTarget in subTargets {
+                    guard let subDeadlineDate = subTarget.deadLineDateTime?.dateFromStringISO8601 else { continue }
+                    
+                    let subStartOfDay = Calendar.current.startOfDay(for: subDeadlineDate)
+                    
+                    // Пропускаем, если дедлайн подцели совпадает с дедлайном основной цели
+                    if subStartOfDay == startOfDay { continue }
+                    
+                    let subTitle = "Подцель: \(subTarget.title ?? "Без названия")"
+                    
+                    // Создаем модель цели с одной подцелью для отображения
+                    var subTargetModel = target
+                    subTargetModel.subTargets = [subTarget]
+                    
+                    var subEventsCurrent = rawTempScheduleListItems[subStartOfDay] ?? []
+                    subEventsCurrent.append(.init(user: user, title: subTitle, type: .target(subTargetModel), date: subDeadlineDate, category: category))
+                    rawTempScheduleListItems[subStartOfDay] = subEventsCurrent
+                }
+            }
         })
         
         // Создаем данные для отметок в календаре
@@ -144,14 +166,19 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
             // Отдельные цвета для платежей и целей
             var hasPayment = false
             var hasTarget = false
+            var hasSubTarget = false
             var colors: [UIColor] = []
             
             // Проверяем типы событий
             for event in events {
-                if case .payment = event.type  {
+                if case .payment = event.type {
                     hasPayment = true
-                } else if case .target = event.type {
-                    hasTarget = true
+                } else if case let .target(target) = event.type {
+                    if let subTargets = target.subTargets, subTargets.count == 1 && event.title.hasPrefix("Подцель:") {
+                        hasSubTarget = true
+                    } else {
+                        hasTarget = true
+                    }
                 }
             }
             
@@ -161,6 +188,9 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
             }
             if hasTarget {
                 colors.append(UIColor.systemGreen)
+            }
+            if hasSubTarget {
+                colors.append(UIColor.systemBlue)
             }
             
             tempCalendar[dateComponents] = colors

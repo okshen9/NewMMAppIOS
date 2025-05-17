@@ -9,8 +9,13 @@ import Foundation
 import SwiftUI
 
 enum MMFonts {
-	static var title: Font {
+	static var titleULTRA: Font {
 		.custom("SangBleuSunrise-Bold-WebXL", size: 22)
+	}
+	
+	static var title: Font {
+//		.custom("SangBleuSunrise-Bold-WebXL", size: 22)
+		Font.custom("SangBleuSunrise", size: 22).weight(.bold)
 	}
 	
 	static var subTitle: Font {
@@ -27,6 +32,26 @@ enum MMFonts {
 	
 	static var subCaption: Font {
 		.custom("SangBleuSunrise-Light-WebXL", size: 12)
+		.bold()
+	}
+	
+	static func custom(_ size: CGFloat, _ width: WidthFont = .regular) -> Font {
+		var fontName: String
+		switch width {
+		case .bold: fontName = "SangBleuSunrise-Bold-WebXL"
+		case .medium: fontName = "SangBleuSunrise-Medium-WebXL"
+		case .regular: fontName = "SangBleuSunrise-Regular-WebXL"
+		case .light: fontName = "SangBleuSunrise-Light-WebXL"
+		}
+		return .custom(fontName, size: size)
+	}
+	
+	enum WidthFont {
+		case bold
+		case medium
+		case regular
+		case light
+		
 	}
 }
 

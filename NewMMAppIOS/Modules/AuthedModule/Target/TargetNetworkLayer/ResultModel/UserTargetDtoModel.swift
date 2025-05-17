@@ -227,15 +227,15 @@ extension UserTargetDtoModel {
         let subTargets = [
             UserSubTargetDtoModel(
                 id: 32,
-                title: "sfdsfsdf",
+                title: "First",
                 description: nil,
                 subTargetPercentage: 50,
                 targetSubStatus: .notDone,
                 rootTargetId: 45,
                 isDeleted: false,
-                creationDateTime: "2025-03-29T16:45:24.752615",
+                creationDateTime: "2025-01-29T16:45:24.752615",
                 lastUpdatingDateTime: nil,
-                deadLineDateTime: "2025-03-31T23:59:59.999"
+                deadLineDateTime: "2025-03-20T23:59:59.999"
             ),
             UserSubTargetDtoModel(
                 id: 33,
@@ -245,10 +245,22 @@ extension UserTargetDtoModel {
                 targetSubStatus: .notDone,
                 rootTargetId: 45,
                 isDeleted: false,
-                creationDateTime: "2025-03-29T16:45:24.753233",
+                creationDateTime: "2025-01-29T16:45:24.753233",
                 lastUpdatingDateTime: nil,
                 deadLineDateTime: "2025-03-31T23:59:59.999"
-            )
+            ),
+			UserSubTargetDtoModel(
+				id: 33,
+				title: "sddfsdfdsf",
+				description: "длинное описание 3.Собрал команду в корпоративной практике - подписал трудовые договоры с новыми сотрудниками (ведущий юрист, юрист, руководитель отдела) до 12.05.2025",
+				subTargetPercentage: 50,
+				targetSubStatus: .notDone,
+				rootTargetId: 45,
+				isDeleted: false,
+				creationDateTime: "2025-06-29T16:45:24.753233",
+				lastUpdatingDateTime: nil,
+				deadLineDateTime: "2025-03-31T23:59:59.999"
+			)
         ]
 
         return UserTargetDtoModel(

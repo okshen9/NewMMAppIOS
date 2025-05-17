@@ -11,6 +11,15 @@ struct ImageSheduler: View {
     let event: CalendatItem
     var font: Font = .system(size: 16)
     
+    var isSubTarget: Bool {
+        if case let .target(target) = event.type,
+           let subTargets = target.subTargets,
+           subTargets.count == 1 && event.title.hasPrefix("Подцель:") {
+            return true
+        }
+        return false
+    }
+    
     var body: some View {
         switch event.type {
         case .target:
@@ -25,7 +34,14 @@ struct ImageSheduler: View {
     @ViewBuilder
     func getTargetImage() -> some View {
         // Используем иконки из централизованного AppIcons
-        if let target = event.target, let status = target.targetStatus {
+        if isSubTarget {
+            // Специальная иконка для подцелей
+            Image(systemName: "checkmark.circle")
+                .renderingMode(.template)
+                .foregroundStyle(Color.blue)
+                .font(font)
+                .symbolRenderingMode(.hierarchical)
+        } else if let target = event.target, let status = target.targetStatus {
             AppIcons.Target.icon(for: status)
                 .renderingMode(.template)
                 .foregroundStyle(AppIcons.Target.color(for: status))

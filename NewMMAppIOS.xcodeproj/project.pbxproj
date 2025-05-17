@@ -18,6 +18,19 @@
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
 		AC2E101E2DBED7B900F98765 /* Exceptions for "NewMMAppIOS" folder in "NewMMAppIOS" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			assetTagsByRelativePath = {
+				"SangBleuSans/SangBleuSunrise-Air-WebXL.otf" = (SangBleuSunrise, );
+				"SangBleuSans/SangBleuSunrise-AirItalic-WebXL.otf" = (SangBleuSunrise, );
+				"SangBleuSans/SangBleuSunrise-Bold-WebXL.otf" = (SangBleuSunrise, );
+				"SangBleuSans/SangBleuSunrise-BoldItalic-WebXL.otf" = (SangBleuSunrise, );
+				"SangBleuSans/SangBleuSunrise-Light-WebXL.otf" = (SangBleuSunrise, );
+				"SangBleuSans/SangBleuSunrise-LightItalic-WebXL.otf" = (SangBleuSunrise, );
+				"SangBleuSans/SangBleuSunrise-Livre-WebXL.otf" = (SangBleuSunrise, );
+				"SangBleuSans/SangBleuSunrise-Medium-WebXL.otf" = (SangBleuSunrise, );
+				"SangBleuSans/SangBleuSunrise-MediumItalic-WebXL.otf" = (SangBleuSunrise, );
+				"SangBleuSans/SangBleuSunrise-Regular-WebXL.otf" = (SangBleuSunrise, );
+				"SangBleuSans/SangBleuSunrise-RegularItalic-WebXL.otf" = (SangBleuSunrise, );
+			};
 			membershipExceptions = (
 				Info.plist,
 			);
@@ -99,6 +112,9 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
+				KnownAssetTags = (
+					SangBleuSunrise,
+				);
 				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
