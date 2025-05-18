@@ -221,8 +221,6 @@ extension UserTargetDtoModel {
 		return minimalModel
 	}
 	
-	
-	
     static func getBaseTarget(withOutSub: Bool = false, withOutDesc: Bool = false) -> UserTargetDtoModel {
         let subTargets = [
             UserSubTargetDtoModel(

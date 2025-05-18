@@ -36,6 +36,14 @@ struct ProfileView: View {
                 }
             }
         }
+		.toolbar {
+			// Кнопка справа (trailing)
+			if viewModel.isMyProfile {
+				ToolbarItem(placement: .navigationBarTrailing) {
+					toolBarMenu()
+				}
+			}
+		}
 		
         .toolbarBackground(.hidden, for: .navigationBar)
         .onAppear {
@@ -197,14 +205,6 @@ struct ProfileView: View {
                     await viewModel.updateProfile()
                 })
             }))
-        }
-        .toolbar {
-            // Кнопка справа (trailing)
-            if viewModel.isMyProfile {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    toolBarMenu()
-                }
-            }
         }
     }
     

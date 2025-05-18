@@ -36,19 +36,19 @@ struct ImageSheduler: View {
         // Используем иконки из централизованного AppIcons
         if isSubTarget {
             // Специальная иконка для подцелей
-            Image(systemName: "checkmark.circle")
+            Image("mm.subtarget")
                 .renderingMode(.template)
                 .foregroundStyle(Color.blue)
                 .font(font)
                 .symbolRenderingMode(.hierarchical)
         } else if let target = event.target, let status = target.targetStatus {
-            AppIcons.Target.icon(for: status)
+			Image(systemName: status.targetIcon)
                 .renderingMode(.template)
-                .foregroundStyle(AppIcons.Target.color(for: status))
+				.foregroundStyle(status.tagetColor)
                 .font(font)
                 .symbolRenderingMode(.hierarchical)
         } else {
-            AppIcons.Target.defaultIcon
+			Image(systemName: "star")
                 .renderingMode(.template)
                 .foregroundStyle(.green)
                 .font(font)
@@ -60,13 +60,13 @@ struct ImageSheduler: View {
     func getPaymentImage() -> some View {
         // Используем иконки из централизованного AppIcons
         if let status = event.payment?.paymentRequestStatus {
-            AppIcons.Payment.icon(for: status)
+            AppIcons.Payment.baseIcon(for: status)
                 .renderingMode(.template)
                 .foregroundStyle(AppIcons.Payment.color(for: status))
                 .font(font)
                 .symbolRenderingMode(.hierarchical)
         } else {
-            AppIcons.Payment.defaultIcon
+            AppIcons.Payment.baseIcon(for: nil)
                 .renderingMode(.template)
                 .foregroundStyle(Color.mainRed)
                 .font(font)
@@ -77,41 +77,11 @@ struct ImageSheduler: View {
     @ViewBuilder
     func getDefaultEventImage() -> some View {
         // Используем комбинированную иконку из AppIcons
-        AppIcons.combined
+		AppIcons.General.combined
             .renderingMode(.template)
             .foregroundStyle(.blue)
             .font(font)
             .symbolRenderingMode(.hierarchical)
-    }
-}
-
-extension ImageSheduler {
-    enum Constants {
-        // Целевые иконки
-        static let targetDefaultImage = Image(systemName: "star.fill")
-        static let targetInProgressImage = Image(systemName: "star.fill")
-        static let targetDoneImage = Image(systemName: "star.fill")
-        static let targetExpiredImage = Image(systemName: "star.fill")
-        
-
-        // Иконки платежей
-        static let paymentDefaultImage = Image(systemName: "creditcard.fill")
-        static let paymentWaitingImage = Image(systemName: "creditcard.fill")
-        static let paymentCompletedImage = Image(systemName: "creditcard.fill")
-        static let paymentCancelledImage = Image(systemName: "creditcard.fill")
-        
-        // Остальные иконки
-        static let defaultEventImage = Image(systemName: "calendar.badge.exclamationmark")
-        
-        // Устаревшие иконки (оставлены для обратной совместимости)
-        static let xmarkImage = Image(systemName: "xmark.circle.fill")
-        static let checkmarkImageEmpty = Image(systemName: "circle")
-        static let checkmarkImage = Image(systemName: "checkmark.circle.fill")
-        static let expaiderImage = Image(systemName: "clock.fill")
-        static let waitImage = Image(systemName: "hourglass")
-        static let moneyImage = Image(systemName: "dollarsign.circle.fill")
-        static let refreshImage = Image(systemName: "arrow.clockwise.circle.fill")
-        static let dollarsignImage = Image(systemName: "dollarsign")
     }
 }
 

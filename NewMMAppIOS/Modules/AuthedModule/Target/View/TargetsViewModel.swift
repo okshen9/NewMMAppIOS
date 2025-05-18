@@ -14,6 +14,7 @@ protocol SubViewScopeProtocol: TargetRowViewModelProtocol, SubTargetRowViewModel
 
 final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeProtocol {
     // MARK: - Published Properties
+	@Published var firstOpen = true
     @Published var targets: [UserTargetDtoModel] = []
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
@@ -135,6 +136,8 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
     /// Загружает цели пользователя с сервера
     @MainActor
     func loadTargets() {
+		firstOpen = false
+		guard !isLoading else { return }
         isLoading = true
         errorMessage = nil
         

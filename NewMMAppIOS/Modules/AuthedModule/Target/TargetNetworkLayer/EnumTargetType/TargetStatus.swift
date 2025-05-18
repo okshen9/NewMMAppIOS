@@ -108,6 +108,20 @@ extension TargetStatus {
 			return "questionmark.diamond.fill"
 		}
 	}
+	
+	/// Получить цвет для иконки цели в зависимости от статуса
+	var tagetColor: Color {
+		switch self {
+		case .inProgress:
+			return .green
+		case .done, .doneExpired:
+			return .green
+		case .expired:
+			return .orange
+		default:
+			return .green
+		}
+	}
     
     mutating func changeSelf() {
         self = switch self {

@@ -28,7 +28,7 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
 
 
     var isMyProfile: Bool {
-        profile == userRepository.userProfile
+		externalId == userRepository.userProfile?.externalId
     }
 
     // MARK: - Private properties

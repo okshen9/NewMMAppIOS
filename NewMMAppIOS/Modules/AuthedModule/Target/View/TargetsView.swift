@@ -20,15 +20,22 @@ struct TargetsView: View {
     
     var body: some View {
         NavigationView {
-            Group {
+			ScrollView {
                 if viewModel.isLoading && viewModel.targets.isEmpty {
                     shimerView()
                 } else if viewModel.targets.isEmpty {
-                    emptyStateView()
+						emptyStateView()
+
+					
                 } else {
-                    mainContentView()
+						mainContentView()
+						
                 }
-            }
+					.refreshable {
+						await MainActor.run {
+							viewModel.loadTargets()
+						}
+					}
             .navigationTitle("Цели")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -51,16 +58,16 @@ struct TargetsView: View {
                     dismissButton: .default(Text("OK"))
                 )
             }
-            .onAppear {
-                if viewModel.targets.isEmpty {
-                    viewModel.loadTargets()
-                }
-            }
-            .environmentObject(viewModel)
         }
         .onChange(of: viewModel.errorMessage) { _, newValue in
             showErrorAlert = newValue != nil
         }
+		.onAppear {
+			if viewModel.targets.isEmpty && viewModel.firstOpen {
+				viewModel.loadTargets()
+			}
+		}
+		.environmentObject(viewModel)
 		
     }
     
@@ -69,9 +76,9 @@ struct TargetsView: View {
     private func emptyStateView() -> some View {
         VStack {
             Spacer()
-            Image(systemName: "checkmark.circle.badge.xmark")
-                .font(MMFonts.title)
-                .foregroundColor(.secondary)
+            Image(systemName: "list.star")
+				.font(.system(size: 66))
+				.foregroundColor(.mainRed)
                 .padding(.bottom, 20)
             
             Text("У вас пока нет целей")
@@ -106,7 +113,6 @@ struct TargetsView: View {
     // MARK: - Main Content View
     @ViewBuilder
     private func mainContentView() -> some View {
-        ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 // Диаграмма статистики как обычный первый элемент
                 statisticsView()
@@ -120,12 +126,6 @@ struct TargetsView: View {
                 categoriesView()
             }
             .padding(.horizontal, 8)
-        }
-        .refreshable {
-            await MainActor.run {
-                viewModel.loadTargets()
-            }
-        }
     }
     
     // MARK: - Statistics View

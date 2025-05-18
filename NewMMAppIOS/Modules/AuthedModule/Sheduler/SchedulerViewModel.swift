@@ -177,7 +177,7 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
                     if let subTargets = target.subTargets, subTargets.count == 1 && event.title.hasPrefix("Подцель:") {
                         hasSubTarget = true
                     } else {
-                        hasTarget = true
+                    hasTarget = true
                     }
                 }
             }

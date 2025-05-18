@@ -188,7 +188,7 @@ struct TargetRowView<ViewModel: TargetRowViewModelProtocol>: View {
 			}
 			
 			HStack(spacing: 8) {
-				AppIcons.calendar
+				AppIcons.General.calendar
 					.foregroundColor(.gray)
 					.imageScale(.small)
 				
