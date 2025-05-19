@@ -22,10 +22,13 @@ struct ImageSheduler: View {
     
     var body: some View {
         switch event.type {
-        case .target:
+        case .target(let target):
             getTargetImage()
-        case .payment:
+        case .payment(let payment):
             getPaymentImage()
+        case .subTarget(let subTarget):
+            AppIcons.SubTarget.coloredIcon(for: .notDone, backColor: .white)
+                .frameRect(16)
         case .anyEvent:
             getDefaultEventImage()
         }
@@ -34,21 +37,14 @@ struct ImageSheduler: View {
     @ViewBuilder
     func getTargetImage() -> some View {
         // Используем иконки из централизованного AppIcons
-        if isSubTarget {
-            // Специальная иконка для подцелей
-            Image("mm.subtarget")
+        if let target = event.target, let status = target.targetStatus {
+            AppIcons.Target.baseIcon(for: status)
                 .renderingMode(.template)
-                .foregroundStyle(Color.blue)
-                .font(font)
-                .symbolRenderingMode(.hierarchical)
-        } else if let target = event.target, let status = target.targetStatus {
-			Image(systemName: status.targetIcon)
-                .renderingMode(.template)
-				.foregroundStyle(status.tagetColor)
+                .foregroundStyle(AppIcons.Target.color(for: status))
                 .font(font)
                 .symbolRenderingMode(.hierarchical)
         } else {
-			Image(systemName: "star")
+            AppIcons.Target.baseIcon(for: .unknown)
                 .renderingMode(.template)
                 .foregroundStyle(.green)
                 .font(font)
@@ -59,19 +55,11 @@ struct ImageSheduler: View {
     @ViewBuilder
     func getPaymentImage() -> some View {
         // Используем иконки из централизованного AppIcons
-        if let status = event.payment?.paymentRequestStatus {
-            AppIcons.Payment.baseIcon(for: status)
+            AppIcons.Payment.baseIcon(for: event.payment?.paymentRequestStatus)
                 .renderingMode(.template)
-                .foregroundStyle(AppIcons.Payment.color(for: status))
+                .foregroundStyle(AppIcons.Payment.color(for: event.payment?.paymentRequestStatus))
                 .font(font)
                 .symbolRenderingMode(.hierarchical)
-        } else {
-            AppIcons.Payment.baseIcon(for: nil)
-                .renderingMode(.template)
-                .foregroundStyle(Color.mainRed)
-                .font(font)
-                .symbolRenderingMode(.hierarchical)
-        }
     }
     
     @ViewBuilder

@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUICore
 
-enum TargetStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable, Equatable {
+enum TargetStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable, Equatable, Hashable {
 	/// Цель успешно завершена в срок.
 	case done = "DONE"
 	
@@ -89,39 +89,6 @@ extension TargetStatus {
             return "Статус цели неизвестен. Обратитесь к метору для уточнения информации."
         }
     }
-	
-	var targetIcon: String {
-		switch self {
-		case .inProgress:
-			return "star"
-		case .done:
-			return "star.fill"
-		case .doneExpired:
-			return "star.leadinghalf.filled"
-		case .expired:
-			return "calendar.badge.clock"
-		case .draft:
-			return "hand.raised.fill"
-		case .cancelled, .failed:
-			return "star.slash.fill"
-		case .unknown:
-			return "questionmark.diamond.fill"
-		}
-	}
-	
-	/// Получить цвет для иконки цели в зависимости от статуса
-	var tagetColor: Color {
-		switch self {
-		case .inProgress:
-			return .green
-		case .done, .doneExpired:
-			return .green
-		case .expired:
-			return .orange
-		default:
-			return .green
-		}
-	}
     
     mutating func changeSelf() {
         self = switch self {

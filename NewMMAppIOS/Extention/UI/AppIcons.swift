@@ -11,6 +11,7 @@ enum AppIcons {
 		static let add = Image(systemName: "plus")
 		static let expand = Image(systemName: "chevron.down.circle.fill")
 		static let collapse = Image(systemName: "chevron.up.circle.fill")
+		static let arrowTurnDownRight = Image(systemName: "arrow.turn.down.right")
 	}
 }
 	
@@ -41,7 +42,7 @@ extension AppIcons {
 		static func color(for status: PaymentRequestStatus?) -> Color {
 			switch status {
 			case .wait:
-				return .orange
+				return .mainRed
 			case .fullPaid:
 				return .green
 			case .canceled:
@@ -79,7 +80,7 @@ extension AppIcons {
 	}
 }
 
-
+// MARK: - Иконки для целей (target)
 extension AppIcons {
 	enum Target {
 		/// Получить цветную иконку для платежа в зависимости от статуса
@@ -105,17 +106,17 @@ extension AppIcons {
 		static func baseIcon(for status: TargetStatus) -> Image {
 			switch status {
 			case .inProgress:
-				return Image(systemName: NameIcon.inProgress)
+				return Image(NameIcon.inProgress)
 			case .done:
-				return Image(systemName: NameIcon.done)
+				return Image(NameIcon.done)
 			case .doneExpired:
-				return Image(systemName: NameIcon.doneExpired)
+				return Image(NameIcon.doneExpired)
 			case .expired:
-				return Image(systemName: NameIcon.expired)
+				return Image(NameIcon.expired)
 			case .draft:
 				return Image(systemName: NameIcon.draft)
 			case .cancelled, .failed:
-				return Image(systemName: NameIcon.failed)
+				return Image(NameIcon.failed)
 			case .unknown:
 				return Image(systemName: NameIcon.unknown)
 			}
@@ -128,21 +129,23 @@ extension AppIcons {
 				return .green
 			case .done, .doneExpired:
 				return .green
-			case .expired:
+			case .expired, .failed:
+				return .mainRed
+			case .unknown, .cancelled:
+				return .secondary
+			case .draft:
 				return .orange
-			default:
-				return .green
 			}
 		}
 		
 		// Базовые иконки
 		private enum NameIcon {
-			static let inProgress = "star"
-			static let done = "star.fill"
-			static let doneExpired = "star.leadinghalf.filled"
-			static let expired = "calendar.badge.clock"
+			static let inProgress = "mm.target"
+			static let done = "mm.target.done"
+			static let doneExpired = "mm.target.half"
+			static let expired = "mm.target.clock"
 			static let draft = "hand.raised.fill"
-			static let failed = "star.slash.fill"
+			static let failed = "mm.target.slash"
 			static let unknown = "questionmark.diamond.fill"
 		}
 	}
@@ -156,34 +159,47 @@ extension AppIcons {
 		///  - resizeble: включен ли режим resizeble для иконки
 		static func coloredIcon(
 			for status: TargetSubStatus,
-			resizeble: Bool = false
+            backColor: Color
 		) -> some View {
-			if resizeble {
-				return baseIcon(for: status)
-					.resizable()
-					.renderingMode(.template)
-					.foregroundStyle(color(for: status))
-			} else {
-				return baseIcon(for: status)
-					.renderingMode(.template)
-					.foregroundStyle(color(for: status))
-			}
+            return baseIcon(for: status, backColor: backColor)
 		}
+        
+//            .resizable()
+//            .renderingMode(.template)
 		
-		static func baseIcon(for status: TargetSubStatus) -> Image {
+        private static func baseIcon(for status: TargetSubStatus, backColor: Color) -> some View {
 			switch status {
 			case .inProgress, .notDone:
-				return Image(systemName: NameIcon.inProgress)
+//				return Image(NameIcon.inProgress)
+                return SubTargetInProgressView(backColor: backColor, fiilColor: color(for: status))
+                    .eraseToAnyView()
 			case .done:
-				return Image(systemName: NameIcon.done)
+                return SubTargetDoneView(backColor: backColor, fiilColor: color(for: status))
+                    .eraseToAnyView()
+                
 			case .expiredDone:
-				return Image(systemName: NameIcon.doneExpired)
+				return Image(NameIcon.doneExpired)
+                    .symbolRenderingMode(.palette)
+                    .resizable()
+                    .foregroundStyle(Color.mainRed, .green)
+                    .eraseToAnyView()
 			case .expired:
-				return Image(systemName: NameIcon.expired)
+				return Image(NameIcon.expired)
+                    .symbolRenderingMode(.palette)
+                    .resizable()
+                    .foregroundStyle(Color.mainRed, .gray)
+                    .eraseToAnyView()
 			case .failed:
-				return Image(systemName: NameIcon.failed)
+				return Image(NameIcon.failed)
+                    .symbolRenderingMode(.palette)
+                    .resizable()
+                    .foregroundStyle(Color.mainRed, .gray)
+                    .eraseToAnyView()
 			case .unknown:
 				return Image(systemName: NameIcon.unknown)
+                    .resizable()
+                    .foregroundStyle(.orange)
+                    .eraseToAnyView()
 			}
 		}
 		
@@ -204,8 +220,8 @@ extension AppIcons {
 		// Базовые иконки
 		private enum NameIcon {
 			static let inProgress = "mm.subtarget"
-			static let done = "mm.subtarget.checkmark"
-			static let doneExpired = "mm.subtarget.exclamationmark"
+			static let done = "mm.subtarget.done"
+			static let doneExpired = "mm.subarget.done.clock"
 			static let expired = "mm.subtarget.clock"
 			static let failed = "mm.subtarget.xmark"
 			static let unknown = "questionmark.diamond.fill"
@@ -213,12 +229,121 @@ extension AppIcons {
 	}
 }
 
-
 #Preview {
-	VStack {
-		AppIcons.Payment.coloredIcon(for: .fullPaid)
-			.font(.system(size: 22))
-		AppIcons.Target.coloredIcon(for: .done)
-			
+	HStack(alignment: .top) {
+		VStack(alignment: .leading, spacing: 8) {
+			Text("Payment")
+			ForEach(Array(PaymentRequestStatus.allCases.enumerated()), id: \.1) { index, status  in
+				HStack {
+					AppIcons.Payment.coloredIcon(for: status)
+					Text(status.rawValue)
+						.font(MMFonts.caption)
+				}
+			}
+		}
+		VStack(alignment: .leading, spacing: 8) {
+			Text("Target")
+			ForEach(Array(TargetStatus.allCases.enumerated()), id: \.1) { index, status  in
+				HStack {
+					AppIcons.Target.coloredIcon(for: status)
+					Text(status.title)
+						.font(MMFonts.caption)
+				}
+			}
+		}
+		VStack(alignment: .leading, spacing: 8) {
+			Text("SubTarget")
+            ForEach(Array(TargetSubStatus.allCases.enumerated()), id: \.1) { index, status  in
+                HStack {
+                    AppIcons.SubTarget.coloredIcon(
+                        for: status,
+                        backColor: .white)
+                    .frameRect(22)
+                    Text(status.title)
+                        .font(MMFonts.caption)
+                }
+            }
+//            HStack {
+//                AppIcons.SubTarget.coloredIcon(for: .done, backColor: .white)
+//                    .frameRect(22)
+////                    .bred()
+//                Text(TargetSubStatus.done.title)
+//                    .font(MMFonts.caption)
+//            }
+//            SubTargetInProgressView(backColor: .white, fiilColor: .green)
+//                .frameRect(22)
+//            SubTargetDoneView(backColor: .white, fiilColor: .green)
+//                .frameRect(22)
+            Image("mm.subarget.done.clock")
+//                .bred()
+		}
 	}
+}
+
+// Костыли
+fileprivate struct SubTargetInProgressView: View {
+    @State var backColor: Color
+    @State var fiilColor: Color
+    var body: some View {
+        GeometryReader { geometry in
+            let gwidth = geometry.size.width
+            let gheight = geometry.size.height
+            
+            Image(systemName: "circle")
+                .resizable()
+                .foregroundStyle(.gray)
+                .frame(width: gwidth * 0.8,
+                       height: gheight * 0.8)
+                .overlay(alignment: .bottomTrailing, content: {
+                    ZStack {
+                        Image(systemName: "star.circle.fill")
+                            .resizable()
+                            .foregroundStyle(fiilColor)
+                            .frame(width: gwidth * 0.45, height: gheight * 0.45)
+                            .background(backColor)
+                            .cornerRadius(gwidth * 0.5)
+                        
+                        Image(systemName: "circle")
+                            .resizable()
+                            .foregroundStyle(backColor)
+                            .frame(width: gwidth * 0.5, height: gheight * 0.5)
+                    }
+                    .offset(x: gwidth * 0.2, y: gwidth * 0.2)
+                })
+        }
+        .frame(idealWidth: 20, idealHeight: 20)
+    }
+}
+
+fileprivate struct SubTargetDoneView: View {
+    @State var backColor: Color
+    @State var fiilColor: Color
+    var body: some View {
+        GeometryReader { geometry in
+            let gwidth = geometry.size.width
+            let gheight = geometry.size.height
+            
+            Image(systemName: "checkmark.circle.fill")
+                .resizable()
+                .foregroundStyle(fiilColor)
+                .frame(width: gwidth * 0.8,
+                       height: gheight * 0.8)
+                .overlay(alignment: .bottomTrailing, content: {
+                    ZStack {
+                        Image(systemName: "star.circle.fill")
+                            .resizable()
+                            .foregroundStyle(fiilColor)
+                            .frame(width: gwidth * 0.45, height: gheight * 0.45)
+                            .background(backColor)
+                            .cornerRadius(gwidth * 0.5)
+                        
+                        Image(systemName: "circle")
+                            .resizable()
+                            .foregroundStyle(backColor)
+                            .frame(width: gwidth * 0.5, height: gheight * 0.5)
+                    }
+                    .offset(x: gwidth * 0.2, y: gwidth * 0.2)
+                })
+        }
+    }
 }

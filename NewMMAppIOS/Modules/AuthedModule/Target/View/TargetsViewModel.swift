@@ -159,9 +159,10 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
     
     /// Обрабатывает ошибки при работе с сетевыми запросами
     @MainActor
-    private func handleError(_ error: Error) {
+	private func handleError(_ error: Error) async {
         isLoading = false
         errorMessage = "Ошибка: \(error.localizedDescription)"
+		await ToastManager.shared.show(.baseError)
         print("Ошибка Target: \(error.localizedDescription)")
     }
     
@@ -191,7 +192,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
 			} else {
 				minModel = target
 			}
-			let updatedTarget = try await networkService.updateTargetAll(model: target)
+			let updatedTarget = try await networkService.updateTargetAll(model: minModel)
             await refreshTargetsData()
             return updatedTarget
         } catch {
@@ -261,7 +262,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
                 
                 findedTarget = targets[targetIndex]
                 
-                findedTarget?.subTargets?[subTargetIndex].targetStatus?.changeSelfStatus()
+                findedTarget?.subTargets?[subTargetIndex].targetStatus?.changeSelf()
             }
         }
         guard let findedTarget else { return }
@@ -291,7 +292,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
 				findedTarget = targets[targetIndex]
 				
 				// Закрываем подцель
-				findedTarget?.subTargets?[subTargetIndex].targetStatus?.changeSelfStatus()
+				findedTarget?.subTargets?[subTargetIndex].targetStatus?.changeSelf()
 				
 				// Если выбрано "Цель закрыта полностью", меняем статус цели на done/doneExpired
 				if closeParent {
@@ -379,7 +380,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
     func closedTarget(target: UserTargetDtoModel) {
         isLoading = true
         var tempTarget = target
-        tempTarget.changeSelfStatus()
+        tempTarget.changeSelf()
         errorMessage = nil
         
         Task { [weak self] in

@@ -36,6 +36,7 @@ struct CalendatItem: Identifiable, Equatable {
     enum CalendatItemType: Equatable {
         case payment(PaymentRequestResponseDto)
         case target(UserTargetDtoModel)
+        case subTarget(UserSubTargetDtoModel)
         case anyEvent(String?)
         
         var name: String {
@@ -44,30 +45,54 @@ struct CalendatItem: Identifiable, Equatable {
                 return "Оплата"
             case .target:
                 return "Закрытие цели"
+            case .subTarget:
+                return "Закрытие подцели"
             case .anyEvent(let title):
                 return title.orEmpty
+
             }
         }
         
-        var color: UIColor {
+        var uiColor: UIColor {
             switch self {
-            case .payment:
-                return UIColor(Color.mainRed)
-            case .target:
-                return UIColor.systemGreen
+            case .payment(let payment):
+                return UIColor(AppIcons.Payment.color(for: payment.paymentRequestStatus ?? .unknown))
+            case .target(let target):
+                return UIColor(AppIcons.Target.color(for: target.targetStatus ?? .unknown))
+            case .subTarget(let subTarget):
+                return UIColor(AppIcons.SubTarget.color(for: subTarget.targetStatus ?? .unknown))
             case .anyEvent:
                 return UIColor.systemIndigo
             }
         }
         
-        var image: Image {
+        var color: Color {
             switch self {
-            case .payment:
-                return Image(systemName: "creditcard")
-            case .target:
-                return Image(systemName: "star.fill")
+            case .payment(let payment):
+                return AppIcons.Payment.color(for: payment.paymentRequestStatus ?? .unknown)
+            case .target(let target):
+                return AppIcons.Target.color(for: target.targetStatus ?? .unknown)
+            case .subTarget(let subTarget):
+                return AppIcons.SubTarget.color(for: subTarget.targetStatus ?? .unknown)
+            case .anyEvent:
+                return Color.indigo
+            }
+        }
+        
+        func image(backColor: Color) -> some View {
+            switch self {
+            case .payment(let payment):
+                return AppIcons.Payment.coloredIcon(for: payment.paymentRequestStatus ?? .unknown)
+                    .eraseToAnyView()
+            case .target(let target):
+                return AppIcons.Target.coloredIcon(for: target.targetStatus ?? .unknown)
+                    .eraseToAnyView()
+            case .subTarget(let subTarget):
+                return AppIcons.SubTarget.coloredIcon(for: subTarget.targetStatus ?? .unknown, backColor: .white)
+                    .eraseToAnyView()
             case .anyEvent:
                 return Image(systemName: "lightbulb.min.fill")
+                    .eraseToAnyView()
                 
             }
         }

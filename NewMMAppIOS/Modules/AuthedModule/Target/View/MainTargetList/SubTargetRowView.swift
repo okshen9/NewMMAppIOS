@@ -57,9 +57,8 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
 //                            }
                         }
                     }) {
-                        Image(systemName: subTarget.targetStatus == .done ? "checkmark.circle.fill" : "circle")
-                            .foregroundColor(subTarget.targetStatus == .done ? .green : .gray)
-                            .imageScale(.medium)
+                        AppIcons.SubTarget.coloredIcon(for: subTarget.targetStatus ?? .notDone, backColor: .white)
+                            .frameRect(20)
                     }
                     .buttonStyle(.plain)
                     .padding(.top, 2)
@@ -77,7 +76,7 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
                     }
 
                     HStack(spacing: 8) {
-                        Image(systemName: "calendar")
+                        AppIcons.General.calendar
                             .foregroundColor(.gray)
                             .imageScale(.small)
 

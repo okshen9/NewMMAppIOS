@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUICore
 
-enum TargetSubStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable, Equatable {
+enum TargetSubStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable, Equatable, Hashable {
     // Для целей и подцелей
     /// Подцель не выполнена
     case notDone = "NOT_DONE"
@@ -45,7 +45,7 @@ enum TargetSubStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable,
 		}
     }
     
-    mutating func changeSelfStatus() {
+    mutating func changeSelf() {
 		if self.isDone {
 			self = .inProgress
 		} else {

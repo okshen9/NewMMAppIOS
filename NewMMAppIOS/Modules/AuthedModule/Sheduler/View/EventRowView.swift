@@ -41,7 +41,7 @@ struct EventRowView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         HStack(spacing: 4) {
                             if isSubTarget {
-                                Image(systemName: "arrow.turn.down.right")
+                                AppIcons.General.arrowTurnDownRight
                                     .font(MMFonts.subCaption)
                                     .foregroundColor(.secondary)
                             }
@@ -85,7 +85,7 @@ struct EventRowView: View {
                             if case .target(_) = event.type, let target = event.target, 
                                (target.description != nil && !target.description.isEmptyOrNil) ||
                                (target.subTargets != nil && !target.subTargets!.isEmpty) {
-                                Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                                (isExpanded ? AppIcons.General.collapse : AppIcons.General.expand)
                                     .font(MMFonts.caption)
                                     .foregroundColor(.secondary)
                                     .padding(.leading, 4)
@@ -156,16 +156,8 @@ struct EventRowView: View {
                             ForEach(subTargets, id: \.id) { subTarget in
                                 HStack(alignment: .top, spacing: 12) {
                                     // Иконка подцели
-                                    Circle()
-                                        .fill(subTarget.targetStatus == .done ? Color.green : Color.secondary.opacity(0.3))
-                                        .frame(width: 18, height: 18)
-                                        .overlay(
-                                            Image(systemName: subTarget.targetStatus == .done ? "checkmark" : "circle")
-                                                .font(MMFonts.subCaption)
-                                                .foregroundColor(subTarget.targetStatus == .done ? .white : .secondary)
-                                        )
-                                        .padding(.leading, 44)
-                                        .padding(.top, 2)
+                                    AppIcons.SubTarget.coloredIcon(for: subTarget.targetStatus ?? .notDone, backColor: .white)
+                                        .frameRect(18)
                                     
                                     // Название подцели и описание
                                     VStack(alignment: .leading, spacing: 2) {
@@ -241,7 +233,7 @@ struct EventRowView: View {
     @ViewBuilder
     private func paymentLabel(_ amount: Double) -> some View {
         HStack(spacing: 4) {
-            Image(systemName: "creditcard.fill")
+            AppIcons.Payment.baseIcon(for: nil)
                 .font(MMFonts.subCaption)
             Text("\(Int(amount)) ₽")
                 .font(MMFonts.caption)
@@ -279,18 +271,11 @@ struct EventRowView: View {
     private var eventIconView: some View {
         ZStack {
             Circle()
-                .fill(eventColor.opacity(0.15))
+                .fill(event.type.color.opacity(0.15))
                 .frame(width: 36, height: 36)
             
             if isSubTarget {
-                ZStack {
-                    ImageSheduler(event: event)
-                        .font(MMFonts.body)
-                    
-                    Circle()
-                        .strokeBorder(Color.secondary.opacity(0.5), lineWidth: 1.5)
-                        .frame(width: 36, height: 36)
-                }
+                ImageSheduler(event: event)
             } else {
                 ImageSheduler(event: event)
                     .font(MMFonts.body)
@@ -315,16 +300,6 @@ struct EventRowView: View {
     }
     
     // MARK: - Helper Methods
-    private var eventColor: Color {
-        switch event.type {
-        case .payment:
-            return Color.mainRed
-        case .target:
-            return Color.green
-        case .anyEvent:
-            return Color.blue
-        }
-    }
     
     private func statusText(for status: TargetStatus) -> String {
         switch status {

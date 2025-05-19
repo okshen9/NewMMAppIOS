@@ -90,7 +90,7 @@ struct UserTargetDtoModel: Codable, JSONRepresentable, Identifiable, Hashable {
     }
     
     mutating
-    func changeSelfStatus() {
+    func changeSelf() {
         switch targetStatus {
         case .draft, .failed, .inProgress:
             self.targetStatus = .done

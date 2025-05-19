@@ -59,7 +59,7 @@ struct StatusTargetIndicatorView: View {
 				.rotationEffect(.degrees(-90))
 			
 			// Иконка цели
-			Image(systemName: status.targetIcon)
+			AppIcons.Target.baseIcon(for: status)
 				.font(MMFonts.caption)
 				.foregroundColor(categoryColor)
 		}

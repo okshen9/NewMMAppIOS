@@ -238,6 +238,7 @@ struct SchedulerView: View {
 	}
     
     // MARK: - Events List Content
+    @ViewBuilder
     private func eventsListContent(_ events: [Date: [CalendatItem]]) -> some View {
         LazyVStack(spacing: 16) {
             ForEach(events.sorted(by: { $0.key < $1.key }), id: \.key) { date, items in
@@ -249,6 +250,7 @@ struct SchedulerView: View {
     }
     
     // MARK: - Event Card
+    @ViewBuilder
     private func eventCard(date: Date, events: [CalendatItem]) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             // Заголовок с датой

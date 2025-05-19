@@ -18,58 +18,55 @@ struct TargetsView: View {
     @State private var currentLevelItemsCount: Int = 0 // Добавляем состояние
     @State private var currentLevelPie: Int = 0 // Добавляем состояние
     
-    var body: some View {
-        NavigationView {
+	var body: some View {
+		NavigationView {
 			ScrollView {
-                if viewModel.isLoading && viewModel.targets.isEmpty {
-                    shimerView()
-                } else if viewModel.targets.isEmpty {
-						emptyStateView()
-
-					
-                } else {
-						mainContentView()
-						
-                }
-					.refreshable {
-						await MainActor.run {
-							viewModel.loadTargets()
-						}
+				if viewModel.isLoading && viewModel.targets.isEmpty {
+					shimerView()
+				} else if viewModel.targets.isEmpty {
+					emptyStateView()
+				} else {
+					mainContentView()
+				}
+			}
+			.refreshable {
+				await MainActor.run {
+					viewModel.loadTargets()
+				}
+			}
+			.navigationTitle("Цели")
+			.toolbar {
+				ToolbarItem(placement: .navigationBarTrailing) {
+					Button(action: {
+						showAddTarget = true
+					}) {
+						Image(systemName: "plus")
+							.foregroundColor(.mainRed)
 					}
-            .navigationTitle("Цели")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showAddTarget = true
-                    }) {
-                        Image(systemName: "plus")
-                            .foregroundColor(.mainRed)
-                    }
-                }
-            }
-            .sheet(isPresented: $showAddTarget) {
-                TargetEditView<TargetsViewModel>(category: .money, isCreateTarget: true)
-                    .interactiveDismissDisabled(true)
-            }
-            .alert(isPresented: $showErrorAlert) {
-                Alert(
-                    title: Text("Ошибка"),
-                    message: Text(viewModel.errorMessage ?? "Произошла неизвестная ошибка"),
-                    dismissButton: .default(Text("OK"))
-                )
-            }
-        }
-        .onChange(of: viewModel.errorMessage) { _, newValue in
-            showErrorAlert = newValue != nil
-        }
+				}
+			}
+			.sheet(isPresented: $showAddTarget) {
+				TargetEditView<TargetsViewModel>(category: .money, isCreateTarget: true)
+					.interactiveDismissDisabled(true)
+			}
+			.alert(isPresented: $showErrorAlert) {
+				Alert(
+					title: Text("Ошибка"),
+					message: Text(viewModel.errorMessage ?? "Произошла неизвестная ошибка"),
+					dismissButton: .default(Text("OK"))
+				)
+			}
+		}
+		.onChange(of: viewModel.errorMessage) { _, newValue in
+			showErrorAlert = newValue != nil
+		}
 		.onAppear {
 			if viewModel.targets.isEmpty && viewModel.firstOpen {
 				viewModel.loadTargets()
 			}
 		}
 		.environmentObject(viewModel)
-		
-    }
+	}
     
     // MARK: - Empty State View
     @ViewBuilder
@@ -228,20 +225,11 @@ struct TargetsView: View {
     }
     
     // Получение иконки для цели
-    private func getTargetIcon(for target: UserTargetDtoModel) -> String {
-        guard let status = target.targetStatus else { return "star" }
-        
-        switch status {
-        case .inProgress:
-            return "star"
-        case .done, .doneExpired:
-            return "star.fill"
-        case .expired:
-            return "exclamationmark.circle"
-        default:
-            return "star"
-        }
-    }
+//    private func getTargetIcon(for target: UserTargetDtoModel) -> String {
+//        guard let status = target.targetStatus else { return "star" }
+//        
+//        return AppIcons.Target.baseIcon(for: status).renderingMode(.template)
+//    }
     
     // MARK: - Shimer Loading View
     @ViewBuilder
