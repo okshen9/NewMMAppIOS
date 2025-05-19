@@ -270,13 +270,14 @@ struct SchedulerView: View {
             Divider()
                 .padding(.horizontal)
             
-            // Список событий с оптимизированным лейаутом
-            VStack(spacing: 8) {
+            // Список событий
+            VStack(spacing: 12) {
                 ForEach(events) { event in
                     EventRowView(event: event)
                         .padding(.horizontal)
                 }
             }
+            
             .padding(.vertical, 8)
         }
         .padding(.vertical, 12)
@@ -351,7 +352,7 @@ extension SchedulerView {
                     id: 3,
                     externalId: 3,
                     amount: 3000.0,
-                    dueDate: Date.nowWith(plus: 10).toApiString,
+                    dueDate: Date.nowWith(plus: 1).toApiString,
                     comment: "Оплата за материалы",
                     paymentRequestStatus: .canceled,
                     userProfilePreview: .getTestUser()
