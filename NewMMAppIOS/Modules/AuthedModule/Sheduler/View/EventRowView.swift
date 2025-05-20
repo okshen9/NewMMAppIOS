@@ -81,15 +81,6 @@ struct EventRowView: View {
                                     endPoint: .trailing
                                 )
                             )
-                            
-                            if case .target(_) = event.type, let target = event.target, 
-                               (target.description != nil && !target.description.isEmptyOrNil) ||
-                               (target.subTargets != nil && !target.subTargets!.isEmpty) {
-                                (isExpanded ? AppIcons.General.collapse : AppIcons.General.expand)
-                                    .font(MMFonts.caption)
-                                    .foregroundColor(.secondary)
-                                    .padding(.leading, 4)
-                            }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
@@ -97,7 +88,14 @@ struct EventRowView: View {
                     Spacer()
                     
                     // Статус события
-                    dateStatusView(event.date)
+                    if case .target(_) = event.type, let target = event.target,
+                       (target.description != nil && !target.description.isEmptyOrNil) ||
+                       (target.subTargets != nil && !target.subTargets!.isEmpty) {
+                        (isExpanded ? AppIcons.General.collapse : AppIcons.General.expand)
+                            .font(MMFonts.caption)
+                            .foregroundColor(.secondary)
+                            .padding()
+                    }
                 }
                 .contentShape(Rectangle())
             }
@@ -123,14 +121,12 @@ struct EventRowView: View {
                                     .lineLimit(nil)
                                     .fixedSize(horizontal: false, vertical: true)
                             }
-                            .padding(.leading, 44)
                             .padding(.top, 4)
                         }
                         
                         // Подцели, если они есть
                         if let subTargets = event.target?.subTargets, !subTargets.isEmpty {
                             Divider()
-                                .padding(.leading, 44)
                                 .padding(.vertical, 4)
                             
                             HStack {
@@ -150,10 +146,7 @@ struct EventRowView: View {
                                             .fill(Color.secondary.opacity(0.1))
                                     )
                             }
-                            .padding(.leading, 44)
-                            .padding(.trailing, 16)
-                            
-                            ForEach(subTargets, id: \.id) { subTarget in
+                            ForEach(subTargets) { subTarget in
                                 HStack(alignment: .top, spacing: 12) {
                                     // Иконка подцели
                                     AppIcons.SubTarget.coloredIcon(for: subTarget.targetStatus ?? .notDone, backColor: .white)
@@ -165,7 +158,6 @@ struct EventRowView: View {
                                             Text(subTarget.title ?? "Подзадача")
                                                 .font(MMFonts.caption)
                                                 .foregroundColor(.primary)
-                                                .lineLimit(2)
                                                 .fixedSize(horizontal: false, vertical: true)
                                             
                                             Spacer(minLength: 4)
@@ -270,33 +262,34 @@ struct EventRowView: View {
     // MARK: - Event Icon
     private var eventIconView: some View {
         ZStack {
-            Circle()
-                .fill(event.type.color.opacity(0.15))
-                .frame(width: 36, height: 36)
-            
-            if isSubTarget {
-                ImageSheduler(event: event)
-            } else {
-                ImageSheduler(event: event)
-                    .font(MMFonts.body)
+
+            switch event.type {
+            case .payment(let payment):
+                let status = payment.paymentRequestStatus ?? .wait
+                Circle()
+                    .fill(AppIcons.Payment.color(for: status).opacity(0.15))
+                    .frameRect(36)
+                AppIcons.Payment.coloredIcon(for: status)
+            case .target(let target):
+                StatusTargetIndicatorView(target)
+            case .subTarget(let subTarget):
+                AppIcons.SubTarget.coloredIcon(for: subTarget.targetStatus ?? .notDone, backColor: Color(UIColor.secondarySystemBackground))
+                    .frameRect(24)
+            case .anyEvent(_):
+                Circle()
+                    .fill(event.type.color.opacity(0.15))
+                    .frameRect(24)
+                Image(systemName: "lightbulb.fill")
+                    .foregroundStyle(event.type.color)
             }
-        }
-    }
-    
-    // MARK: - Date Status
-    private func dateStatusView(_ date: Date) -> some View {
-        VStack(spacing: 2) {
-            Text(relativeDateString(date))
-                .font(MMFonts.caption)
-                .foregroundColor(isOverdue(date) ? .red : .secondary)
-                .lineLimit(1)
+//            if isSubTarget {
+//                ImageSheduler(event: event)
+//            } else {
+//                ImageSheduler(event: event)
+//                    .font(MMFonts.body)
+//            }
             
-            Text(dateString(date))
-                .font(MMFonts.subCaption)
-                .foregroundColor(.secondary)
-                .lineLimit(1)
         }
-        .frame(minWidth: 60)
     }
     
     // MARK: - Helper Methods
@@ -355,15 +348,6 @@ struct EventRowView: View {
         formatter.dateFormat = "d MMM"
         return formatter.string(from: date)
     }
-    
-    private func relativeDateString(_ date: Date) -> String {
-        return date.relativeTimeString()
-    }
-    
-    private func isOverdue(_ date: Date) -> Bool {
-        let today = Calendar.current.startOfDay(for: Date())
-        return date < today
-    }
 }
 
 extension String {
@@ -379,50 +363,191 @@ extension Optional where Wrapped == String {
 }
 
 #Preview {
-    let item = CalendatItem(
-        user: .getTestUser(),
-        title: "Оплата курса наставничества",
-        type: .payment(.init(
-            id: 12,
-            externalId: 11,
-            amount: 100.0,
-            dueDate: Date().toApiString,
-            comment: "надо оплатить",
-            paymentRequestStatus: PaymentRequestStatus.wait,
-            userProfilePreview: UserProfileResultDto.getTestUser()
-        )),
-        date: Date(),
-        category: nil
-    )
     ScrollView {
-        VStack {
-            EventRowView(event: item)
+        VStack(spacing: 16) {
+            // Платеж
+            VStack(alignment: .leading) {
+                Text("Состояние: Платеж (ожидание оплаты)")
+                    .font(.headline)
+                    .padding(.horizontal)
+                
+                EventRowView(event: CalendatItem(
+                    user: .getTestUser(),
+                    title: "Оплата курса наставничества",
+                    type: .payment(.init(
+                        id: 12,
+                        externalId: 11,
+                        amount: 100.0,
+                        dueDate: Date().toApiString,
+                        comment: "надо оплатить",
+                        paymentRequestStatus: .wait,
+                        userProfilePreview: UserProfileResultDto.getTestUser()
+                    )),
+                    date: Date(),
+                    category: nil
+                ))
                 .padding()
                 .background(Color.white)
                 .cornerRadius(8)
+            }
             
-            EventRowView(event: CalendatItem(
-                user: .getTestUser(),
-                title: "3.Собрал команду в корпоративной практике - подписал трудовые договоры с новыми сотрудниками (ведущий юрист, юрист, руководитель отдела) до 12.05.2025",
-                type: .target(.getBaseTarget(withOutSub: true, withOutDesc: true)),
-                date: Date().addingTimeInterval(86400), // Tomorrow
-                category: .money
-            ))
-            .padding()
-            .background(Color.white)
-            .cornerRadius(8)
+            // Платеж оплаченный
+            VStack(alignment: .leading) {
+                Text("Состояние: Платеж (оплачено)")
+                    .font(.headline)
+                    .padding(.horizontal)
+                
+                EventRowView(event: CalendatItem(
+                    user: .getTestUser(),
+                    title: "Оплата за консультацию",
+                    type: .payment(.init(
+                        id: 13,
+                        externalId: 12,
+                        amount: 2500.0,
+                        dueDate: Date().addingTimeInterval(-86400).toApiString,
+                        comment: "Оплачено",
+                        paymentRequestStatus: .fullPaid,
+                        userProfilePreview: UserProfileResultDto.getTestUser()
+                    )),
+                    date: Date().addingTimeInterval(-86400),
+                    category: nil
+                ))
+                .padding()
+                .background(Color.white)
+                .cornerRadius(8)
+            }
             
-            EventRowView(event: CalendatItem(
-                user: .getTestUser(),
-                title: "Закрыть цель: Пробежать 5 км",
-                type: .target(.getBaseTarget()),
-                date: Date().addingTimeInterval(172800 * 10), // Day after tomorrow
-                category: .health
-            ))
-            .padding()
-            .background(Color.white)
-            .cornerRadius(8)
+            // Цель без подцелей
+            VStack(alignment: .leading) {
+                Text("Состояние: Цель без подцелей")
+                    .font(.headline)
+                    .padding(.horizontal)
+                
+                EventRowView(event: CalendatItem(
+                    user: .getTestUser(),
+                    title: "Цель без подцелей",
+                    type: .target(.getBaseTarget(withOutSub: true, withOutDesc: false)),
+                    date: Date().addingTimeInterval(86400),
+                    category: .money
+                ))
+                .padding()
+                .background(Color.white)
+                .cornerRadius(8)
+            }
+            
+            // Цель с подцелями
+            VStack(alignment: .leading) {
+                Text("Состояние: Цель с подцелями")
+                    .font(.headline)
+                    .padding(.horizontal)
+                
+                EventRowView(event: CalendatItem(
+                    user: .getTestUser(),
+                    title: "Закрыть цель: Пробежать 5 км",
+                    type: .target(UserTargetDtoModel.getBaseTarget()),
+                    date: Date().addingTimeInterval(172800 * 10),
+                    category: .health
+                ))
+                .padding()
+                .background(Color.white)
+                .cornerRadius(8)
+            }
+            
+            // Цель со статусом "Выполнено"
+            VStack(alignment: .leading) {
+                Text("Состояние: Цель со статусом 'Выполнено'")
+                    .font(.headline)
+                    .padding(.horizontal)
+                
+                var doneTarget = UserTargetDtoModel.getBaseTarget(.done)
+                
+                EventRowView(event: CalendatItem(
+                    user: .getTestUser(),
+                    title: "Выполненная цель",
+                    type: .target(doneTarget),
+                    date: Date().addingTimeInterval(-86400 * 2),
+                    category: .personal
+                ))
+                .padding()
+                .background(Color.white)
+                .cornerRadius(8)
+            }
+            
+            // Цель со статусом "Просрочено"
+            VStack(alignment: .leading) {
+                Text("Состояние: Цель со статусом 'Просрочено'")
+                    .font(.headline)
+                    .padding(.horizontal)
+                
+                let expiredTarget = UserTargetDtoModel.getBaseTarget(.expired)
+                
+                EventRowView(event: CalendatItem(
+                    user: .getTestUser(),
+                    title: "Просроченная цель",
+                    type: .target(expiredTarget),
+                    date: Date().addingTimeInterval(-86400 * 5),
+                    category: .family
+                ))
+                .padding()
+                .background(Color.white)
+                .cornerRadius(8)
+            }
+            
+            // Подцель
+            VStack(alignment: .leading) {
+                Text("Состояние: Подцель")
+                    .font(.headline)
+                    .padding(.horizontal)
+                
+                let subTarget = UserSubTargetDtoModel(
+                    id: 1,
+                    title: "Тренировка выносливости",
+                    description: "Бег 3 раза в неделю по 30 минут",
+                    subTargetPercentage: 50,
+                    targetSubStatus: .notDone,
+                    rootTargetId: 1
+                )
+                
+                EventRowView(event: CalendatItem(
+                    user: .getTestUser(),
+                    title: "Подцель: Тренировка выносливости",
+                    type: .subTarget(subTarget),
+                    date: Date().addingTimeInterval(86400 * 5),
+                    category: .health
+                ))
+                .padding()
+                .background(Color.white)
+                .cornerRadius(8)
+            }
+            
+            // Выполненная подцель
+            VStack(alignment: .leading) {
+                Text("Состояние: Выполненная подцель")
+                    .font(.headline)
+                    .padding(.horizontal)
+                
+                let doneSubTarget = UserSubTargetDtoModel(
+                    id: 2,
+                    title: "Силовые тренировки",
+                    description: "Тренировка с весами 2 раза в неделю",
+                    subTargetPercentage: 100,
+                    targetSubStatus: .done,
+                    rootTargetId: 1
+                )
+                
+                EventRowView(event: CalendatItem(
+                    user: .getTestUser(),
+                    title: "Подцель: Силовые тренировки",
+                    type: .subTarget(doneSubTarget),
+                    date: Date().addingTimeInterval(86400 * 3),
+                    category: .health
+                ))
+                .padding()
+                .background(Color.white)
+                .cornerRadius(8)
+            }
         }
         .padding()
+        .background(Color(UIColor.systemGroupedBackground))
     }
 }

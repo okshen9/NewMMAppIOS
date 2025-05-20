@@ -15,7 +15,7 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
     private let userRepository = UserRepository.shared
     
     @Published var scheduleListItems = [Date: [CalendatItem]]()
-    @Published var calendarComponetsItems: Dictionary<DateComponents, [UIColor]> = [DateComponents: [UIColor]]()
+    @Published var calendarComponetsItems: [DateComponents: [CalendatItem]] = [:]
 
     /// Только для превью
     convenience init(payRequest: [PaymentRequestResponseDto],
@@ -64,7 +64,7 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
 
     // MARK: - Private Methods
     @MainActor
-    private func updateUI(scheduleListItems: [Date: [CalendatItem]], calendarItems: [DateComponents: [UIColor]], isLoading: Bool = false) {
+    private func updateUI(scheduleListItems: [Date: [CalendatItem]], calendarItems: [DateComponents: [CalendatItem]], isLoading: Bool = false) {
         self.isLoading = isLoading
         self.scheduleListItems = scheduleListItems
         self.calendarComponetsItems = calendarItems
@@ -78,7 +78,7 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
     
     private func prepereScheduleListItems(paymant: [PaymentRequestResponseDto],
                                           targets: [UserTargetDtoModel]
-    ) ->(scheduleListItems: [Date: [CalendatItem]], calendarItems: [DateComponents: [UIColor]])
+    ) -> (scheduleListItems: [Date: [CalendatItem]], calendarItems: [DateComponents: [CalendatItem]])
     {
         self.payRequest = paymant
         self.targets = targets
@@ -86,8 +86,21 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
         var rawTempScheduleListItems = [Date: [CalendatItem]]()
         
         // Обработка платежей
-        paymant.forEach({ payMent in
-            guard let dateOfPay = payMent.dueDate?.dateFromApiString,
+        processPayments(payments: paymant, scheduleItems: &rawTempScheduleListItems)
+        
+        // Обработка целей
+        processTargets(targets: targets, scheduleItems: &rawTempScheduleListItems)
+        
+        // Создаем данные для отметок в календаре
+        let tempCalendar = createCalendarMarkers(from: rawTempScheduleListItems)
+        
+        return (rawTempScheduleListItems, tempCalendar)
+    }
+    
+    /// Обрабатывает платежи и добавляет их в список событий календаря
+    private func processPayments(payments: [PaymentRequestResponseDto], scheduleItems: inout [Date: [CalendatItem]]) {
+        payments.forEach { payment in
+            guard let dateOfPay = payment.dueDate?.dateFromApiString,
                   let user = userRepository.userProfile ?? userPreview
             else {
                 print("neshko1 ERROR")
@@ -96,107 +109,77 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
 
             // Используем startOfDay для группировки по дням
             let startOfDay = Calendar.current.startOfDay(for: dateOfPay)
-            let dateComponents = startOfDay.dateComponentsFor([.year, .month, .day])
             
-            let title = payMent.comment.isEmptyOrNil ? "Оплата" : payMent.comment.orEmpty
+            let title = payment.comment.isEmptyOrNil ? "Оплата" : payment.comment.orEmpty
             
-            var currentScheduleListItems = rawTempScheduleListItems[startOfDay] ?? []
-            currentScheduleListItems.append(.init(user: user, title: title, type: .payment(payMent), date: dateOfPay, category: nil))
-            rawTempScheduleListItems[startOfDay] = currentScheduleListItems
-        })
-        
-        // Обработка целей
-        targets.forEach({ target in
+            var currentScheduleListItems = scheduleItems[startOfDay] ?? []
+            currentScheduleListItems.append(.init(user: user, title: title, type: .payment(payment), date: dateOfPay, category: nil))
+            scheduleItems[startOfDay] = currentScheduleListItems
+        }
+    }
+    
+    /// Обрабатывает цели и их подцели, добавляя их в список событий календаря
+    private func processTargets(targets: [UserTargetDtoModel], scheduleItems: inout [Date: [CalendatItem]]) {
+        targets.forEach { target in
             guard let deadlineDate = target.deadLineDateTime?.dateFromStringISO8601,
                   let user = userRepository.userProfile ?? userPreview
             else { return }
             
-            // Используем startOfDay для группировки по дням
-            let startOfDay = Calendar.current.startOfDay(for: deadlineDate)
+            // Добавляем основную цель
+            addTargetToSchedule(target: target, date: deadlineDate, user: user, scheduleItems: &scheduleItems)
             
-            // Определяем категорию
-            let category = target.category
-            
-            let title = "Цель: \(target.title ?? "Без названия")"
-            
-            // Создаем копию модели цели с полным списком подцелей для отображения
-            var targetWithDetails = target
-            
-            // Отфильтровываем только необходимые подцели (если нужна дополнительная логика фильтрации)
-            if let subTargets = targetWithDetails.subTargets {
-                // Здесь можно добавить фильтрацию подцелей по статусу, если необходимо
-                // Например, только невыполненные или с близким дедлайном
-                targetWithDetails.subTargets = subTargets
-            }
-            
-            var eventsCurrent = rawTempScheduleListItems[startOfDay] ?? []
-            eventsCurrent.append(.init(user: user, title: title, type: .target(targetWithDetails), date: deadlineDate, category: category))
-            rawTempScheduleListItems[startOfDay] = eventsCurrent
-            
-            // Добавляем подцели как отдельные события в календарь
-            if let subTargets = target.subTargets {
-                for subTarget in subTargets {
-                    guard let subDeadlineDate = subTarget.deadLineDateTime?.dateFromStringISO8601 else { continue }
-                    
-                    let subStartOfDay = Calendar.current.startOfDay(for: subDeadlineDate)
-                    
-                    // Пропускаем, если дедлайн подцели совпадает с дедлайном основной цели
-                    if subStartOfDay == startOfDay { continue }
-                    
-                    let subTitle = "Подцель: \(subTarget.title ?? "Без названия")"
-                    
-                    // Создаем модель цели с одной подцелью для отображения
-                    var subTargetModel = target
-                    subTargetModel.subTargets = [subTarget]
-                    
-                    var subEventsCurrent = rawTempScheduleListItems[subStartOfDay] ?? []
-                    subEventsCurrent.append(.init(user: user, title: subTitle, type: .target(subTargetModel), date: subDeadlineDate, category: category))
-                    rawTempScheduleListItems[subStartOfDay] = subEventsCurrent
-                }
-            }
-        })
+            // Обрабатываем подцели
+            processSubTargets(parentTarget: target, parentDeadline: deadlineDate, user: user, scheduleItems: &scheduleItems)
+        }
+    }
+    
+    /// Добавляет основную цель в список событий календаря
+    private func addTargetToSchedule(target: UserTargetDtoModel, date: Date, user: UserProfileResultDto, scheduleItems: inout [Date: [CalendatItem]]) {
+        let startOfDay = Calendar.current.startOfDay(for: date)
+        let category = target.category
+        let title = "Цель: \(target.title ?? "Без названия")"
         
-        // Создаем данные для отметок в календаре
-        var tempCalendar = [DateComponents: [UIColor]]()
+        // Создаем копию модели цели с полным списком подцелей для отображения
+        var targetWithDetails = target
         
-        // Группируем события по дням для календаря
-        for (date, events) in rawTempScheduleListItems {
+        var eventsCurrent = scheduleItems[startOfDay] ?? []
+        eventsCurrent.append(.init(user: user, title: title, type: .target(targetWithDetails), date: date, category: category))
+        scheduleItems[startOfDay] = eventsCurrent
+    }
+    
+    /// Обрабатывает подцели и добавляет их в список событий календаря
+    private func processSubTargets(parentTarget: UserTargetDtoModel, parentDeadline: Date, user: UserProfileResultDto, scheduleItems: inout [Date: [CalendatItem]]) {
+        guard let subTargets = parentTarget.subTargets else { return }
+        
+        let parentStartOfDay = Calendar.current.startOfDay(for: parentDeadline)
+        let category = parentTarget.category
+        
+        for subTarget in subTargets {
+            guard let subDeadlineDate = subTarget.deadLineDateTime?.dateFromStringISO8601 else { continue }
+            
+            let subStartOfDay = Calendar.current.startOfDay(for: subDeadlineDate)
+            
+            // Пропускаем, если дедлайн подцели совпадает с дедлайном основной цели
+            if subStartOfDay == parentStartOfDay { continue }
+            
+            let subTitle = "Подцель: \(subTarget.title ?? "Без названия")"
+            
+            var eventsCurrent = scheduleItems[subStartOfDay] ?? []
+            eventsCurrent.append(.init(user: user, title: subTitle, type: .subTarget(subTarget), date: subDeadlineDate, category: category))
+            scheduleItems[subStartOfDay] = eventsCurrent
+        }
+    }
+    
+    /// Создает маркеры для календаря на основе списка событий
+    private func createCalendarMarkers(from scheduleItems: [Date: [CalendatItem]]) -> [DateComponents: [CalendatItem]] {
+        var calendarMarkers = [DateComponents: [CalendatItem]]()
+        
+        for (date, events) in scheduleItems {
             let dateComponents = date.dateComponentsFor([.year, .month, .day])
-            
-            // Отдельные цвета для платежей и целей
-            var hasPayment = false
-            var hasTarget = false
-            var hasSubTarget = false
-            var colors: [UIColor] = []
-            
-            // Проверяем типы событий
-            for event in events {
-                if case .payment = event.type {
-                    hasPayment = true
-                } else if case let .target(target) = event.type {
-                    if let subTargets = target.subTargets, subTargets.count == 1 && event.title.hasPrefix("Подцель:") {
-                        hasSubTarget = true
-                    } else {
-                    hasTarget = true
-                    }
-                }
-            }
-            
-            // Добавляем цвета в порядке приоритета
-            if hasPayment {
-                colors.append(UIColor(Color.mainRed))
-            }
-            if hasTarget {
-                colors.append(UIColor.systemGreen)
-            }
-            if hasSubTarget {
-                colors.append(UIColor.systemBlue)
-            }
-            
-            tempCalendar[dateComponents] = colors
+            calendarMarkers[dateComponents] = events
         }
         
-        return (rawTempScheduleListItems, tempCalendar)
+        return calendarMarkers
     }
 }
 

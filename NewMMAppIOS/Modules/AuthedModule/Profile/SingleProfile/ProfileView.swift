@@ -416,9 +416,9 @@ struct ProfileView: View {
                     action: {})
             }
 			// Группы человека
-			GroupButton(title: "Группы",
-						subTitle: "Не названчена",
-						action: {})
+//			GroupButton(title: "Группы",
+//						subTitle: "Не назначена",
+//						action: {})
 			// TODO: NESHKO
 //            if let userGroup = profile.userGroups,
 //               let stream = profile.stream,

@@ -89,6 +89,7 @@ struct CalendatItem: Identifiable, Equatable {
                     .eraseToAnyView()
             case .subTarget(let subTarget):
                 return AppIcons.SubTarget.coloredIcon(for: subTarget.targetStatus ?? .unknown, backColor: .white)
+                    .frameRect(16)
                     .eraseToAnyView()
             case .anyEvent:
                 return Image(systemName: "lightbulb.min.fill")

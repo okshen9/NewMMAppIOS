@@ -213,26 +213,34 @@ struct SchedulerView: View {
 					.offset(x: 0, y: -10)
 				
 				// Типы событий - компактно в одной строке
-				HStack(spacing: 16) {
-					HStack(spacing: 8) {
-						Circle()
-							.foregroundStyle(Color.green)
-							.frame(width: 12, height: 12)
-						Text("Цели")
-							.font(MMFonts.body)
-					}
-					
-					HStack(spacing: 8) {
-						Circle()
-							.foregroundStyle(Color.mainRed)
-							.frame(width: 12, height: 12)
+
+                HStack{
+                    // Платежи
+                    HStack(spacing: 2) {
+                        AppIcons.Payment.coloredIcon(for: .wait)
+                            .font(.system(size: 12))
 						Text("Платежи")
 							.font(MMFonts.body)
 					}
+					
+                    // Цели
+                    HStack(spacing: 2) {
+                        AppIcons.Target.coloredIcon(for: .done, resizeble: true)
+                            .frameRect(18)
+						Text("Цели")
+							.font(MMFonts.body)
+					}
+                    
+                    // Подцели
+                    HStack(spacing: 2) {
+                        AppIcons.SubTarget.coloredIcon(for: .done, backColor: Color.white)
+                            .frameRect(18)
+                        Text("Подцели")
+                            .font(MMFonts.body)
+                    }
 				}
-				.padding(.horizontal, 24)
 			}
-			.padding()
+            .padding()
 			.presentationCompactAdaptation(.popover)
 		})
 	}
@@ -261,9 +269,7 @@ struct SchedulerView: View {
                 
                 Spacer()
                 
-                Text(dateString(date))
-                    .font(MMFonts.subTitle)
-                    .foregroundStyle(Color.secondary)
+                dateStatusView(date)
             }
             .padding(.horizontal)
             
@@ -286,6 +292,21 @@ struct SchedulerView: View {
                 .fill(Color(UIColor.secondarySystemBackground))
                 .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
         )
+    }
+    
+    private func dateStatusView(_ date: Date) -> some View {
+        VStack(spacing: 2) {
+            Text(date.relativeTimeString())
+                .font(MMFonts.caption)
+                .foregroundColor(date.isOverdue ? .red : .secondary)
+                .lineLimit(1)
+            
+            Text(dateString(date))
+                .font(MMFonts.subCaption)
+                .foregroundColor(.secondary)
+                .lineLimit(1)
+        }
+        .frame(minWidth: 60)
     }
     
     // MARK: - Helper Methods

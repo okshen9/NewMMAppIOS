@@ -4,7 +4,11 @@ import SwiftUI
 enum AppIcons {
 	enum General {
 		// MARK: - Комбинированные иконки
-		static let combined = Image(systemName: "calendar.badge.exclamationmark")
+		static let combined = Image(systemName: "calendar.badge.plus")
+        
+        static let cardCombined = Image("creditcard.combined")
+        static let targetCombined = Image("star.combined")
+        
 		
 		// MARK: - Вспомогательные иконки
 		static let calendar = Image(systemName: "calendar")
@@ -82,73 +86,82 @@ extension AppIcons {
 
 // MARK: - Иконки для целей (target)
 extension AppIcons {
-	enum Target {
-		/// Получить цветную иконку для платежа в зависимости от статуса
-		/// - Parameters:
-		///  - for: устатус платежа
-		///  - resizeble: включен ли режим resizeble для иконки
-		static func coloredIcon(
-			for status: TargetStatus,
-			resizeble: Bool = false
-		) -> some View {
-			if resizeble {
-				return baseIcon(for: status)
-					.resizable()
-					.renderingMode(.template)
-					.foregroundStyle(color(for: status))
-			} else {
-				return baseIcon(for: status)
-					.renderingMode(.template)
-					.foregroundStyle(color(for: status))
-			}
-		}
-		
-		static func baseIcon(for status: TargetStatus) -> Image {
-			switch status {
-			case .inProgress:
-				return Image(NameIcon.inProgress)
-			case .done:
-				return Image(NameIcon.done)
-			case .doneExpired:
-				return Image(NameIcon.doneExpired)
-			case .expired:
-				return Image(NameIcon.expired)
-			case .draft:
-				return Image(systemName: NameIcon.draft)
-			case .cancelled, .failed:
-				return Image(NameIcon.failed)
-			case .unknown:
-				return Image(systemName: NameIcon.unknown)
-			}
-		}
-		
-		/// Получить цвет для иконки цели в зависимости от статуса
-		static func color(for status: TargetStatus) -> Color {
-			switch status {
-			case .inProgress:
-				return .green
-			case .done, .doneExpired:
-				return .green
-			case .expired, .failed:
-				return .mainRed
-			case .unknown, .cancelled:
-				return .secondary
-			case .draft:
-				return .orange
-			}
-		}
-		
-		// Базовые иконки
-		private enum NameIcon {
-			static let inProgress = "mm.target"
-			static let done = "mm.target.done"
-			static let doneExpired = "mm.target.half"
-			static let expired = "mm.target.clock"
-			static let draft = "hand.raised.fill"
-			static let failed = "mm.target.slash"
-			static let unknown = "questionmark.diamond.fill"
-		}
-	}
+    enum Target {
+//        static func coloredWithBackGraundIcon(
+//            category: TargetCategory,
+//            target: UserTargetDtoModel
+//        ) -> some View {
+//            StatusTargetIndicatorView(category: category,
+//                                      percentage: target.percentage ?? 0,
+//                                      status: status)
+//        }
+        
+        /// Получить цветную иконку для платежа в зависимости от статуса
+        /// - Parameters:
+        ///  - for: устатус платежа
+        ///  - resizeble: включен ли режим resizeble для иконки
+        static func coloredIcon(
+            for status: TargetStatus,
+            resizeble: Bool = false
+        ) -> some View {
+            if resizeble {
+                return baseIcon(for: status)
+                    .resizable()
+                    .renderingMode(.template)
+                    .foregroundStyle(color(for: status))
+            } else {
+                return baseIcon(for: status)
+                    .renderingMode(.template)
+                    .foregroundStyle(color(for: status))
+            }
+        }
+        
+        static func baseIcon(for status: TargetStatus) -> Image {
+            switch status {
+            case .inProgress:
+                return Image(NameIcon.inProgress)
+            case .done:
+                return Image(NameIcon.done)
+            case .doneExpired:
+                return Image(NameIcon.doneExpired)
+            case .expired:
+                return Image(NameIcon.expired)
+            case .draft:
+                return Image(systemName: NameIcon.draft)
+            case .cancelled, .failed:
+                return Image(NameIcon.failed)
+            case .unknown:
+                return Image(systemName: NameIcon.unknown)
+            }
+        }
+        
+        /// Получить цвет для иконки цели в зависимости от статуса
+        static func color(for status: TargetStatus) -> Color {
+            switch status {
+            case .inProgress:
+                return .green
+            case .done, .doneExpired:
+                return .green
+            case .expired, .failed:
+                return .mainRed
+            case .unknown, .cancelled:
+                return .secondary
+            case .draft:
+                return .orange
+            }
+        }
+        
+        // Базовые иконки
+        private enum NameIcon {
+            static let inProgress = "mm.target"
+            static let done = "mm.target.done"
+            static let doneExpired = "mm.target.half"
+            static let expired = "mm.target.clock"
+            static let draft = "hand.raised.fill"
+            static let failed = "mm.target.slash"
+            static let unknown = "questionmark.diamond.fill"
+        }
+    }
 }
 
 extension AppIcons {
@@ -162,6 +175,7 @@ extension AppIcons {
             backColor: Color
 		) -> some View {
             return baseIcon(for: status, backColor: backColor)
+                .offset(x: 0, y: 2)
 		}
         
 //            .resizable()
@@ -275,6 +289,9 @@ extension AppIcons {
 //            SubTargetDoneView(backColor: .white, fiilColor: .green)
 //                .frameRect(22)
             Image("mm.subarget.done.clock")
+            AppIcons.General.combined
+            AppIcons.General.cardCombined
+            AppIcons.General.targetCombined
 //                .bred()
 		}
 	}

@@ -221,7 +221,7 @@ extension UserTargetDtoModel {
 		return minimalModel
 	}
 	
-    static func getBaseTarget(withOutSub: Bool = false, withOutDesc: Bool = false) -> UserTargetDtoModel {
+    static func getBaseTarget(withOutSub: Bool = false, withOutDesc: Bool = false, _ status: TargetStatus = .inProgress) -> UserTargetDtoModel {
         let subTargets = [
             UserSubTargetDtoModel(
                 id: 32,
@@ -277,4 +277,8 @@ extension UserTargetDtoModel {
             category: .money
         )
     }
+    
+    static var doneTarget: UserTargetDtoModel = {
+        UserTargetDtoModel(percentage: 100, targetStatus: .done)
+    }()
 }

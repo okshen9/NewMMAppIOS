@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct StatusTargetIndicatorView: View {
-	private let targetIndicatorSize: CGFloat = 28
+	var targetIndicatorSize: CGFloat = 28
 	var categoryColor: Color
 	let percentage: Double
 	let status: TargetStatus

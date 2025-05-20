@@ -618,3 +618,11 @@ extension DateComponents {
         return isEquals.allSatisfy { $0 }
     }
 }
+
+
+extension Date {
+    var isOverdue: Bool {
+        let today = Calendar.current.startOfDay(for: Date())
+        return self < today
+    }
+}
