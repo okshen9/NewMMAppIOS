@@ -143,8 +143,10 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
         
         Task { [weak self] in
             do {
-                guard let self = self else { return }
-                let userExternalId = UserRepository.shared.userProfile?.externalId ?? 0
+                guard let self = self, let userExternalId = UserRepository.shared.userProfile?.externalId else {
+                    await ToastManager.shared.show(.baseError)
+                    return
+                }
                 let result = try await self.networkService.getUserTargets(externalId: userExternalId)
                 
 				if let targets = result.userTargets {
@@ -234,7 +236,10 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
     @MainActor
     private func refreshTargetsData() async {
         do {
-            let userExternalId = UserRepository.shared.userProfile?.externalId ?? 0
+            guard let userExternalId = UserRepository.shared.userProfile?.externalId else {
+                await ToastManager.shared.show(.baseError)
+                return
+            }
             let result = try await networkService.getUserTargets(externalId: userExternalId)
             
             if let targets = result.userTargets {
@@ -243,6 +248,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
                 }
             }
         } catch {
+            await ToastManager.shared.show(.baseError)
             print("Ошибка обновления целей: \(error.localizedDescription)")
         }
     }

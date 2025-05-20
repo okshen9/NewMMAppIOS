@@ -22,7 +22,7 @@ class ProfileInfoViewModel: ObservableObject {
     private let authModel: AuthUserDtoResult?
     private let profileModel: UserProfileResultDto?
     private let apiFactory = ServiceBuilder.shared
-    private let isEditProfile: Bool
+    let isEditProfile: Bool
     private var needUpdateAction: () -> Void
 
     init(profileModel: UserProfileResultDto?, authModel: AuthUserDtoResult?, isEditProfile: Bool, needUpdateAction: @escaping () -> Void = {}) {
@@ -124,7 +124,7 @@ class ProfileInfoViewModel: ObservableObject {
                 await navigationTo(.dismiss)
             } else {
                 let finalUser = try await apiFactory.createProfile(profileData: CreateUserProfileBodyModel(
-                    externalId: 0, // Предполагаем, что ID будет получен позже
+                    externalId: nil, // Предполагаем, что ID будет получен позже
                     username: userProfile.telegramUsername,
                     fullName: userProfile.firstName,
                     userProfileStatus: nil,
@@ -143,6 +143,7 @@ class ProfileInfoViewModel: ObservableObject {
                 UserRepository.shared.setAuthUser(updatedAuthUser)
                 UserRepository.shared.setUserProfile(finalUser)
                 await setIsLoaded(false)
+                await navigationTo(.dismiss)
                 await navigationTo(.toMinView)
             }
         } catch {

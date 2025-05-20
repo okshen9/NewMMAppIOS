@@ -3,6 +3,7 @@ import Kingfisher
 //import Yamobaile
 
 struct ProfileView: View {
+    @Environment(\.navigationPath) private var path
     @EnvironmentObject var appStateService: AppNavigationStateService
     @EnvironmentObject var navigationManager: NavigationManager<AuthRoute>
     @StateObject private var viewModel = ProfileViewModel()
@@ -25,20 +26,33 @@ struct ProfileView: View {
     }
     
     var body: some View {
+        ScrollView {
         VStack {
-            if let profile = viewModel.profile, !viewModel.isLoading  {
-                contentState(profile: profile)
-            } else {
-                if viewModel.isLoading {
-                    shimerState()
+            
+                if let profile = viewModel.profile, !viewModel.isLoading  {
+                    contentState(profile: profile)
                 } else {
-                    Text("Не удалось загрузить профиль")
+                    if viewModel.isLoading {
+                        shimerState()
+                    } else {
+                        Spacer()
+                        Image(systemName: "person.crop.circle.badge.exclamationmark.fill")
+                            .foregroundStyle(Color.mainRed)
+                            .font(.system(size: 60))
+                            .padding(.top, 200)
+                        Text("Не удалось загрузить профиль")
+                        
+                    }
                 }
             }
         }
+        .scrollDisabled(showMap)
+        .refreshable {
+            viewModel.onApper(onReset: true)
+        }
 		.toolbar {
 			// Кнопка справа (trailing)
-			if viewModel.isMyProfile {
+            if !viewModel.isOtherProfile {
 				ToolbarItem(placement: .navigationBarTrailing) {
 					toolBarMenu()
 				}
@@ -56,7 +70,6 @@ struct ProfileView: View {
     
     @ViewBuilder
     func contentState(profile: UserProfileResultDto) -> some View {
-        ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 // Карта
                 ZStack {
@@ -193,12 +206,8 @@ struct ProfileView: View {
                         .transition(.opacity)
                 }
             }
-        }
-        .scrollDisabled(showMap)
+        
         .animation(.easeInOut, value: selectedTab)
-        .refreshable {
-            viewModel.onApper(onReset: true)
-        }
         .sheet(isPresented: $showEditProfile) {
             ProfileInfoView(viewModel: .editProfileViewModel(needUpdateAction: {
                 Task.detached(operation: {
@@ -350,16 +359,18 @@ struct ProfileView: View {
     @ViewBuilder
     func toolBarMenu() -> some View {
         Menu {
-            Button(action: {
-                print("Кнопка справа нажата")
-                showEditProfile = true
-            }, label: {
-                HStack {
-                    Text("Редактировать")
-                    Image(systemName: "square.and.pencil")
-                        .foregroundStyle(Color.mainRed)
-                }
-            })
+            if viewModel.isMyProfile && viewModel.profile != nil {
+                Button(action: {
+                    print("Кнопка справа нажата")
+                    showEditProfile = true
+                }, label: {
+                    HStack {
+                        Text("Редактировать")
+                        Image(systemName: "square.and.pencil")
+                            .foregroundStyle(Color.mainRed)
+                    }
+                })
+            }
             Button("Выйти", action: {
                 viewModel.logout()
                 appStateService.setNewState(.unAuthorized)

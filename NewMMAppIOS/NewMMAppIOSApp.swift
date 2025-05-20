@@ -39,6 +39,7 @@ struct NewMMAppIOSApp: App {
                                         profileModel: profileModel,
                                         authModel: authModel,
                                         isEditProfile: false))
+                                    .environmentObject(authNavigationManager)
                                 }
                             }
                             .environmentObject(authNavigationManager)

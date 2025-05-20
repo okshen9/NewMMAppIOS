@@ -42,18 +42,27 @@ struct AuthSUIView: View {
 				.opacity(viewModel.showWebView ? 1 : 0)
                 .edgesIgnoringSafeArea(.all)
                 .transition(.opacity)
+                .onDisappear(perform: {
+                    print("MMM WebView onDisappear")
+                })
             }
         }
         .onAppear() {
             viewModel.navPath = .authView
         }
         .onChange(of: viewModel.navPath) { navPathOld, navPathNew in
+            guard navPathOld != navPathNew else { return }
+            
             switch navPathNew {
             case .authView:
                 break
             case .toInfoView:
-                let authUser = UserRepository.shared.authUser?.authUserDto
-                navigationManager.navigate(to: .signup(profileModel: nil, authModel: authUser))
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    if !viewModel.showWebView {
+                        let authUser = UserRepository.shared.authUser?.authUserDto
+                        navigationManager.navigate(to: .signup(profileModel: nil, authModel: authUser))
+                    }
+//                }
             case .toMinView:
                 appStateServise.setNewState(.authorized)
             }

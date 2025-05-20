@@ -30,6 +30,12 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
     var isMyProfile: Bool {
 		externalId == userRepository.userProfile?.externalId
     }
+    
+    var isOtherProfile: Bool {
+        userRepository.userProfile?.externalId != nil &&
+        externalId != nil &&
+        externalId != userRepository.userProfile?.externalId
+    }
 
     // MARK: - Private properties
     let serviceNetwork = ServiceBuilder.shared
@@ -99,7 +105,7 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
             await setIsLoading(true)
             let targetExternalId = externalId ?? self.externalId
             print("updateProfile с externalId: \(targetExternalId ?? -1)")
-
+            self.profile = nil
             if let targetExternalId = targetExternalId {
                 guard let updatetedProfile = try await serviceNetwork.getUserProfile(externalId: targetExternalId) else { 
                     print("Не удалось получить профиль с externalId: \(targetExternalId)")

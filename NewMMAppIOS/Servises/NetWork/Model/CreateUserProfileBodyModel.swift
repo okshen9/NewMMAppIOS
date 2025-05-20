@@ -11,7 +11,7 @@ import Foundation
 struct CreateUserProfileBodyModel: JSONRepresentable {
     
     /// "Уникальный идентификатор пользователя (ID) для внешней системы", example = "1")
-    var externalId: Int
+    var externalId: Int?
     
     /// "Уникальное имя пользователя", example = "TestUser")
     var username: String

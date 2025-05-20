@@ -31,15 +31,29 @@ final class AuthSUIViewModel: NSObject, ObservableObject {
             print("Neshko telegramCallBack")
             let authQueryModel = AuthQueryModel(tgData: tgKey)
             guard let authModel = await getAuthProfile(authQueryModel: authQueryModel) else {
-				await MainActor.run {
-					navPath = .authView
-				}
+                await MainActor.run {
+                    // Сначала закрываем WebView
+                    withAnimation {
+                        showWebView = false
+                    }
+                    // Добавляем задержку перед изменением navPath
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        self.navPath = .authView
+                    }
+                }
                 await ToastManager.shared.show(.init(message: "Не удалось создать пользователя"))
                 return
             }
             UserRepository.shared.setAuthUser(authModel)
             await MainActor.run {
-                handleNavigation(for: authModel.authUserDto)
+                // Сначала закрываем WebView
+                withAnimation {
+                    showWebView = false
+                }
+                // Добавляем задержку перед изменением navPath
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self.handleNavigation(for: authModel.authUserDto)
+                }
             }
         }
     }
