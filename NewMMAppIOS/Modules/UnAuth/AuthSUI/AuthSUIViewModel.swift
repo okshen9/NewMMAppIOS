@@ -84,7 +84,7 @@ extension AuthSUIViewModel: WKUIDelegate, WKNavigationDelegate {
     func webViewDidClose(_ webView: WKWebView) {
 		webView.endEditing(true)
         withAnimation {
-			showWebView.toggle()
+			showWebView = false
         }
     }
 }
