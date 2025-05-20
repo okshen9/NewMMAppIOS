@@ -15,7 +15,14 @@ struct PayRequestView: View {
             VStack {
                 if let payRequest = viewModel.payRequest, !viewModel.isLoading {
 					if payRequest.isEmpty {
-						emptyPayment
+                        ScrollView {
+                            emptyPayment
+                        }
+                        .refreshable {
+                            Task.detached {
+                                await viewModel.updateProfile()
+                            }
+                        }
                     } else {
 						paymentList(payRequest)
                     }

@@ -34,6 +34,7 @@ final class AuthSUIViewModel: NSObject, ObservableObject {
 				await MainActor.run {
 					navPath = .authView
 				}
+                await ToastManager.shared.show(.init(message: "Не удалось создать пользователя"))
                 return
             }
             UserRepository.shared.setAuthUser(authModel)

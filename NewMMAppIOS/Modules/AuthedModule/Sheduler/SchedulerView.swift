@@ -29,9 +29,7 @@ struct SchedulerView: View {
 								Spacer()
 							} else {
 								Spacer()
-								Text("У вас нет событий")
-									.font(MMFonts.title)
-									.foregroundColor(.headerText)
+                                noEventsForSelectedDate
 								Spacer()
 							}
 						}
