@@ -128,11 +128,11 @@ final class TargetEditViewModel: ObservableObject {
         }
         
         // Валидация даты
-		if targetDeadline.endOfDay < Date() {
-            deadlineError = "Дата не может быть раньше текущей"
-        } else {
+//		if targetDeadline.endOfDay < Date() {
+//            deadlineError = "Дата не может быть раньше текущей"
+//        } else {
             deadlineError = nil
-        }
+//        }
     }
     
     /// Выполняет проверку названия, длины описания и дедлайна каждой подцели относительно основной цели.

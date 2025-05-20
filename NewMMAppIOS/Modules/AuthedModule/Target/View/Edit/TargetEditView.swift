@@ -51,7 +51,7 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
 				Section(header: headerView()) {
 					TextField("Название", text: $viewModel.targetTitle)
 						.foregroundStyle(Color.headerText)
-					TextEditorWithPalceHolder(palceHolder: "Описание подцели", textBinding: $viewModel.targetDescription)
+					TextEditorWithPalceHolder(palceHolder: "Описание цели", textBinding: $viewModel.targetDescription)
 						.foregroundStyle(Color.headerText)
 					Picker(
 //						label: {
@@ -132,7 +132,7 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
                         .font(MMFonts.caption)
                 }
                 
-                TextEditorWithPalceHolder(palceHolder: "Описание", textBinding: $viewModel.subTargets[index].description)
+                TextEditorWithPalceHolder(palceHolder: "Описание подцели", textBinding: $viewModel.subTargets[index].description)
                     .foregroundStyle(Color.headerText)
                 
                 if let descriptionError = viewModel.subTargets[index].descriptionError {

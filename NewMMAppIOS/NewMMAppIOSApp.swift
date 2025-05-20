@@ -60,8 +60,10 @@ struct NewMMAppIOSApp: App {
                 appStateService.setNewState(newState)
             }
             .onShakeGesture {
+#if DEBUG
                 print("Device has been shaken")
                 showDebugPanel = true
+#endif
             }
             .sheet(isPresented: $showDebugPanel) {
 				TestScreenVC(appStateService: appStateService)
