@@ -13,21 +13,24 @@ struct PayRequestView: View {
 	var body: some View {
         NavigationView {
             VStack {
-                if let payRequest = viewModel.payRequest, !viewModel.isLoading {
-					if payRequest.isEmpty {
-                        ScrollView {
+                if let payRequest = viewModel.payRequest, !viewModel.isLoading, !payRequest.isEmpty {
+						paymentList(payRequest)
+                } else {
+                    ScrollView {
+                        if !viewModel.isLoading {
                             emptyPayment
+                        } else {
+                            shimerState()
                         }
-                        .refreshable {
+                    }
+                    .refreshable {
+                        if !viewModel.isLoading {
                             Task.detached {
                                 await viewModel.updateProfile()
                             }
                         }
-                    } else {
-						paymentList(payRequest)
                     }
-                } else {
-                    shimerState()
+                    
                 }
             }
             .padding(.top, 6)

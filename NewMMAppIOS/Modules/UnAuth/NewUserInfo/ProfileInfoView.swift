@@ -34,7 +34,7 @@ struct ProfileInfoView: View {
                     }
                 }
                 ValidatedTextField(
-                    title: "Имя",
+                    title: "ФИО",
                     text: $viewModel.userProfile.firstName,
                     error: viewModel.errors["firstName"]
                 )

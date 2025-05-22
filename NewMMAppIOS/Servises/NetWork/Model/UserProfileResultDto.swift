@@ -9,7 +9,7 @@ import Foundation
 
 struct UserProfileResultDto: Codable, Equatable, Hashable {
     let id: Int?
-    let externalId: Int?
+    let externalId: Int
     let username: String?
     let fullName: String?
     let userProfileStatus: String?
@@ -34,7 +34,7 @@ struct UserProfileResultDto: Codable, Equatable, Hashable {
         return lhs.id == rhs.id
     }
 
-    init(id: Int?, externalId: Int?, username: String?, fullName: String?, userProfileStatus: String?, userPaymentStatus: String?, isDeleted: Bool?, creationDateTime: String?, lastUpdatingDateTime: String?, userGroups: UserGroupResultDto?, stream: StreamResultDto?, comment: String?, photoUrl: String?, userTargets: [UserTargetDtoModel]?, targetCalculationInfo: TargetCalculationInfoDto?, location: String?, phoneNumber: String?, activitySphere: String?, paymentCalculationInfo: PaymentCalculationInfoDto?, biography: String?) {
+    init(id: Int?, externalId: Int, username: String?, fullName: String?, userProfileStatus: String?, userPaymentStatus: String?, isDeleted: Bool?, creationDateTime: String?, lastUpdatingDateTime: String?, userGroups: UserGroupResultDto?, stream: StreamResultDto?, comment: String?, photoUrl: String?, userTargets: [UserTargetDtoModel]?, targetCalculationInfo: TargetCalculationInfoDto?, location: String?, phoneNumber: String?, activitySphere: String?, paymentCalculationInfo: PaymentCalculationInfoDto?, biography: String?) {
         self.id = id
         self.externalId = externalId
         self.username = username
@@ -61,7 +61,7 @@ struct UserProfileResultDto: Codable, Equatable, Hashable {
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.id = try container.decodeIfPresent(Int.self, forKey: .id)
-        self.externalId = try container.decodeIfPresent(Int.self, forKey: .externalId)
+        self.externalId = try container.decode(Int.self, forKey: .externalId)
         self.username = try container.decodeIfPresent(String.self, forKey: .username)
         self.fullName = try container.decodeIfPresent(String.self, forKey: .fullName)
         self.userProfileStatus = try container.decodeIfPresent(String.self, forKey: .userProfileStatus)

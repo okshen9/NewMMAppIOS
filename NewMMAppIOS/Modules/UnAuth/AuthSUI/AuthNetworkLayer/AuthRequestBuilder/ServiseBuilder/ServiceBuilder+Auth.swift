@@ -35,7 +35,7 @@ extension ServiceBuilder: AuthServiceProtocol {
     }
     
     /// /user-profile
-    func createProfile(profileData: CreateUserProfileBodyModel) async throws -> UserProfileResultDto? {
+    func createProfile(profileData: CreateUserProfileBodyModel) async throws -> UserProfileResultDto {
         try await performRequest {
             try apiFactory.createProfileRequest(profileData: profileData)
         }
@@ -47,7 +47,7 @@ extension ServiceBuilder: AuthServiceProtocol {
         }
     }
 
-    func patchMe(profileData: EditProfileBodyDTO) async throws -> UserProfileResultDto? {
+    func patchMe(profileData: EditProfileBodyDTO) async throws -> UserProfileResultDto {
         try await performRequest {
             try apiFactory.patchMe(profileData: profileData)
         }

@@ -133,7 +133,7 @@ struct ProfileView: View {
                                     )
                                     .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
                                 
-                                Text(profile.fullName ?? "Имя не указано")
+                                Text(profile.fullName ?? "ФИО не указано")
                                     .multilineTextAlignment(.center)
                                     .font(MMFonts.title)
                                     .foregroundColor(.headerText)

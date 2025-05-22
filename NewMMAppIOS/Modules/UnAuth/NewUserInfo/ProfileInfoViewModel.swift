@@ -52,11 +52,11 @@ class ProfileInfoViewModel: ObservableObject {
     func validate() {
         
         withAnimation {
-            errors["firstName"] =  userProfile.firstName.isEmpty || userProfile.firstName.count > 3 ? nil : "Имя не может быть 3 символов"
-            errors["telegramUsername"] =  userProfile.telegramUsername.isEmpty || userProfile.telegramUsername.count > 3 ? nil : "Имя пользователя в Telegram не может быть менее 3 символов"
-            errors["occupation"] =  userProfile.occupation.isEmpty || userProfile.occupation.count > 3 ? nil : "Род деятельности не может быть менее 3 символов"
-            errors["city"] =  userProfile.city.isEmpty || userProfile.city.count > 3 ? nil : "Город проживания не может быть менее 3 символов"
-            errors["about"] =  userProfile.about.isEmpty || userProfile.about.count > 3 ? nil : "Поле 'О себе' не может быть менее 3-х символов"
+            errors["firstName"] =  userProfile.firstName.isEmpty || userProfile.firstName.count >= 5 ? nil : "ФИО не может быть менее 5-ти символов"
+            errors["telegramUsername"] =  userProfile.telegramUsername.isEmpty || userProfile.telegramUsername.count >= 5 ? nil : "Имя пользователя в Telegram не может быть менее 5-ти символов"
+            errors["occupation"] =  userProfile.occupation.isEmpty || userProfile.occupation.count >= 3 ? nil : "Род деятельности не может быть менее 3-х символов"
+            errors["city"] =  userProfile.city.isEmpty || userProfile.city.count >= 3 ? nil : "Город проживания не может быть менее 3-х символов"
+            errors["about"] =  userProfile.about.isEmpty || userProfile.about.count >= 3 ? nil : "Поле 'О себе' не может быть менее 3-х символов"
             errors["phoneNumber"] =  (userProfile.phoneNumber.isEmpty || isValidPhoneNumber(userProfile.phoneNumber))  ? nil : "Некорректный номер телефона"
             
             // поля не должны быть пустыми
@@ -115,10 +115,8 @@ class ProfileInfoViewModel: ObservableObject {
                                                                 )
                 )
                 // Сохраняем обновленный профиль в UserRepository
-                if let updatedUser = updatedUser {
-                    UserRepository.shared.setUserProfile(updatedUser)
-                }
-                UserRepository.shared.setRoles([(updatedUser?.userProfileStatus) ?? ""])
+                UserRepository.shared.setUserProfile(updatedUser)
+                UserRepository.shared.setRoles([(updatedUser.userProfileStatus) ?? ""])
                 await setIsLoaded(false)
                 self.needUpdateAction()
                 await navigationTo(.dismiss)
