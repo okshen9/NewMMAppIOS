@@ -7,8 +7,12 @@ struct ProfileView: View {
     @EnvironmentObject var appStateService: AppNavigationStateService
     @EnvironmentObject var navigationManager: NavigationManager<AuthRoute>
     @StateObject private var viewModel = ProfileViewModel()
+    /// показать карту
     @State private var showMap = false
+    /// открыть редактирование профиля
     @State private var showEditProfile = false
+    /// открыть шит жалобы
+    @State private var showReport = false
     
     @State private var selectedTab = 0 // Индекс текущей выбранной вкладки
     
@@ -50,14 +54,12 @@ struct ProfileView: View {
         .refreshable {
             viewModel.onApper(onReset: true)
         }
-		.toolbar {
-			// Кнопка справа (trailing)
-            if !viewModel.isOtherProfile {
-				ToolbarItem(placement: .navigationBarTrailing) {
-					toolBarMenu()
-				}
-			}
-		}
+        .toolbar {
+            // Кнопка справа (trailing)   
+            ToolbarItem(placement: .navigationBarTrailing) {
+                toolBarMenu()
+            }
+        }
 		
         .toolbarBackground(.hidden, for: .navigationBar)
         .onAppear {
@@ -215,6 +217,12 @@ struct ProfileView: View {
                 })
             }))
         }
+        .sheet(isPresented: $showReport) {
+            if let profile = viewModel.profile {
+                RepotView(viewModel: .init(profile: profile))
+            }
+        }
+
     }
     
     /// Таббар
@@ -359,22 +367,29 @@ struct ProfileView: View {
     @ViewBuilder
     func toolBarMenu() -> some View {
         Menu {
-            if viewModel.isMyProfile && viewModel.profile != nil {
+            if !viewModel.isOtherProfile {
+                if viewModel.isMyProfile && viewModel.profile != nil {
+                    Button(action: {
+                        showEditProfile = true
+                    }, label: {
+                        HStack {
+                            Text("Редактировать")
+                            Image(systemName: "square.and.pencil")
+                                .foregroundStyle(Color.mainRed)
+                        }
+                    })
+                }
+                Button("Выйти", action: {
+                    viewModel.logout()
+                    appStateService.setNewState(.unAuthorized)
+                })
+            } else {
                 Button(action: {
-                    print("Кнопка справа нажата")
-                    showEditProfile = true
+                    showReport = true
                 }, label: {
-                    HStack {
-                        Text("Редактировать")
-                        Image(systemName: "square.and.pencil")
-                            .foregroundStyle(Color.mainRed)
-                    }
+                    Text("Жалоба")
                 })
             }
-            Button("Выйти", action: {
-                viewModel.logout()
-                appStateService.setNewState(.unAuthorized)
-            })
         } label: {
             Image(systemName: "ellipsis.circle")
                 .foregroundStyle(Color.mainRed)

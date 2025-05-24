@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// Многострочное поле ввода
 struct ValidatedTextEditor: View {
     let title: String
     @Binding var text: String

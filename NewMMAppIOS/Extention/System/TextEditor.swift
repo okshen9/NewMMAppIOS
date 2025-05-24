@@ -13,20 +13,21 @@ struct TextEditorWithPalceHolder: View {
     
     var body: some View {
             ZStack(alignment: .topLeading) {
-                if $textBinding.wrappedValue.isEmpty {
-                    Text(palceHolder)
-                        .foregroundColor(.gray)
-                        .padding(.top, 4)
-                }
                 TextEditor(text: $textBinding)
                     .padding(.leading, -4)
                     .frame(maxHeight: 200)
+                if $textBinding.wrappedValue.isEmpty {
+                    Text(palceHolder)
+                        .foregroundColor(.gray)
+                        .padding(.top, 8)
+                }
             }
+            .foregroundStyle(Color.headerText)
     }
 }
 
 #Preview {
-    @Previewable @State var text: String = "sdfsdf"
+    @Previewable @State var text: String = ""
     TextEditorWithPalceHolder(palceHolder: "sdds", textBinding: $text)
 }
 

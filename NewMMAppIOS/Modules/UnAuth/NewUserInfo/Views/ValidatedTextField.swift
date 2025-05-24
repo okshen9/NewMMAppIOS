@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// Однострочное поле ввода
 struct ValidatedTextField: View {
     let title: String
     @Binding var text: String
