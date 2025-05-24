@@ -205,7 +205,13 @@ class UserRepository {
         setTGData(nil)
     }
 
-    func clearWebViewCache() {
+    func clearWebViewCache(completion: ((Bool) -> Void)? = nil) {
+        guard let dataStore = WKWebsiteDataStore.default() as? WKWebsiteDataStore else {
+            print("Ошибка: не удалось получить WKWebsiteDataStore")
+            completion?(false)
+            return
+        }
+        
         let websiteDataTypes = Set([
             WKWebsiteDataTypeCookies,
             WKWebsiteDataTypeDiskCache,
@@ -218,11 +224,12 @@ class UserRepository {
 
         let dateFrom = Date(timeIntervalSince1970: 0) // Удалить данные с самого начала времени
 
-        WKWebsiteDataStore.default().removeData(
+        dataStore.removeData(
             ofTypes: websiteDataTypes,
             modifiedSince: dateFrom
-        ) {
+        ) { [weak self] in
             print("All webview caches cleared.")
+            completion?(true)
         }
     }
 }

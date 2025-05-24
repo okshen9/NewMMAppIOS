@@ -29,6 +29,21 @@ struct AuthSUIView: View {
                         .frame(width: 200, height: 200)
                         .cornerRadius(4)
                         .padding(.top, 80)
+                        .onTapGesture(count: 3, perform: {
+                            viewModel.enableDemo = true
+                            Task {
+                                await ToastManager.shared.show(.init(message: "Вы разблокировали демо режим"))
+                            }
+                        })
+                        .onLongPressGesture(minimumDuration: 3) {
+                            if viewModel.enableDemo {
+                                Task {
+                                    await ToastManager.shared.show(.init(message: "Переход в демо режим"))
+                                }
+                                let demoKey = "eyJpZCI6NzgzNDI0MDI4NCwiZmlyc3RfbmFtZSI6IkRlbW8iLCJsYXN0X25hbWUiOiJBcHBsZSIsImF1dGhfZGF0ZSI6MTc0ODA5NTE0MywiaGFzaCI6IjYwNDc5MWY4YmY4MGQ0Y2Y0NmY0MmU4NzJjMDkzOGU2OWJhYmFiZjU1YTk1OWQ3YWM4NzM1YzI0MWYwYjg3YjYifQ"
+                                viewModel.telegramCallBack(tgKey: demoKey)
+                            }
+                        }
 
                     Spacer()
                 }

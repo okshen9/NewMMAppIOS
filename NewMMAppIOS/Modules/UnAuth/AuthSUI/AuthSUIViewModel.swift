@@ -16,6 +16,9 @@ final class AuthSUIViewModel: NSObject, ObservableObject {
     private let service = ServiceBuilder.shared
 
     @Published var navPath = AuthViewModelPath.authView
+    
+    /// дает возможность открыть демо режим
+    @Published var enableDemo = false
 
     // MARK: - Methods
     /// проверяет есть ли ответ от телеги с данными в tgAuthResult
