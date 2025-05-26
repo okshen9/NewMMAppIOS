@@ -10,38 +10,38 @@ import SwiftUI
 
 enum MMFonts {
 	static var titleULTRA: Font {
-		.custom("SangBleuSunrise-Bold-WebXL", size: 22)
+		.custom("SangBleu Sunrise", size: 22)
 	}
 	
 	static var title: Font {
-//		.custom("SangBleuSunrise-Bold-WebXL", size: 22)
-		Font.custom("SangBleuSunrise", size: 22).weight(.bold)
+//		.custom("SangBleu Sunrise-Bold-WebXL", size: 22)
+		Font.custom("SangBleu", size: 22).weight(.bold)
 	}
 	
 	static var subTitle: Font {
-		.custom("SangBleuSunrise-Medium-WebXL", size: 18)
+		.custom("SangBleu Sunrise", size: 18)
 	}
 	
 	static var body: Font {
-		.custom("SangBleuSunrise-Regular-WebXL", size: 16)
+		.custom("SangBleu Sunrise", size: 16)
 	}
 	
 	static var caption: Font {
-		.custom("SangBleuSunrise-Livre-WebXL", size: 14)
+		.custom("SangBleu Sunrise", size: 14)
 	}
 	
 	static var subCaption: Font {
-		.custom("SangBleuSunrise-Light-WebXL", size: 12)
+		.custom("SangBleu Sunrise", size: 12)
 		.bold()
 	}
 	
 	static func custom(_ size: CGFloat, _ width: WidthFont = .regular) -> Font {
 		var fontName: String
 		switch width {
-		case .bold: fontName = "SangBleuSunrise-Bold-WebXL"
-		case .medium: fontName = "SangBleuSunrise-Medium-WebXL"
-		case .regular: fontName = "SangBleuSunrise-Regular-WebXL"
-		case .light: fontName = "SangBleuSunrise-Light-WebXL"
+		case .bold: fontName = "SangBleu Sunrise"
+		case .medium: fontName = "SangBleu Sunrise"
+		case .regular: fontName = "SangBleu Sunrise"
+		case .light: fontName = "SangBleu Sunrise"
 		}
 		return .custom(fontName, size: size)
 	}

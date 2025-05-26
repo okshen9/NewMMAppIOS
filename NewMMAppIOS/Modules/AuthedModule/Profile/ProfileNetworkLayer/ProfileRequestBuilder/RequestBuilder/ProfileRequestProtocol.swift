@@ -14,4 +14,9 @@ protocol ProfileRequestProtocol {
     ///   - id: id пользователя
     /// - Returns: подготовленный запрос
     func getDataRequest(model: ProfileBodyModel, id: Int) throws -> URLRequest
+    
+    /// Отправить жалобу на пользователя
+    /// - Parameter model: модель жалобы
+    /// - Returns: подготовленный запрос
+    func sendComplaintRequest(model: ComplaintBodyModel) throws -> URLRequest
 }

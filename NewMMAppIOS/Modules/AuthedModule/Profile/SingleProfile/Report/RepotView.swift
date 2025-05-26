@@ -81,16 +81,25 @@ struct RepotView: View {
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Отправить") {
-                        Task {
-                            if await viewModel.sendReport("\(selectedReason.title): \(reportText)") {
-                                dismiss()
-                                await ToastManager.shared.show(.init(message: "Жалоба отправлена на рассмотрение"))
-                            } else {
-                                await ToastManager.shared.show(.init(message: "Не удалось отправить жалобу"))
+                    Button(
+                        action: {
+                            Task {
+                                if await viewModel.sendReport("\(selectedReason.title): \(reportText)") {
+                                    dismiss()
+                                    await ToastManager.shared.show(.init(message: "Жалоба отправлена на рассмотрение"))
+                                } else {
+                                    await ToastManager.shared.show(.init(message: "Не удалось отправить жалобу"))
+                                }
                             }
-                        }
-                    }
+                        },
+                        label: {
+                            if viewModel.isLoad {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle())
+                            } else {
+                                Text("Отправить")
+                            }
+                        })
                     .fontWeight(.medium)
                     .disabled(!validReport)
                     .foregroundStyle(validReport ? Color.mainRed : Color.secondary)

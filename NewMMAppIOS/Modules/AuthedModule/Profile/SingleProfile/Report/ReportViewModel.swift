@@ -10,8 +10,10 @@ import Combine
 import SwiftUI
 
 class ReportViewModel: ObservableObject, SubscriptionStore {
+    private let serviceNetwork = ServiceBuilder.shared
     /// профиль накого жалоба
     let profile: UserProfileResultDto
+    @Published var isLoad = false
     
     /// - Parameter profile: профиль на кого жалоба
     init(profile: UserProfileResultDto) {
@@ -19,6 +21,14 @@ class ReportViewModel: ObservableObject, SubscriptionStore {
     }
     
     func sendReport(_ reportText: String) async -> Bool {
-        return true
+        isLoad = true
+        do {
+            let _ = try await serviceNetwork.sendReport(reportText, userId: profile.id ?? 0)
+            isLoad = false
+            return true
+        } catch {
+            isLoad = false
+            return false
+        }
     }
 }

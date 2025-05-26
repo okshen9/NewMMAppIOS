@@ -37,6 +37,9 @@ enum RequestUrls {
     /// Поиск пользователя по параметрам
     static let userSearch = "/user-profile/search"
     
+    /// Отправка жалобы на пользователя
+    static let complaint = "/complaint"
+    
     
     
     // MARK: - Цели

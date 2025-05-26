@@ -15,4 +15,10 @@ protocol ProfileServiceProtocol {
     ///   - id: id пользователя
     /// - Returns: модель пользователя
     func getData(model: ProfileBodyModel, id: Int) async throws -> UserProfileWithAuthData
+    
+    /// Отправить жалобу на пользователя
+    /// - Parameter message: текст жалобы
+    /// - Parameter userId: id пользователя
+    /// - Returns: успешность отправки
+    func sendReport(_ message: String, userId: Int)  async throws -> ComplaintResult
 }

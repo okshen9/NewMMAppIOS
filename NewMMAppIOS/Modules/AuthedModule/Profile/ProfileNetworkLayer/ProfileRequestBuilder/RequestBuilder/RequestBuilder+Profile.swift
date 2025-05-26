@@ -33,4 +33,21 @@ extension APIFactory :ProfileRequestProtocol {
 //            method: helper.method)
 //        return try await dataTaskBuilder.buildDataTask(urlRequest).response
     }
+    
+    /// Отправить жалобу на пользователя
+    /// - Parameter model: модель жалобы
+    /// - Returns: подготовленный запрос
+    func sendComplaintRequest(model: ComplaintBodyModel) throws -> URLRequest {
+        let helper = ProfileRequestHelper.sendComplaint
+        let url = try urlBuilder.buildURL(path: helper.path)
+        
+        let urlRequest = try requestBuilder.buildJSONParamsRequest(
+            url: url,
+            bodyModel: model,
+            query: helper.query,
+            method: helper.method,
+            tokenNeccessity: .mandatory
+        )
+        return urlRequest
+    }
 }

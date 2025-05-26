@@ -18,19 +18,6 @@
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
 		AC2E101E2DBED7B900F98765 /* Exceptions for "NewMMAppIOS" folder in "NewMMAppIOS" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			assetTagsByRelativePath = {
-				"SangBleuSans/SangBleuSunrise-Air-WebXL.otf" = (SangBleuSunrise, );
-				"SangBleuSans/SangBleuSunrise-AirItalic-WebXL.otf" = (SangBleuSunrise, );
-				"SangBleuSans/SangBleuSunrise-Bold-WebXL.otf" = (SangBleuSunrise, );
-				"SangBleuSans/SangBleuSunrise-BoldItalic-WebXL.otf" = (SangBleuSunrise, );
-				"SangBleuSans/SangBleuSunrise-Light-WebXL.otf" = (SangBleuSunrise, );
-				"SangBleuSans/SangBleuSunrise-LightItalic-WebXL.otf" = (SangBleuSunrise, );
-				"SangBleuSans/SangBleuSunrise-Livre-WebXL.otf" = (SangBleuSunrise, );
-				"SangBleuSans/SangBleuSunrise-Medium-WebXL.otf" = (SangBleuSunrise, );
-				"SangBleuSans/SangBleuSunrise-MediumItalic-WebXL.otf" = (SangBleuSunrise, );
-				"SangBleuSans/SangBleuSunrise-Regular-WebXL.otf" = (SangBleuSunrise, );
-				"SangBleuSans/SangBleuSunrise-RegularItalic-WebXL.otf" = (SangBleuSunrise, );
-			};
 			membershipExceptions = (
 				Info.plist,
 			);
@@ -39,6 +26,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		ACE839822DE2A21700DEB847 /* SangBleuSans */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SangBleuSans;
+			sourceTree = "<group>";
+		};
 		ACF16C782DA42CD000991F43 /* NewMMAppIOS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -65,6 +57,7 @@
 		ACF16C6D2DA42CD000991F43 = {
 			isa = PBXGroup;
 			children = (
+				ACE839822DE2A21700DEB847 /* SangBleuSans */,
 				ACF16C782DA42CD000991F43 /* NewMMAppIOS */,
 				ACF16C772DA42CD000991F43 /* Products */,
 			);
@@ -94,6 +87,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				ACE839822DE2A21700DEB847 /* SangBleuSans */,
 				ACF16C782DA42CD000991F43 /* NewMMAppIOS */,
 			);
 			name = NewMMAppIOS;
@@ -295,7 +289,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 37;
 				DEVELOPMENT_ASSET_PATHS = "\"NewMMAppIOS/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = A85HZ7CNSR;
@@ -337,7 +331,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 37;
 				DEVELOPMENT_ASSET_PATHS = "\"NewMMAppIOS/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = A85HZ7CNSR;

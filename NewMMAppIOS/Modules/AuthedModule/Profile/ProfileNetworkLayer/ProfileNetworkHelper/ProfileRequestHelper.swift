@@ -9,13 +9,15 @@ enum ProfileRequestHelper {
     // MARK: - Кейсы
     /// получение данных
     case getData(id: Int)
+    /// отправка жалобы
+    case sendComplaint
 
     // MARK: Query
     var query: ProfileQueryBuilder? {
         switch self {
         case let .getData(externalId):
             return ProfileQueryBuilder.getData(id: externalId)
-        default:
+        case .sendComplaint:
             return nil
         }
     }
@@ -25,6 +27,8 @@ enum ProfileRequestHelper {
         switch self {
         case let .getData(externalId):
             return RequestUrls.tgCallBack + "/test/" + externalId.toString
+        case .sendComplaint:
+            return RequestUrls.complaint
         }
     }
     
@@ -33,6 +37,8 @@ enum ProfileRequestHelper {
         switch self {
         case .getData:
             return .get
+        case .sendComplaint:
+            return .post
         }
     }
 }
