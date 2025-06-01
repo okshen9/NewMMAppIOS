@@ -12,7 +12,64 @@ protocol BasicEventCell: View {
     var event: EventDTO { get set }
 }
 
-extension BasicEventCell {
+struct NewFeedCell: BasicEventCell {
+    var onHeaderTap: () -> Void
+    var onHideUser: ((Int) async -> Bool)
+    var showHidenTogle: Bool = true
+    @State var isLoading = false
+    @State private var showHideUserAlert = false
+    @State private var userToHide: (externalId: Int, name: String)?
+    var event: EventDTO
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            headerEvent()
+                .padding(.bottom, 8)
+                .onTapGesture {
+                    onHeaderTap()
+                }
+            bodyEvent()
+            bottomDate()
+        }
+        .padding()
+        .background(.white)
+        .cornerRadius(26)
+
+        .shadow(color: .gray, radius: 4)
+        .alert("Скрыть пользователя", isPresented: $showHideUserAlert) {
+            Button("Отмена", role: .cancel) { }
+            Button("Скрыть", role: .destructive) {
+                
+                if let externalId = Int(event.creatorExternalId.orEmpty) {
+                    Task {
+                        isLoading = true
+                        await onHideUser(externalId)
+                        isLoading = false
+                    }
+                }
+            }
+        } message: {
+            Text("Вы уверены, что хотите скрыть все новости от пользователя \(event.userProfile?.fullName ?? "Неизвестный пользователь")?")
+        }
+    }
+
+    @ViewBuilder
+    @MainActor
+    func bodyEvent() -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(event.title ?? "Описание не указано")
+                .foregroundStyle(Color.headerText)
+                .font(MMFonts.body)
+                .multilineTextAlignment(.leading)
+
+
+            Text(event.description ?? "Описание не указано")
+                .foregroundStyle(Color.subtitleText)
+                .font(MMFonts.subTitle)
+                .multilineTextAlignment(.leading)
+        }
+    }
+    
+    // MARK: - Basic Event
     @ViewBuilder
     @MainActor
     func headerEvent() -> some View {
@@ -43,6 +100,26 @@ extension BasicEventCell {
                     .frame(alignment: .leading)
             }
             Spacer()
+            if showHidenTogle {
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .black))
+                } else {
+                    Menu {
+                        Button(action: {
+                            showHideUserAlert = true
+                        }) {
+                            Label("Скрыть контент пользователя", systemImage: "eye.slash")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .foregroundColor(.gray)
+                            .font(.system(size: 16))
+                            .padding(8)
+                    }
+                }
+            }
+            
             IconActionFeedView(type: event.type ?? .unknown)
         }
     }
@@ -58,53 +135,52 @@ extension BasicEventCell {
                 .foregroundStyle(Color.headerText)
         }
     }
-
-}
-
-struct NewFeedCell: BasicEventCell {
-    var onHeaderTap: () -> Void
-    var event: EventDTO
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            headerEvent()
-                .padding(.bottom, 8)
-                .onTapGesture {
-                    onHeaderTap()
-                }
-            bodyEvent()
-            bottomDate()
-        }
-        .padding()
-        .background(.white)
-        .cornerRadius(26)
-
-        .shadow(color: .gray, radius: 4)
-//        .frame(width: .infinity)
-    }
-
-    @ViewBuilder
-    @MainActor
-    func bodyEvent() -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(event.title ?? "Описание не указано")
-                .foregroundStyle(Color.headerText)
-                .font(MMFonts.body)
-                .multilineTextAlignment(.leading)
-
-
-            Text(event.description ?? "Описание не указано")
-                .foregroundStyle(Color.subtitleText)
-                .font(MMFonts.subTitle)
-                .multilineTextAlignment(.leading)
-        }
-    }
-
-
-
-
 }
 
 #Preview {
-    NewFeedCell(onHeaderTap: {}, event: .getTextEvent(for: .TARGET_DONE))
+    VStack {
+        Text("Тест превью")
+            .font(.title)
+        
+        NewFeedCell(
+            onHeaderTap: {},
+            onHideUser: {_ in return true },
+            event: EventDTO(
+                id: 1,
+                title: "Тестовая цель",
+                startDate: "2025-04-06T13:45:55.772694",
+                endDate: "2025-04-30T23:59:59.999",
+                type: .TARGET_DONE,
+                creatorExternalId: "1",
+                assigneeExternalIds: ["1"],
+                issueId: 1,
+                description: "Тестовое описание",
+                displayDate: "2025-04-06T13:45:55.772694",
+                userProfile: UserProfileResultDto(
+                    id: 1,
+                    externalId: 1,
+                    username: "test",
+                    fullName: "Тестовый пользователь",
+                    userProfileStatus: nil,
+                    userPaymentStatus: nil,
+                    isDeleted: false,
+                    creationDateTime: nil,
+                    lastUpdatingDateTime: nil,
+                    userGroups: nil,
+                    stream: nil,
+                    comment: nil,
+                    photoUrl: nil,
+                    userTargets: nil,
+                    targetCalculationInfo: nil,
+                    location: nil,
+                    phoneNumber: nil,
+                    activitySphere: nil,
+                    paymentCalculationInfo: nil,
+                    biography: nil,
+                    forUserHideThisExtIdUsersEvents: nil
+                )
+            )
+        )
         .padding(.horizontal, 8)
+    }
 }

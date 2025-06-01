@@ -17,6 +17,12 @@ struct ProfileStatsView: View {
         VStack(spacing: 8) {
             CircularProgressView(progress: progress, lineWidth: lineWidth)
                 .frame(height: 60)
+                .overlay(alignment: .bottomTrailing) {
+                    Image(systemName: "arrow.up.backward.circle.fill")
+                        .font(.subheadline)
+                        .foregroundStyle(Color.mainRed)
+                        .offset(x:0, y: 4)
+                }
             Text(title)
                 .multilineTextAlignment(.center)
                 .font(MMFonts.caption)

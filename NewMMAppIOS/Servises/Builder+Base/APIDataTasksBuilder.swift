@@ -171,7 +171,6 @@ extension APIDataTasksBuilder {
         }
         
         let jsonString = String(data: data, encoding: .utf8) ?? "<не удалось сконвертировать в строку>"
-        print("🟢 PAYPLAN JSON: \(jsonString)")
         
         do {
             let responseObject = try decoder.decode(T.self, from: data)

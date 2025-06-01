@@ -68,7 +68,8 @@ extension EventDTO {
             issueId: 1,
             description: "3 тренировки в неделю в спортзале",
             displayDate: "2025-04-06T13:45:55.772694",
-            userProfile: UserProfileResultDto.getTestUser())
+            userProfile: UserProfileResultDto.getTestUser()
+        )
     }
 }
 

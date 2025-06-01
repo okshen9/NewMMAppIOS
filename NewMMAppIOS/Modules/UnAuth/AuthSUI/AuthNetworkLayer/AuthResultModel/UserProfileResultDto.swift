@@ -29,12 +29,13 @@ struct UserProfileResultDto: Codable, Equatable, Hashable {
     let activitySphere: String?
     let paymentCalculationInfo: PaymentCalculationInfoDto?
     let biography: String?
+    var forUserHideThisExtIdUsersEvents: [Int]?
 
     static func == (lhs: UserProfileResultDto, rhs: UserProfileResultDto) -> Bool {
         return lhs.id == rhs.id
     }
 
-    init(id: Int?, externalId: Int, username: String?, fullName: String?, userProfileStatus: String?, userPaymentStatus: String?, isDeleted: Bool?, creationDateTime: String?, lastUpdatingDateTime: String?, userGroups: UserGroupResultDto?, stream: StreamResultDto?, comment: String?, photoUrl: String?, userTargets: [UserTargetDtoModel]?, targetCalculationInfo: TargetCalculationInfoDto?, location: String?, phoneNumber: String?, activitySphere: String?, paymentCalculationInfo: PaymentCalculationInfoDto?, biography: String?) {
+    init(id: Int?, externalId: Int, username: String?, fullName: String?, userProfileStatus: String?, userPaymentStatus: String?, isDeleted: Bool?, creationDateTime: String?, lastUpdatingDateTime: String?, userGroups: UserGroupResultDto?, stream: StreamResultDto?, comment: String?, photoUrl: String?, userTargets: [UserTargetDtoModel]?, targetCalculationInfo: TargetCalculationInfoDto?, location: String?, phoneNumber: String?, activitySphere: String?, paymentCalculationInfo: PaymentCalculationInfoDto?, biography: String?, forUserHideThisExtIdUsersEvents: [Int]?) {
         self.id = id
         self.externalId = externalId
         self.username = username
@@ -56,6 +57,7 @@ struct UserProfileResultDto: Codable, Equatable, Hashable {
         self.activitySphere = activitySphere
         self.paymentCalculationInfo = paymentCalculationInfo
         self.biography = biography
+        self.forUserHideThisExtIdUsersEvents = forUserHideThisExtIdUsersEvents
     }
 
     init(from decoder: any Decoder) throws {
@@ -81,6 +83,7 @@ struct UserProfileResultDto: Codable, Equatable, Hashable {
         self.activitySphere = try container.decodeIfPresent(String.self, forKey: .activitySphere)
         self.paymentCalculationInfo = try container.decodeIfPresent(PaymentCalculationInfoDto.self, forKey: .paymentCalculationInfo)
         self.biography = try container.decodeIfPresent(String.self, forKey: .biography)
+        self.forUserHideThisExtIdUsersEvents = try container.decodeIfPresent([Int].self, forKey: .forUserHideThisExtIdUsersEvents)
     }
 }
 
@@ -153,13 +156,23 @@ struct TargetCalculationInfoDto: Codable, Hashable {
         self.categoryToInfoMapping = categoryToInfoMapping
         self.allCategoriesDonePercentage = allCategoriesDonePercentage
     }
+    
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.categoryToInfoMapping = try container.decode([String : TargetCategoryCalculationInfoDto].self, forKey: .categoryToInfoMapping)
+        let allCategoriesDonePercentageStr = try container.decodeIfPresent(String.self, forKey: .allCategoriesDonePercentage).orEmpty
+        self.allCategoriesDonePercentage = Double(allCategoriesDonePercentageStr) ?? 0
+    }
 }
 
 // Модель TargetCategoryCalculationInfoDto
 
 struct TargetCategoryCalculationInfoDto: Codable, Hashable {
+    /// количество целей в профиле
     var quantityForUserProfile: Int?
+    /// количество готовых
     var doneForUserProfile: Int?
+    /// процент выполнения
     var percentageOfDoneAllCategoryForUserProfile: Double
     
     init(quantityForUserProfile: Int = 0,
@@ -168,6 +181,14 @@ struct TargetCategoryCalculationInfoDto: Codable, Hashable {
         self.quantityForUserProfile = quantityForUserProfile
         self.doneForUserProfile = doneForUserProfile
         self.percentageOfDoneAllCategoryForUserProfile = percentageOfDoneAllCategoryForUserProfile
+    }
+    
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.quantityForUserProfile = try container.decodeIfPresent(Int.self, forKey: .quantityForUserProfile)
+        self.doneForUserProfile = try container.decodeIfPresent(Int.self, forKey: .doneForUserProfile)
+        let percentageOfDoneAllCategoryForUserProfileStr = try container.decodeIfPresent(String.self, forKey: .percentageOfDoneAllCategoryForUserProfile).orEmpty
+        self.percentageOfDoneAllCategoryForUserProfile = Double(percentageOfDoneAllCategoryForUserProfileStr) ?? 0
     }
 }
 
@@ -194,7 +215,8 @@ extension UserProfileResultDto {
             phoneNumber: "+79272243688",
             activitySphere: "Психолог",
             paymentCalculationInfo: nil,
-            biography: "Что-то о себе"
+            biography: "Что-то о себе",
+            forUserHideThisExtIdUsersEvents: nil
         )
     }
 }

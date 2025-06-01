@@ -110,7 +110,6 @@ class ProfileInfoViewModel: ObservableObject {
                                                                     location: userProfile.city,
                                                                     phoneNumber: userProfile.phoneNumber,
                                                                     activitySphere: userProfile.occupation,
-                                                                    authUserDto: authModel,
                                                                     biography: userProfile.about
                                                                 )
                 )

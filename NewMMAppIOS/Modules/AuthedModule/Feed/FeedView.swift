@@ -28,12 +28,21 @@ struct FeedView: View {
                                             viewModel.navigateToProfile(withId: externalId)
                                         }
                                     },
+                                    onHideUser: { externalId in
+                                        let hideResult = await viewModel.hideEvent(externalId: externalId)
+                                        if hideResult {
+                                            let updateResult = await viewModel.getNextEvents(resetSearch: true)
+                                            return updateResult
+                                        } else {
+                                            return false
+                                        }
+                                    },
                                     event: event)
                                 .onAppear {
                                     let thresholdIndex = feedEvents.count - 1
                                     if index == thresholdIndex && !viewModel.paginatingLoading && !viewModel.isAll {
                                         Task {
-                                            await viewModel.getNextEvents(resetSearch: false)
+                                            let _ = await viewModel.getNextEvents(resetSearch: false)
                                         }
                                     }
                                 }
@@ -67,13 +76,28 @@ struct FeedView: View {
                 }
             })
             .refreshable {
-                await viewModel.getNextEvents(resetSearch: true)
+                let _ = await viewModel.getNextEvents(resetSearch: true)
             }
             .onAppear {
                 print("onAppear FeedView ===")
                 viewModel.onApper()
             }
-
+//            .alert("Скрыть пользователя", isPresented: $showHideUserAlert) {
+//                Button("Отмена", role: .cancel) { }
+//                Button("Скрыть", role: .destructive) {
+//                    if let userToHide = userToHide {
+//                        Task {
+//                            await viewModel.hideEvent(externalId: userToHide.externalId)
+//                            // Обновляем список после скрытия
+//                            await viewModel.getNextEvents(resetSearch: true)
+//                        }
+//                    }
+//                }
+//            } message: {
+//                if let userToHide = userToHide {
+//                    Text("Вы уверены, что хотите скрыть все новости от пользователя \(userToHide.name)?")
+//                }
+//            }
         }
     }
 
@@ -104,7 +128,7 @@ struct FeedView: View {
             ) {
                 // Перезапрашиваем данные
                 Task {
-                    await viewModel.getNextEvents(resetSearch: true)
+                    let _ = await viewModel.getNextEvents(resetSearch: true)
                 }
             }
             .presentationCompactAdaptation(.popover)

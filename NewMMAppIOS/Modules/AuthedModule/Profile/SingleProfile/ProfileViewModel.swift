@@ -95,7 +95,7 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
         Task {
             if profile == nil || externalId == nil || onReset {
 				await updateProfile()
-				await getNextEvents(resetSearch: onReset)
+				let _ = await getNextEvents(resetSearch: onReset)
             }
         }
     }
@@ -105,7 +105,9 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
             await setIsLoading(true)
             let targetExternalId = externalId ?? self.externalId
             print("updateProfile с externalId: \(targetExternalId ?? -1)")
-            self.profile = nil
+            await MainActor.run {
+                self.profile = nil
+            }
             if let targetExternalId = targetExternalId {
                 guard let updatetedProfile = try await serviceNetwork.getUserProfile(externalId: targetExternalId) else { 
                     print("Не удалось получить профиль с externalId: \(targetExternalId)")

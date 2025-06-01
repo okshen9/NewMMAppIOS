@@ -44,7 +44,7 @@ final class AuthSUIViewModel: NSObject, ObservableObject {
                         self.navPath = .authView
                     }
                 }
-                await ToastManager.shared.show(.init(message: "Не удалось создать пользователя"))
+                await ToastManager.shared.show(.init(message: "Не удалось загрузить пользователя"))
                 return
             }
             UserRepository.shared.setAuthUser(authModel)
@@ -91,7 +91,6 @@ extension AuthSUIViewModel: WKUIDelegate, WKNavigationDelegate {
            let tgKey = validateWebRequest(url: url) {
             UserRepository.shared.setTGData(tgKey)
             telegramCallBack(tgKey: tgKey)
-            print("Uspech")
             decisionHandler(.cancel)
             return
         }

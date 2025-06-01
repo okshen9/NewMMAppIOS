@@ -9,9 +9,9 @@
 import Foundation
 
 extension ProfileViewModel {
-    func getNextEvents(resetSearch: Bool) async {
+    func getNextEvents(resetSearch: Bool) async -> Bool {
         do {
-            guard let externalId = self.externalId else { return }
+            guard let externalId = self.externalId else { return false }
             // Включает в себя пагинацию и сортровку в базовой версии
             var searchParams: [EventsQuery.QueryValue]
             // если поиск пустой или с нуля
@@ -32,10 +32,12 @@ extension ProfileViewModel {
             enrichSearchParamsFromType(params: &searchParams)
             let searchResponse = try await serviceNetwork.searchEvents(searchParams: searchParams)
             await updateCurrentEvents(with: searchResponse)
+            return true
         } catch {
             await setIsPaginationLoding(false)
             await setIsFeedLoading(false)
             await ToastManager.shared.show(.baseError)
+            return false
         }
     }
 

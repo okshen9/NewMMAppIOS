@@ -20,7 +20,7 @@ struct CircleImagView: View {
                     .backgroundDecode()
                     .scaleFactor(UIScreen.main.scale)
                     .cacheOriginalImage()
-                    .downsampling(size: CGSize(width: Constraint.width, height: Constraint.height))
+//                    .downsampling(size: CGSize(width: Constraint.width, height: Constraint.height))
                 
             } else {
                 Image(.MM)
@@ -32,7 +32,7 @@ struct CircleImagView: View {
             }
         }
         .clipShape(Circle())
-        .frame(width: Constraint.width, height: Constraint.height)
+//        .frame(width: Constraint.width, height: Constraint.height)
         .overlay {
             Circle().stroke(.gray, lineWidth: 4)
         }

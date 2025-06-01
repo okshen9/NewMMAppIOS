@@ -206,36 +206,40 @@ class UserRepository {
     }
 
     func clearWebViewCache(completion: ((Bool) -> Void)? = nil) {
-        do {
-            guard let dataStore = WKWebsiteDataStore.default() as? WKWebsiteDataStore else {
-                print("Ошибка: не удалось получить WKWebsiteDataStore")
-                completion?(false)
-                return
+        Task {
+            await MainActor.run {
+                do {
+                    guard let dataStore = WKWebsiteDataStore.default() as? WKWebsiteDataStore else {
+                        print("Ошибка: не удалось получить WKWebsiteDataStore")
+                        completion?(false)
+                        return
+                    }
+                    
+                    let websiteDataTypes = Set([
+                        WKWebsiteDataTypeCookies,
+                        WKWebsiteDataTypeDiskCache,
+                        WKWebsiteDataTypeMemoryCache,
+                        WKWebsiteDataTypeLocalStorage,
+                        WKWebsiteDataTypeSessionStorage,
+                        WKWebsiteDataTypeIndexedDBDatabases,
+                        WKWebsiteDataTypeWebSQLDatabases
+                    ])
+                    
+                    let dateFrom = Date(timeIntervalSince1970: 0) // Удалить данные с самого начала времени
+                    
+                    dataStore.removeData(
+                        ofTypes: websiteDataTypes,
+                        modifiedSince: dateFrom
+                    ) { [weak self] in
+                        print("All webview caches cleared.")
+                        completion?(true)
+                    }
+                }
+                catch {
+                    completion?(false)
+                    return
+                }
             }
-            
-            let websiteDataTypes = Set([
-                WKWebsiteDataTypeCookies,
-                WKWebsiteDataTypeDiskCache,
-                WKWebsiteDataTypeMemoryCache,
-                WKWebsiteDataTypeLocalStorage,
-                WKWebsiteDataTypeSessionStorage,
-                WKWebsiteDataTypeIndexedDBDatabases,
-                WKWebsiteDataTypeWebSQLDatabases
-            ])
-            
-            let dateFrom = Date(timeIntervalSince1970: 0) // Удалить данные с самого начала времени
-            
-            dataStore.removeData(
-                ofTypes: websiteDataTypes,
-                modifiedSince: dateFrom
-            ) { [weak self] in
-                print("All webview caches cleared.")
-                completion?(true)
-            }
-        }
-        catch {
-            completion?(false)
-            return
         }
     }
 }

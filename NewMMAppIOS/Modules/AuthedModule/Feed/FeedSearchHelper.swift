@@ -8,7 +8,7 @@
 import Foundation
 
 extension FeedViewModel {
-    func getNextEvents(resetSearch: Bool) async {
+    func getNextEvents(resetSearch: Bool) async -> Bool {
         // Отменяем предыдущую задачу, если она есть
         fetchTask?.cancel()
 
@@ -112,6 +112,7 @@ extension FeedViewModel {
                     // Важно: Не сбрасываем другой флаг, если он был активен
                     // Например, если отменили пагинацию во время isLoading=true
                 }
+                throw CancellationError() // Пробрасываем ошибку отмены
             } catch {
                 // Обрабатываем другие ошибки
                  print("FeedViewModel fetch task failed: \(error)")
@@ -123,8 +124,19 @@ extension FeedViewModel {
                         await ToastManager.shared.show(.baseError)
                     }
                  }
+                throw error // Пробрасываем ошибку
             }
             // --- Конец основной логики ---
+        }
+        
+        // Ждем завершения задачи и возвращаем результат
+        do {
+            try await fetchTask?.value
+            return true // Успешное выполнение
+        } catch is CancellationError {
+            return false // Операция была отменена
+        } catch {
+            return false // Ошибка выполнения
         }
     }
 

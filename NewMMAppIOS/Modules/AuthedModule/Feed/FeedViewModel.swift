@@ -36,7 +36,7 @@ final class FeedViewModel: ObservableObject, FeedViewModelProtocol {
 
     var searchResponseDTO: SearchResponseDTO?
     let service = ServiceBuilder.shared
-    let userRepository = UserRepository.shared
+    private let userRepository = UserRepository.shared
     
     var fetchTask: Task<Void, Error>?
 
@@ -58,7 +58,7 @@ final class FeedViewModel: ObservableObject, FeedViewModelProtocol {
     func onApper() {
         if feedEvents == nil && !isLoading && !paginatingLoading {
             Task {
-                await getNextEvents(resetSearch: true)
+                let _ = await getNextEvents(resetSearch: true)
             }
         }
     }
@@ -76,6 +76,27 @@ final class FeedViewModel: ObservableObject, FeedViewModelProtocol {
     @MainActor
     func setIsPaginationLoding(_ isPaginationLoding: Bool) {
         self.paginatingLoading = isPaginationLoding
+    }
+    
+    /// Скрыть неподходящие эвенты
+    /// - Parameter externalId: id которые надо добавить к скрытию
+    func hideEvent(externalId: Int) async -> Bool {
+        do {
+            guard var userProfile = userRepository.userProfile else {
+                throw NSError(domain: "SendReportError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid type"])
+            }
+            var newForUserHideThisExtIdUsersEvents = Set((userProfile.forUserHideThisExtIdUsersEvents) ?? [])
+            newForUserHideThisExtIdUsersEvents.insert(externalId)
+            userProfile.forUserHideThisExtIdUsersEvents = Array(newForUserHideThisExtIdUsersEvents)
+            let edit = EditProfileBodyDTO(userProfile)
+            let newUser = try await service.patchMe(profileData: edit)
+            userRepository.setUserProfile(newUser)
+            return true
+        }
+        catch {
+            await ToastManager.shared.show(.baseError)
+            return false
+        }
     }
 }
 

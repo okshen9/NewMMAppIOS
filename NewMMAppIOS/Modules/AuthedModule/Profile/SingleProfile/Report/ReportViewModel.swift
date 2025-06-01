@@ -22,12 +22,17 @@ class ReportViewModel: ObservableObject, SubscriptionStore {
     
     func sendReport(_ reportText: String) async -> Bool {
         isLoad = true
+        defer { isLoad = false }
+        
         do {
-            let _ = try await serviceNetwork.sendReport(reportText, userId: profile.id ?? 0)
-            isLoad = false
+            guard let profileId = profile.id else {
+                throw NSError(domain: "SendReportError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid profile ID"])
+            }
+
+            try await serviceNetwork.sendReport(reportText, userId: profileId)
             return true
         } catch {
-            isLoad = false
+            await ToastManager.shared.show(.baseError)
             return false
         }
     }

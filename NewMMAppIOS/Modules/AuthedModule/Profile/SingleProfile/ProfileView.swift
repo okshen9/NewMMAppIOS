@@ -11,6 +11,8 @@ struct ProfileView: View {
     @State private var showMap = false
     /// открыть редактирование профиля
     @State private var showEditProfile = false
+    /// открыть игнорируемых пользователей
+    @State private var showHidenProfiles = false
     /// открыть шит жалобы
     @State private var showReport = false
     
@@ -129,6 +131,7 @@ struct ProfileView: View {
                             // Аватар и имя
                             VStack(spacing: 12) {
                                 CircleImagView(photoUrl: URL(string: profile.photoUrl.orEmpty))
+                                    .frameRect(150)
                                     .overlay(
                                         Circle()
                                             .stroke(Color.white, lineWidth: 4)
@@ -222,7 +225,11 @@ struct ProfileView: View {
                 RepotView(viewModel: .init(profile: profile))
             }
         }
-
+        .sheet(isPresented: $showHidenProfiles) {
+            if let profile = viewModel.profile {
+                HidenProfile(viewModel: .init(hidenIds: profile.forUserHideThisExtIdUsersEvents))
+            }
+        }
     }
     
     /// Таббар
@@ -245,7 +252,7 @@ struct ProfileView: View {
                 }
             } else if let feedEvents = viewModel.feedEvents, !feedEvents.isEmpty {
                 ForEach(feedEvents) { event in
-                    NewFeedCell(onHeaderTap: {}, event: event)
+                    NewFeedCell(onHeaderTap: {}, onHideUser: {_ in true}, showHidenTogle: false, event: event)
                 }
                 
                 if !viewModel.isAll {
@@ -254,7 +261,7 @@ struct ProfileView: View {
                         .onAppear {
                             if !viewModel.paginatingLoading {
                                 Task.detached {
-                                    await viewModel.getNextEvents(resetSearch: false)
+                                    let _ = await viewModel.getNextEvents(resetSearch: false)
                                 }
                             }
                         }
@@ -375,6 +382,15 @@ struct ProfileView: View {
                         HStack {
                             Text("Редактировать")
                             Image(systemName: "square.and.pencil")
+                                .foregroundStyle(Color.mainRed)
+                        }
+                    })
+                    Button(action: {
+                        showHidenProfiles = true
+                    }, label: {
+                        HStack {
+                            Text("Игнорируемые пользователи")
+                            Image(systemName: "eye.slash.fill")
                                 .foregroundStyle(Color.mainRed)
                         }
                     })
