@@ -124,25 +124,6 @@ class UserRepository {
         _refreshJWT = nil
     }
 
-    func makeRefreshToken() async throws -> String {
-        let networkService = ServiceBuilder.shared
-        print("Old JWT: \(String(describing: jwt))")
-        guard let refreshToken = refreshJWT,
-              let authDTO = try await networkService.refreshJWT (
-                refreshModel: .init(
-                    refreshToken: refreshToken
-                )
-              )
-        else {
-            throw APIError.failedRefreshToken
-        }
-        print("New JWT from refresh: \(String(describing: authDTO.jwt))")
-        setAuthUser(authDTO)
-        print("New JWT from keychain: \(String(describing: jwt))")
-        return authDTO.jwt
-    }
-
-
     // MARK: - Roles and External ID
     private var _externalId: Int?
     var externalId: Int? {
@@ -241,5 +222,35 @@ class UserRepository {
                 }
             }
         }
+    }
+}
+
+extension UserRepository {
+    func makeRefreshToken() async throws -> String {
+        let networkService = ServiceBuilder.shared
+        print("Old JWT: \(String(describing: jwt))")
+        guard let refreshToken = refreshJWT,
+              let authDTO = try await networkService.refreshJWT (
+                refreshModel: .init(
+                    refreshToken: refreshToken
+                )
+              )
+        else {
+            throw APIError.failedRefreshToken
+        }
+        print("New JWT from refresh: \(String(describing: authDTO.jwt))")
+        setAuthUser(authDTO)
+        print("New JWT from keychain: \(String(describing: jwt))")
+        return authDTO.jwt
+    }
+    
+    func makeRefreshAuthFormTG() async throws -> String {
+        guard let tgData else {
+            throw APIError.httpResponse
+        }
+        let networkService = ServiceBuilder.shared
+        let authTGRequestModel = try await networkService.sendTGToken(model: .init(tgData: tgData))
+        setAuthUser(authTGRequestModel)
+        return authTGRequestModel.jwt
     }
 }

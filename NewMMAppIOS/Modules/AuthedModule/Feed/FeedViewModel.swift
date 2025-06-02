@@ -25,13 +25,19 @@ protocol FeedViewModelProtocol: ObservableObject {
 
 // MARK: - ViewModel
 final class FeedViewModel: ObservableObject, FeedViewModelProtocol {
+    /// идет ли общая загрузка новостей
     @Published var isLoading = false
+    /// идет ли загрузка пагинации
     @Published var paginatingLoading = false
+    /// это все новсти
     @Published var isAll = false
     @Published var navigationPath = NavigationPath()
 
+    /// список эквентов
     @Published var feedEvents: [EventDTO]?
+    /// текущие филтры
     @Published var currentEventSearch: [EventsQuery.QueryValue] = Constants.baseEventSearch
+    /// выбранные типы событий
     @Published var selectedType: [EventType: Bool] = Dictionary(uniqueKeysWithValues: Constants.baseSelectedEventSearch.map { ($0, true) })
 
     var searchResponseDTO: SearchResponseDTO?

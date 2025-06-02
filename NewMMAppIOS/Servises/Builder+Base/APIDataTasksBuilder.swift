@@ -125,19 +125,27 @@ extension APIDataTasksBuilder {
                     let newToken = try await refreshManager.makeRefreshToken()
                     var request = request
                     let newRequest = setTokensToRequest(&request, authTokens: newToken)
-                    return try await buildDataTask(newRequest, allowRetry: false)
+                    return try await buildDataTask(newRequest, allowRetry: true)
                 } catch {
-                    refreshManager.clearAll()
-                    await MainActor.run {
-                        let authView = AuthSUIView()
-                        let newViewController = UIHostingController(rootView: authView)
-                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                           let window = windowScene.windows.first {
-                            window.rootViewController = newViewController
-                            UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: {}, completion: nil)
-                        }
+                    do {
+                        let newToken = try await refreshManager.makeRefreshAuthFormTG()
+                        var request = request
+                        let newRequest = setTokensToRequest(&request, authTokens: newToken)
+                        return try await buildDataTask(newRequest, allowRetry: false)
                     }
-                    throw ResponseError.invalidRefreshToken
+                    catch{
+                        await MainActor.run {
+                            refreshManager.clearAll()
+                            let authView = AuthSUIView()
+                            let newViewController = UIHostingController(rootView: authView)
+                            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                               let window = windowScene.windows.first {
+                                window.rootViewController = newViewController
+                                UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: {}, completion: nil)
+                            }
+                        }
+                        throw ResponseError.invalidRefreshToken
+                    }
                 }
             }
         case 402:
