@@ -178,7 +178,8 @@ struct NewFeedCell: BasicEventCell {
                     paymentCalculationInfo: nil,
                     biography: nil,
                     forUserHideThisExtIdUsersEvents: nil
-                )
+                ),
+                hidden: false
             )
         )
         .padding(.horizontal, 8)

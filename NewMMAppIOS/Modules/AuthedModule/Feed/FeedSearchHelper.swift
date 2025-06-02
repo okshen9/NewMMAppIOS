@@ -67,7 +67,7 @@ extension FeedViewModel {
                 try Task.checkCancellation() // Проверяем отмену перед обновлением UI
                 
                 // --- Обновление состояния (при успехе) --- 
-                let newEvents = (searchResponse.results) ?? []
+                let newEvents = ((searchResponse.results) ?? []).filter({$0.hidden != true})
                 
                 // Обновляем DTO и UI на главном потоке для потокобезопасности
                 await MainActor.run { 

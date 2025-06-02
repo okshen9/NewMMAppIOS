@@ -24,6 +24,7 @@ struct EventDTO: Codable, JSONRepresentable, Identifiable {
     let displayDate: String?
 
     let userProfile: UserProfileResultDto?
+    let hidden: Bool?
 
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -38,9 +39,10 @@ struct EventDTO: Codable, JSONRepresentable, Identifiable {
         self.description = try container.decodeIfPresent(String.self, forKey: .description)
         self.displayDate = try container.decodeIfPresent(String.self, forKey: .displayDate)
         self.userProfile = try container.decodeIfPresent(UserProfileResultDto.self, forKey: .userProfile)
+        self.hidden = try container.decodeIfPresent(Bool.self, forKey: .hidden)
     }
 
-    init(id: Int?, title: String?, startDate: String?, endDate: String?, type: EventType?, creatorExternalId: String?, assigneeExternalIds: [String]?, issueId: Int?, description: String?, displayDate: String?, userProfile: UserProfileResultDto?) {
+    init(id: Int?, title: String?, startDate: String?, endDate: String?, type: EventType?, creatorExternalId: String?, assigneeExternalIds: [String]?, issueId: Int?, description: String?, displayDate: String?, userProfile: UserProfileResultDto?, hidden: Bool?) {
         self.id = id
         self.title = title
         self.startDate = startDate
@@ -52,6 +54,7 @@ struct EventDTO: Codable, JSONRepresentable, Identifiable {
         self.description = description
         self.displayDate = displayDate
         self.userProfile = userProfile
+        self.hidden = hidden
     }
 }
 
@@ -68,7 +71,8 @@ extension EventDTO {
             issueId: 1,
             description: "3 тренировки в неделю в спортзале",
             displayDate: "2025-04-06T13:45:55.772694",
-            userProfile: UserProfileResultDto.getTestUser()
+            userProfile: UserProfileResultDto.getTestUser(),
+            hidden: false
         )
     }
 }
