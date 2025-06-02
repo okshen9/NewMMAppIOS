@@ -17,7 +17,46 @@ enum TargetCategory: String, UnknownCasedEnum, JSONRepresentable, CaseIterable, 
     case other = "Свободная тема"
     case unknown = "unknown"
     
-    var id: String { rawValue }
+    var id: String {
+        switch self {
+        case .money: return "Бизнес"
+        case .personal: return "Личное"
+        case .family: return "Семья"
+        case .health: return "Здоровье"
+        case .other: return "Свободная тема"
+        case .unknown: return "unknown"
+        }
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(String.self)
+        
+        switch rawValue {
+        case "Бизнес", "BUSINESS": self = .money
+        case "Личное", "PERSONAL": self = .personal
+        case "Семья", "FAMILY": self = .family
+        case "Здоровье", "HEALTH": self = .health
+        case "Свободная тема", "FREE TOPIC": self = .other
+        default: self = .unknown
+        }
+    }
+    
+    init(rawValue: String) {
+        switch rawValue {
+        case "Бизнес", "BUSINESS": self = .money
+        case "Личное", "PERSONAL": self = .personal
+        case "Семья", "FAMILY": self = .family
+        case "Здоровье", "HEALTH": self = .health
+        case "Свободная тема", "FREE TOPIC": self = .other
+        default: self = .unknown
+        }
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(id)
+    }
 
     var color: Color {
         switch self {

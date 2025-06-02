@@ -80,7 +80,7 @@ extension FeedViewModel {
                          self.searchResponseDTO?.results?.append(contentsOf: newEvents)
                          self.searchResponseDTO?.pageNumber = searchResponse.pageNumber
                          self.searchResponseDTO?.pageSize = searchResponse.pageSize
-                         self.searchResponseDTO?.totalRecords = searchResponse.totalRecords
+                         self.searchResponseDTO?.totalPages = searchResponse.totalPages
                      }
                      
                      // Обновляем feedEvents
@@ -99,7 +99,6 @@ extension FeedViewModel {
                      self.paginatingLoading = false
                 }
                 // --- Конец обновления состояния ---
-
             } catch is CancellationError {
                 print("FeedViewModel fetch task cancelled.")
                 await MainActor.run {

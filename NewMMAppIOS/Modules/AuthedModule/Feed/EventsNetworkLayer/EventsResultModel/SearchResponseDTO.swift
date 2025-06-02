@@ -9,7 +9,7 @@ import Foundation
 
 struct SearchResponseDTO: Codable, PaginationProtocol {
     var results: [EventDTO]?
-    var totalRecords: Int?
+    var totalPages: Int?
     var pageNumber: Int?
     var pageSize: Int?
 }

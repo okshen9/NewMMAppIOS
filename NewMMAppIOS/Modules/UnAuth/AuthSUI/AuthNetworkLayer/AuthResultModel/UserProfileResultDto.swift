@@ -160,13 +160,12 @@ struct TargetCalculationInfoDto: Codable, Hashable {
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.categoryToInfoMapping = try container.decode([String : TargetCategoryCalculationInfoDto].self, forKey: .categoryToInfoMapping)
-        let allCategoriesDonePercentageStr = try container.decodeIfPresent(String.self, forKey: .allCategoriesDonePercentage).orEmpty
-        self.allCategoriesDonePercentage = Double(allCategoriesDonePercentageStr) ?? 0
+        
+        self.allCategoriesDonePercentage = container.getDoubleValue(forKey: .allCategoriesDonePercentage).orZero
     }
 }
 
 // Модель TargetCategoryCalculationInfoDto
-
 struct TargetCategoryCalculationInfoDto: Codable, Hashable {
     /// количество целей в профиле
     var quantityForUserProfile: Int?
@@ -174,7 +173,7 @@ struct TargetCategoryCalculationInfoDto: Codable, Hashable {
     var doneForUserProfile: Int?
     /// процент выполнения
     var percentageOfDoneAllCategoryForUserProfile: Double
-    
+
     init(quantityForUserProfile: Int = 0,
          doneForUserProfile: Int = 0,
          percentageOfDoneAllCategoryForUserProfile: Double = 0.0) {
@@ -182,13 +181,19 @@ struct TargetCategoryCalculationInfoDto: Codable, Hashable {
         self.doneForUserProfile = doneForUserProfile
         self.percentageOfDoneAllCategoryForUserProfile = percentageOfDoneAllCategoryForUserProfile
     }
-    
-    init(from decoder: any Decoder) throws {
+
+    enum CodingKeys: String, CodingKey {
+        case quantityForUserProfile
+        case doneForUserProfile
+        case percentageOfDoneAllCategoryForUserProfile
+    }
+
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.quantityForUserProfile = try container.decodeIfPresent(Int.self, forKey: .quantityForUserProfile)
-        self.doneForUserProfile = try container.decodeIfPresent(Int.self, forKey: .doneForUserProfile)
-        let percentageOfDoneAllCategoryForUserProfileStr = try container.decodeIfPresent(String.self, forKey: .percentageOfDoneAllCategoryForUserProfile).orEmpty
-        self.percentageOfDoneAllCategoryForUserProfile = Double(percentageOfDoneAllCategoryForUserProfileStr) ?? 0
+        quantityForUserProfile = try container.decodeIfPresent(Int.self, forKey: .quantityForUserProfile)
+        doneForUserProfile = try container.decodeIfPresent(Int.self, forKey: .doneForUserProfile)
+        
+        percentageOfDoneAllCategoryForUserProfile = container.getDoubleValue(forKey: .percentageOfDoneAllCategoryForUserProfile).orZero
     }
 }
 

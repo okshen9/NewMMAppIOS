@@ -13,4 +13,13 @@ struct PaymentCalculationInfoDto: Codable, Hashable {
     let notDonePaymentsQuantity: Int?
     let donePaymentsPercentage: Double?
     let expiredPaymentsPercentage: Double?
+    
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        totalPaymentsQuantity = try container.decodeIfPresent(Int.self, forKey: .totalPaymentsQuantity)
+        donePaymentsQuantity = try container.decodeIfPresent(Int.self, forKey: .donePaymentsQuantity)
+        notDonePaymentsQuantity = try container.decodeIfPresent(Int.self, forKey: .notDonePaymentsQuantity)
+        donePaymentsPercentage = container.getDoubleValue(forKey: .donePaymentsPercentage)
+        expiredPaymentsPercentage = container.getDoubleValue(forKey: .expiredPaymentsPercentage)
+    }
 }

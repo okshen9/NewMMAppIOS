@@ -74,7 +74,7 @@ extension ProfileViewModel {
         self.searchResponseDTO?.results?.append(contentsOf: newEvents)
         self.searchResponseDTO?.pageNumber = searchResponseDTO.pageNumber
         self.searchResponseDTO?.pageSize = searchResponseDTO.pageSize
-        self.searchResponseDTO?.totalRecords = searchResponseDTO.totalRecords
+        self.searchResponseDTO?.totalPages = searchResponseDTO.totalPages
 
         await MainActor.run {
             self.feedEvents?.append(contentsOf: newEvents)

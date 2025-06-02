@@ -10,7 +10,7 @@ typealias PaginationQury = [String: String]
 protocol PaginationProtocol {
     associatedtype TypeItem
     var results: [TypeItem]? { get }
-    var totalRecords: Int? { get }
+    var totalPages: Int? { get }
     var pageNumber: Int? { get }
     var pageSize: Int? { get }
 }
@@ -28,7 +28,7 @@ extension PaginationProtocol {
     var isAll: Bool {
         // Количество отображенных страниц
         let countPage = pageNumber.orZero + 1
-        return totalRecords.orZero <= pageSize.orZero * (countPage)
+        return totalPages.orZero <= countPage
     }
 }
 

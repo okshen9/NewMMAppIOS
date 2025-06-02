@@ -74,3 +74,9 @@ extension Int? {
         self ?? 0
     }
 }
+
+extension Double? {
+    var orZero: Double {
+        self ?? 0.0
+    }
+}
