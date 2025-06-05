@@ -72,10 +72,11 @@ struct HiddenProfileCell: View {
                         Text("Разблокировать")
                             .font(MMFonts.subCaption)
                             .foregroundStyle(.white)
+                            .lineLimit(1)
 
                 }
                 .foregroundColor(.white)
-                .padding(.horizontal, 12)
+                .padding(.horizontal, 6)
                 .padding(.vertical, 6)
                 .background(Color.mainRed)
                 .cornerRadius(16)

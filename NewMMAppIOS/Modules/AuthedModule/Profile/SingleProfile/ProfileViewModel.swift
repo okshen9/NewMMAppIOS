@@ -197,11 +197,12 @@ extension ProfileViewModel {
         static let baseEventSearch: [EventsQuery.QueryValue] = [
             .sortDisplayDate(.DESC),
             .pageNumberPagination("0"),
-            .pageSizePagination("20")
+            .pageSizePagination("20"),
+            .type(EventType.allTargetsType)
         ]
 
         static let baseSelectedEventSearch: [EventType] = {
-            var type = EventType.allPaymentType
+            var type = EventType.allTargetsType
 //            type.append(.PAYMENT_FULL_PAID)
             return type
         }()

@@ -24,27 +24,30 @@ class HidenProfileViewModel: ObservableObject {
     
     /// Загрузить профили игнорируемых пользователей
     func loadHiddenProfiles() {
-        guard let hiddenIds = hidenIds, !hiddenIds.isEmpty else {
-            self.profiles = []
-            return
-        }
         
-        Task {
-            await setIsLoading(true)
+        Task { [weak self] in
+            await self?.setIsLoading(true)
             
             do {
                 var loadedProfiles: [UserProfileResultDto] = []
+                let meProfile = try await self?.service.getProfileMe()
+                self?.hidenIds = (meProfile?.forUserHideThisExtIdUsersEvents) ?? []
+                
+                guard let hiddenIds = self?.hidenIds, !hiddenIds.isEmpty else {
+                    self?.profiles = []
+                    return
+                }
                 
                 // Загружаем профили по ID
                 for externalId in hiddenIds {
-                    if let profile = try await service.getUserProfile(externalId: externalId) {
+                    if let profile = try await self?.service.getUserProfile(externalId: externalId) {
                         loadedProfiles.append(profile)
                     }
                 }
                 
-                await MainActor.run {
-                    self.profiles = loadedProfiles.sorted { 
-                        ($0.fullName ?? "") < ($1.fullName ?? "") 
+                await MainActor.run {[weak self] in
+                    self?.profiles = loadedProfiles.sorted {
+                        ($0.fullName ?? "") < ($1.fullName ?? "")
                     }
                 }
             } catch {
@@ -52,7 +55,7 @@ class HidenProfileViewModel: ObservableObject {
                 await ToastManager.shared.show(.baseError)
             }
             
-            await setIsLoading(false)
+            await self?.setIsLoading(false)
         }
     }
     

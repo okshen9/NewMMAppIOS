@@ -31,6 +31,7 @@ extension ProfileViewModel {
             // насыщение парметров типами поиска
             enrichSearchParamsFromType(params: &searchParams)
             let searchResponse = try await serviceNetwork.searchEvents(searchParams: searchParams)
+            print("FeedViewModel5 getNextPaginationParams: \(searchResponse.pageNumber)")
             await updateCurrentEvents(with: searchResponse)
             return true
         } catch {
