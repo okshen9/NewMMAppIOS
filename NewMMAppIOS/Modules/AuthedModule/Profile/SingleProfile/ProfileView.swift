@@ -252,7 +252,8 @@ struct ProfileView: View {
                 }
             } else if let feedEvents = viewModel.feedEvents, !feedEvents.isEmpty {
                 ForEach(feedEvents) { event in
-                    NewFeedCell(onHeaderTap: {}, onHideUser: {_ in true}, showHidenTogle: false, event: event)
+                    let showHidenTogle = event.creatorExternalId == viewModel.userRepository.externalId?.toString
+                    NewFeedCell(onHeaderTap: {}, onHideUser: {_ in true}, showHidenTogle: showHidenTogle, event: event)
                 }
                 
                 if !viewModel.isAll {

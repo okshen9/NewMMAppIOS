@@ -39,7 +39,7 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
 
     // MARK: - Private properties
     let serviceNetwork = ServiceBuilder.shared
-    private let userRepository = UserRepository.shared
+    let userRepository = UserRepository.shared
     private(set) var externalId: Int?
 
     init() {

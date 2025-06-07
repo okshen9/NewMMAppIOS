@@ -43,7 +43,10 @@ final class UserGroupsListViewModel: ObservableObject {
     
     /// Обновляет детальную информацию о группах (для pull-to-refresh)
     func refreshGroups() async {
-        await loadDetailedGroupsInfo()
+        // Создаем независимую задачу, которая не отменяется автоматически
+        await Task.detached { [weak self] in
+            await self?.loadDetailedGroupsInfo()
+        }.value
     }
     
     @MainActor
@@ -72,7 +75,7 @@ final class UserGroupsListViewModel: ObservableObject {
         print("UserGroupsListViewModel: Начинаем загрузку детальной информации для \(initialGroups.count) групп")
         await setIsLoading(true)
         
-        // Если важен порядок – заведём “плейсхолдер” под каждый элемент:
+        // Если важен порядок – заведём "плейсхолдер" под каждый элемент:
         var groupList = [GroupResultDTOModel]()
 
         // Запускаем параллельно задачи с передачей индекса
