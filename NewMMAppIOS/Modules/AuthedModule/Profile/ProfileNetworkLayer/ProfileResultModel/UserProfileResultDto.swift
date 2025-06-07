@@ -18,8 +18,7 @@ struct UserProfileResultDto: Codable, Equatable, Hashable {
     let creationDateTime: String?
     let lastUpdatingDateTime: String?
 	// TODO: Neshko
-//    let userGroups: UserGroupResultDto?
-    let stream: StreamResultDto?
+    let userGroups: [GroupResultDTOModel]?
     let comment: String?
     let photoUrl: String?
     let userTargets: [UserTargetDtoModel]?
@@ -35,7 +34,7 @@ struct UserProfileResultDto: Codable, Equatable, Hashable {
         return lhs.id == rhs.id
     }
 
-    init(id: Int?, externalId: Int, username: String?, fullName: String?, userProfileStatus: String?, userPaymentStatus: String?, isDeleted: Bool?, creationDateTime: String?, lastUpdatingDateTime: String?, userGroups: UserGroupResultDto?, stream: StreamResultDto?, comment: String?, photoUrl: String?, userTargets: [UserTargetDtoModel]?, targetCalculationInfo: TargetCalculationInfoDto?, location: String?, phoneNumber: String?, activitySphere: String?, paymentCalculationInfo: PaymentCalculationInfoDto?, biography: String?, forUserHideThisExtIdUsersEvents: [Int]?) {
+    init(id: Int?, externalId: Int, username: String?, fullName: String?, userProfileStatus: String?, userPaymentStatus: String?, isDeleted: Bool?, creationDateTime: String?, lastUpdatingDateTime: String?, userGroups: [GroupResultDTOModel]?, comment: String?, photoUrl: String?, userTargets: [UserTargetDtoModel]?, targetCalculationInfo: TargetCalculationInfoDto?, location: String?, phoneNumber: String?, activitySphere: String?, paymentCalculationInfo: PaymentCalculationInfoDto?, biography: String?, forUserHideThisExtIdUsersEvents: [Int]?) {
         self.id = id
         self.externalId = externalId
         self.username = username
@@ -46,8 +45,7 @@ struct UserProfileResultDto: Codable, Equatable, Hashable {
         self.creationDateTime = creationDateTime
         self.lastUpdatingDateTime = lastUpdatingDateTime
 		//TODO: neshko
-//        self.userGroups = userGroups
-        self.stream = stream
+        self.userGroups = userGroups
         self.comment = comment
         self.photoUrl = photoUrl
         self.userTargets = userTargets
@@ -72,8 +70,7 @@ struct UserProfileResultDto: Codable, Equatable, Hashable {
         self.creationDateTime = try container.decodeIfPresent(String.self, forKey: .creationDateTime)
         self.lastUpdatingDateTime = try container.decodeIfPresent(String.self, forKey: .lastUpdatingDateTime)
 		//TODO: neshko
-//        self.userGroups = try container.decodeIfPresent(UserGroupResultDto.self, forKey: .userGroups)
-        self.stream = try container.decodeIfPresent(StreamResultDto.self, forKey: .stream)
+        self.userGroups = try container.decodeIfPresent([GroupResultDTOModel].self, forKey: .userGroups)
         self.comment = try container.decodeIfPresent(String.self, forKey: .comment)
         self.photoUrl = try container.decodeIfPresent(String.self, forKey: .photoUrl)
         self.userTargets = try container.decodeIfPresent([UserTargetDtoModel].self, forKey: .userTargets)
@@ -84,37 +81,6 @@ struct UserProfileResultDto: Codable, Equatable, Hashable {
         self.paymentCalculationInfo = try container.decodeIfPresent(PaymentCalculationInfoDto.self, forKey: .paymentCalculationInfo)
         self.biography = try container.decodeIfPresent(String.self, forKey: .biography)
         self.forUserHideThisExtIdUsersEvents = try container.decodeIfPresent([Int].self, forKey: .forUserHideThisExtIdUsersEvents)
-    }
-}
-
-struct UserGroupResultDto: Codable, Hashable {
-    let id: Int?
-    let title: String?
-    let groupOwner: Int? //для получения владельца группы ищем группу (id)
-    let isDeleted: Bool?
-    let creationDateTime: String?
-    let lastUpdatingDateTime: String? // не обновлялось, но при обновлении должно быть аналогично creationDateTime
-    let streamDto: Int? // для получения стрима группы ищем группу (id)
-    let owners: [StreamUserProfileShortInfoDto]?
-    let participants: [StreamUserProfileShortInfoDto]?
-}
-
-struct StreamResultDto: Codable, Hashable {
-    let id: Int?
-    let title: String?
-    let description: String?
-    let dateFrom: String?
-    let dateTo: String?
-    let isDeleted: Bool?
-    let creationDateTime: String?
-    let lastUpdatingDateTime: String? // не обновлялось, но при обновлении должно быть аналогично creationDateTime
-    let owners: [StreamUserProfileShortInfoDto]?
-    let participants: [StreamUserProfileShortInfoDto]?
-    
-    var isActive: Bool {
-        guard let dateToStr = dateTo,
-              let dateTo = dateToStr.dateFromString() else { return false }
-        return Date() < dateTo
     }
 }
 
@@ -210,8 +176,38 @@ extension UserProfileResultDto {
             isDeleted: false,
             creationDateTime: "2025-04-06T13:43:27.782416",
             lastUpdatingDateTime: "2025-04-06T13:49:39.54274",
-            userGroups: nil,
-            stream: nil,
+            userGroups: [
+                GroupResultDTOModel(
+                    id: 1,
+                    title: "Основная группа психологов",
+                    userOwners: [],
+                    userMembers: [],
+                    description: "Группа для изучения основ психологии",
+                    tgChatReference: "psychology_group",
+                    isDeleted: false,
+                    creationDateTime: "2025-01-01T00:00:00Z",
+                    lastUpdatingDateTime: "2025-01-15T00:00:00Z",
+                    tgChatId: "123456",
+                    usersGroupType: .group,
+                    dateFrom: "2025-01-01T00:00:00Z",
+                    dateTo: "2025-12-31T23:59:59Z"
+                ),
+                GroupResultDTOModel(
+                    id: 2,
+                    title: "Стрим по когнитивной терапии",
+                    userOwners: [],
+                    userMembers: [],
+                    description: "Изучение методов когнитивной терапии",
+                    tgChatReference: "cognitive_therapy_stream",
+                    isDeleted: false,
+                    creationDateTime: "2025-02-01T00:00:00Z",
+                    lastUpdatingDateTime: "2025-02-15T00:00:00Z",
+                    tgChatId: "234567",
+                    usersGroupType: .stream,
+                    dateFrom: "2025-02-01T00:00:00Z",
+                    dateTo: "2025-08-31T23:59:59Z"
+                )
+            ],
             comment: "Тестовый пользователь!\nШтрафы можно назначить только для теста!",
             photoUrl: "https://t.me/i/userpic/320/i6xQ9kQLTuX0pwKKHNHP9EPcZ9mtatdhZFdTCOQzWfo.jpg",
             userTargets: nil,

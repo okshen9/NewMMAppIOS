@@ -19,4 +19,9 @@ protocol ProfileRequestProtocol {
     /// - Parameter model: модель жалобы
     /// - Returns: подготовленный запрос
     func sendComplaintRequest(model: ComplaintBodyModel) throws -> URLRequest
+    
+    /// Получить детальную информацию по группе
+    /// - Parameter idGroup: id группы
+    /// - Returns: подготовленный запрос
+    func getGroup(idGroup: Int) throws -> URLRequest
 }

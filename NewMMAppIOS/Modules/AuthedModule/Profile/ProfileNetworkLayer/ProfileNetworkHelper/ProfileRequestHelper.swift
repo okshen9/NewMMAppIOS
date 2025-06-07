@@ -11,13 +11,15 @@ enum ProfileRequestHelper {
     case getData(id: Int)
     /// отправка жалобы
     case sendComplaint
+    /// получение группы
+    case getGroup(groupId: Int)
 
     // MARK: Query
     var query: ProfileQueryBuilder? {
         switch self {
         case let .getData(externalId):
             return ProfileQueryBuilder.getData(id: externalId)
-        case .sendComplaint:
+        case .sendComplaint, .getGroup:
             return nil
         }
     }
@@ -29,6 +31,8 @@ enum ProfileRequestHelper {
             return RequestUrls.tgCallBack + "/test/" + externalId.toString
         case .sendComplaint:
             return RequestUrls.complaint
+        case let .getGroup(groupId):
+            return RequestUrls.userGroup + "/" + groupId.toString
         }
     }
     
@@ -39,6 +43,8 @@ enum ProfileRequestHelper {
             return .get
         case .sendComplaint:
             return .post
+        case .getGroup(groupId: let groupId):
+            return .get
         }
     }
 }

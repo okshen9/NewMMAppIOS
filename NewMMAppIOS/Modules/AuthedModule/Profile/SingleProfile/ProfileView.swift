@@ -427,67 +427,42 @@ struct ProfileView: View {
     @ViewBuilder
     func groupeButton(_ profile: UserProfileResultDto) -> some View {
         HStack(spacing: 10) {
-            let streamStatus = profile.stream?.title != nil ?
-            profile.stream?.isActive ?? false ? "Текущий" : "Завершен" :
-            nil
-            
-            if let stream = profile.stream,
-               let owners = stream.owners,
-               let participants = stream.participants
-            {
-                
-                NavigationLink(destination: {
-                    let dateEnd = stream.dateTo.orEmpty.dateFromStringISO8601 ?? Date.yesterday
-                    StreamProfileList(
-                        type: .stream(stream.title ?? "Поток без названия"),
-                        status: dateEnd > Date() ? .current : .ended,
-                        mentors: owners,
-                        participants: participants,
-                        dateStart: (profile.stream?.dateFrom?.dateFromStringISO8601) ?? Date.init(timeIntervalSince1970: 232),
-                        dateEnd: (profile.stream?.dateTo?.dateFromStringISO8601) ?? Date.now
-                    )}, label: {
-                        GroupButton(
-                            title: profile.stream?.title ?? "Поток не назначен",
-                            subTitle: streamStatus,
-                            action: {})
-                    })
+            // Если у пользователя есть группы, показываем кнопку для перехода к ним
+            if let userGroups = profile.userGroups, !userGroups.isEmpty {
+                NavigationLink(destination: UserGroupsListView(userGroups: userGroups)) {
+                    GroupButton(
+                        title: "Группы и стримы",
+                        subTitle: getGroupsSubtitle(from: userGroups),
+                        action: {}
+                    )
+                }
             } else {
+                // Если групп нет, показываем заглушку
                 GroupButton(
-                    title: profile.stream?.title ?? "Поток не назначен",
-                    subTitle: streamStatus,
-                    action: {})
+                    title: "Группы и стримы",
+                    subTitle: "Не назначены",
+                    action: {}
+                )
             }
-			// Группы человека
-//			GroupButton(title: "Группы",
-//						subTitle: "Не назначена",
-//						action: {})
-			// TODO: NESHKO
-//            if let userGroup = profile.userGroups,
-//               let stream = profile.stream,
-//               let owners = userGroup.owners,
-//               let participants = userGroup.participants
-//            {
-//                NavigationLink(destination: {
-//                    StreamProfileList(
-//                        type: .stream(userGroup.title ?? "Подгруппа без названия"),
-//                        status: stream.isActive ? .current : .ended,
-//                        mentors: owners,
-//                        participants: participants,
-//                        dateStart: (profile.stream?.dateFrom?.dateFromStringISO8601) ?? Date.init(timeIntervalSince1970: 232),
-//                        dateEnd: (profile.stream?.dateTo?.dateFromStringISO8601) ?? Date.now
-//                    )}, label: {
-//                        GroupButton(title: profile.userGroups?.title ?? "Подгруппа",
-//                                    subTitle: (profile.userGroups?.title).isNil ? "Не названчена" : nil,
-//                                    action: {})
-//                    })
-//            } else {
-//                GroupButton(title: profile.userGroups?.title ?? "Подгруппа",
-//                            subTitle: (profile.userGroups?.title).isNil ? "Не названчена" : nil,
-//                            action: {})
-//            }
-            
         }
         .frame(height: 56)
+    }
+    
+    /// Определяет подзаголовок для кнопки групп
+    private func getGroupsSubtitle(from userGroups: [GroupResultDTOModel]) -> String {
+        let groupsCount = userGroups.count
+        let streamsCount = userGroups.filter { $0.usersGroupType == .stream }.count
+        let regularGroupsCount = userGroups.filter { $0.usersGroupType == .group }.count
+        
+        if streamsCount > 0 && regularGroupsCount > 0 {
+            return "Групп: \(regularGroupsCount), Стримов: \(streamsCount)"
+        } else if streamsCount > 0 {
+            return "Стримов: \(streamsCount)"
+        } else if regularGroupsCount > 0 {
+            return "Групп: \(regularGroupsCount)"
+        } else {
+            return "Всего: \(groupsCount)"
+        }
     }
     
     /// Шимеры

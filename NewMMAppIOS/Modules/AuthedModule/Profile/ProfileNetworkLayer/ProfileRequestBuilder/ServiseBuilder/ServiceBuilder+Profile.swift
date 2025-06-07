@@ -30,4 +30,13 @@ extension ServiceBuilder: ProfileServiceProtocol {
             try apiFactory.sendComplaintRequest(model: .init(message: message, toUserExtId: userId))
         }
     }
+    
+    /// Получить детальную информацию стримов
+    /// - Parameter idGroup: id группы
+    /// - Returns: модель группы
+    func getGroup(idGroup: Int) async throws -> GroupResultDTOModel {
+        try await performRequest {
+            try apiFactory.getGroup(idGroup: idGroup)
+        }
+    }
 }

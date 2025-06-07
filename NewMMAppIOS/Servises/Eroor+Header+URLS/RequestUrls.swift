@@ -40,6 +40,9 @@ enum RequestUrls {
     /// Отправка жалобы на пользователя
     static let complaint = "/complaint"
     
+    /// работа с группами
+    static let userGroup = "/group"
+    
     
     
     // MARK: - Цели

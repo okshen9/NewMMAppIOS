@@ -152,7 +152,6 @@ struct HidenProfile: View {
             creationDateTime: nil,
             lastUpdatingDateTime: nil,
             userGroups: nil,
-            stream: nil,
             comment: nil,
             photoUrl: nil,
             userTargets: nil,

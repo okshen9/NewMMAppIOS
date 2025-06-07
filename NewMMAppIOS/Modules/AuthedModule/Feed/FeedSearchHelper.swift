@@ -28,7 +28,7 @@ extension FeedViewModel {
     }
     
     /// Выполняет попытки загрузки с автоматической дозагрузкой скрытых событий
-    private func performFetchWithRetry(resetSearch: Bool, accumulatedEvents: [EventDTO], maxRetries: Int = 5) async throws {
+    private func performFetchWithRetry(resetSearch: Bool, accumulatedEvents: [EventDTO], maxRetries: Int = 10) async throws {
         var isPagination = false
         
         // Проверяем возможность запуска и устанавливаем флаги загрузки

@@ -21,4 +21,9 @@ protocol ProfileServiceProtocol {
     /// - Parameter userId: id пользователя
     /// - Returns: успешность отправки
     func sendReport(_ message: String, userId: Int)  async throws -> ComplaintResult
+    
+    /// Получить детальную информацию стримов
+    /// - Parameter idGroup: id группы
+    /// - Returns: модель группы
+    func getGroup(idGroup: Int) async throws -> GroupResultDTOModel
 }

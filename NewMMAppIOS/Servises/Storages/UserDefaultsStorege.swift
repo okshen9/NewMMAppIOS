@@ -42,7 +42,6 @@ extension UserRepository {
             case is Data.Type: return defaults.data(forKey: key) as? T
             case is [String].Type: return defaults.stringArray(forKey: key) as? T
             default:
-                precondition(false, "Unsupported type \(T.self) for UserDefaults")
                 return nil
             }
         }

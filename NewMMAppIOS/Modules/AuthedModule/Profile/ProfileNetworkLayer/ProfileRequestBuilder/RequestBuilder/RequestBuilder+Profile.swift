@@ -50,4 +50,18 @@ extension APIFactory :ProfileRequestProtocol {
         )
         return urlRequest
     }
+    
+    /// Получить детальную информацию по группе
+    /// - Parameter idGroup: id группы
+    /// - Returns: подготовленный запрос
+    func getGroup(idGroup: Int) throws -> URLRequest {
+        let helper = ProfileRequestHelper.getGroup(groupId: idGroup)
+        let url = try urlBuilder.buildURL(path: helper.path)
+        return try requestBuilder.buildURLRequest(
+            url: url,
+            query: helper.query,
+            method: helper.method,
+            tokenNeccessity: .mandatory
+        )
+    }
 }
