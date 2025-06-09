@@ -22,7 +22,7 @@ struct ProfileTargetView: View {
                 ScrollView {
                     LazyVStack(spacing: 16) {
                         ForEach(viewModel.categories, id: \.self) { category in
-                            if let targets = viewModel.targetsByCategory[category] {
+                            if let targets = viewModel.targetsByCategory[category], !targets.isEmpty {
                                 CategorySectionView(
                                     myTarget: viewModel.canEdit,
                                     category: category,
@@ -32,6 +32,8 @@ struct ProfileTargetView: View {
 //                                        isEditingCategory = true
                                     }
                                 )
+                            } else {
+                                emptyStateView()
                             }
                         }
                     }
@@ -84,8 +86,30 @@ struct ProfileTargetView: View {
             )
         }
     }
+    
+    @ViewBuilder
+    private func emptyStateView() -> some View {
+        VStack {
+            Spacer()
+            Image(systemName: "list.star")
+                .font(.system(size: 66))
+                .foregroundColor(.mainRed)
+                .padding(.bottom, 20)
+            
+            Text("У пользователя пока нет целей")
+                .font(MMFonts.title)
+                .foregroundColor(.headerText)
+                .padding(.bottom, 4)
+            
+            Text("Как только человек создаст цели вы сможете увидеть их")
+                .font(MMFonts.subTitle)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 20)
+            
+            Spacer()
+        }
+        .padding()
+    }
 }
 
-#Preview {
-    ProfileTargetView(externalId: 33)
-}

@@ -47,7 +47,3 @@ struct SegmentedView: View {
     }
 }
 
-#Preview {
-    @Previewable @State var selectedIndex: Int = 0
-    SegmentedView(segments: ["test1", "test2", "test3"], selected: $selectedIndex)
-}

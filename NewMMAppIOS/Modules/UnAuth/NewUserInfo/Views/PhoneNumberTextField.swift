@@ -111,17 +111,3 @@ struct PhoneNumberTextField: View {
     }
 }
 
-#Preview {
-    PhoneNumberTextField(phoneNumber: .constant(""), error: "error")
-}
-
-
-extension String : BidirectionalCollection {
-
-    public func saveIndex(_ i: String.Index, offsetBy distance: Int) -> String.Index {
-        guard let index = self.index(i, offsetBy: distance, limitedBy: self.endIndex) else {
-            return self.endIndex
-        }
-        return index
-    }
-}

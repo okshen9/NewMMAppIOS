@@ -134,6 +134,10 @@ enum ReportReason: String, CaseIterable, Identifiable {
     }
 }
 
-#Preview {
-    RepotView(viewModel: .init(profile: .getTestUser()))
+// MARK: - UIApplication Extension
+extension UIApplication {
+    func endEditing() {
+        sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
 }
+

@@ -14,6 +14,7 @@ struct ProfileInfoView: View {
     @EnvironmentObject var navigationManager: NavigationManager<AuthRoute>
     @State var isKeyboardVisible = false
     @State private var showDismissAlert = false
+    @State private var showDeleteAlert = false
 
     var body: some View {
         ScrollView {
@@ -92,7 +93,30 @@ struct ProfileInfoView: View {
                     }
                 }
                 .disabled(!viewModel.isValid || viewModel.isLoaded)
-
+                
+                
+                if viewModel.isEditProfile {
+                    Button(action: {
+                        showDeleteAlert = true
+                    }) {
+                        if !viewModel.isLoaded {
+                            Text("Удалить аккаунт")
+                                .font(MMFonts.caption)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .foregroundColor(.mainRed)
+                                .cornerRadius(16)
+                        } else {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle())
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.gray.opacity(0.3))
+                                .foregroundColor(.white)
+                                .cornerRadius(16)
+                        }
+                    }
+                }
             }
             .padding()
             .onChange(of: viewModel.userProfile) {
@@ -128,6 +152,7 @@ struct ProfileInfoView: View {
                 }
             }
         }
+        /// Алерт закрытия странички
         .alert("Закрыть?", isPresented: $showDismissAlert) {
             Button("Отмена", role: .cancel) {}
             Button("Закрыть", role: .destructive) {
@@ -140,31 +165,23 @@ struct ProfileInfoView: View {
         } message: {
             Text("Все изменения будут потеряны.")
         }
+        /// Алерт удаления аккаунта
+        .alert("Вы точно хотите удалить свой аккаунт?", isPresented: $showDeleteAlert) {
+            Button("Отмена", role: .cancel) {}
+            Button("Да", role: .destructive) {
+                Task {
+                    await viewModel.saveProfile()
+                    dismiss()
+                    UserRepository.shared.clearAll()
+                    appStateServise.setNewState(.unAuthorized)
+                }
+            }
+        } message: {
+            Text("Ващ аккаунт будет будет удален.")
+        }
         .interactiveDismissDisabled(true) // Блокируем свайп
         .navigationBarBackButtonHidden()
     }
 }
 
 
-#Preview {
-	@Previewable @State var isPresented: Bool = false
-	let view = ProfileInfoView(viewModel: ProfileInfoViewModel(profileModel: .getTestUser(),
-															   authModel: AuthUserDtoResult(id: 123, telegramId: nil, authDate: nil, hash: nil, lastName: nil, firstName: nil, username: nil, enabled: true, authStatus: nil, roles: nil),
-															   isEditProfile: false,
-															   needUpdateAction: {}))
-	NavigationStack {
-		NavigationLink("sdvsd", destination:
-						view
-					   
-		)
-		Text("Sheet")
-			.onTapGesture {
-				isPresented.toggle()
-			}
-			.sheet(isPresented: $isPresented) {
-				view
-			}
-		
-		
-	}
-}

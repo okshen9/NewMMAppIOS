@@ -42,7 +42,3 @@ struct ShimmeringRectangle: View {
 }
 
 
-#Preview {
-    ShimmeringRectangle()
-        .frame(width: 300, height: 100)
-}

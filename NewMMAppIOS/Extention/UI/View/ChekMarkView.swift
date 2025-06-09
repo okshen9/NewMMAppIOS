@@ -19,6 +19,3 @@ struct ChekMarkView: View {
     }
 }
 
-#Preview {
-    ChekMarkView(.constant(true))
-}

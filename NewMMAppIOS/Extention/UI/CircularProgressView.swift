@@ -80,6 +80,3 @@ struct CircularProgressView: View {
     }
 }
 
-#Preview {
-    CircularProgressView(progress: 0.5, lineWidth: 4)
-}

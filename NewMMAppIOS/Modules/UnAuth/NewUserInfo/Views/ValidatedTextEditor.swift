@@ -32,7 +32,3 @@ struct ValidatedTextEditor: View {
     }
 }
 
-#Preview {
-    @Previewable @State var text = "wed"
-    ValidatedTextEditor(title: "test", text: $text, error: "error")
-}

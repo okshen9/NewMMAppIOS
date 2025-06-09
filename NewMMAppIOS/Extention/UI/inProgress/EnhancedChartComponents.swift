@@ -183,40 +183,40 @@ struct PieSlice: Shape {
 }
 
 // MARK: - Preview
-struct EnhancedChartComponents_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(spacing: 32) {
-            BarChartView(
-                tasks: [
-                    TaskProgress(progress: 0.75, color: .blue, name: "Бизнес", value: 0.25),
-                    TaskProgress(progress: 0.5, color: .green, name: "Личное", value: 0.25),
-                    TaskProgress(progress: 0.9, color: .orange, name: "Семья", value: 0.25),
-                    TaskProgress(progress: 0.9, color: .yellow, name: "Здоровье", value: 0.25)
-                ],
-                selectedCategory: .constant(nil)
-            )
-            
-            EnhancedBarChartView(
-                tasks: [
-                    TaskProgress(progress: 0.75, color: .blue, name: "Бизнес", value: 0.25),
-                    TaskProgress(progress: 0.5, color: .green, name: "Личное", value: 0.25),
-                    TaskProgress(progress: 0.9, color: .orange, name: "Семья", value: 0.25),
-                    TaskProgress(progress: 0.9, color: .yellow, name: "Здоровье", value: 0.25)
-                ],
-                selectedCategory: .constant(nil)
-            )
-            
-            EnhancedPieChartView(
-                tasks: [
-                    TaskProgress(progress: 0.75, color: .blue, name: "Бизнес", value: 0.25),
-                    TaskProgress(progress: 0.5, color: .green, name: "Личное", value: 0.25),
-                    TaskProgress(progress: 0.9, color: .orange, name: "Семья", value: 0.25),
-                    TaskProgress(progress: 0.9, color: .yellow, name: "Здоровье", value: 0.25)
-                ],
-                selectedCategory: .constant(nil)
-            )
-        }
-        .padding()
-        .background(Color(.systemGroupedBackground))
-    }
-} 
+//struct EnhancedChartComponents_Previews: PreviewProvider {
+//    static var previews: some View {
+//        VStack(spacing: 32) {
+//            BarChartView(
+//                tasks: [
+//                    TaskProgress(progress: 0.75, color: .blue, name: "Бизнес", value: 0.25),
+//                    TaskProgress(progress: 0.5, color: .green, name: "Личное", value: 0.25),
+//                    TaskProgress(progress: 0.9, color: .orange, name: "Семья", value: 0.25),
+//                    TaskProgress(progress: 0.9, color: .yellow, name: "Здоровье", value: 0.25)
+//                ],
+//                selectedCategory: .constant(nil)
+//            )
+//            
+//            EnhancedBarChartView(
+//                tasks: [
+//                    TaskProgress(progress: 0.75, color: .blue, name: "Бизнес", value: 0.25),
+//                    TaskProgress(progress: 0.5, color: .green, name: "Личное", value: 0.25),
+//                    TaskProgress(progress: 0.9, color: .orange, name: "Семья", value: 0.25),
+//                    TaskProgress(progress: 0.9, color: .yellow, name: "Здоровье", value: 0.25)
+//                ],
+//                selectedCategory: .constant(nil)
+//            )
+//            
+//            EnhancedPieChartView(
+//                tasks: [
+//                    TaskProgress(progress: 0.75, color: .blue, name: "Бизнес", value: 0.25),
+//                    TaskProgress(progress: 0.5, color: .green, name: "Личное", value: 0.25),
+//                    TaskProgress(progress: 0.9, color: .orange, name: "Семья", value: 0.25),
+//                    TaskProgress(progress: 0.9, color: .yellow, name: "Здоровье", value: 0.25)
+//                ],
+//                selectedCategory: .constant(nil)
+//            )
+//        }
+//        .padding()
+//        .background(Color(.systemGroupedBackground))
+//    }
+//} 

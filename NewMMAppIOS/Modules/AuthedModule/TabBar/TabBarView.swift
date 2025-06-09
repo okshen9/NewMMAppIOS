@@ -82,6 +82,3 @@ extension TabBarView {
     }
 }
 
-#Preview {
-    TabBarView()
-}

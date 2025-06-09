@@ -339,184 +339,10 @@ struct NewPieDiagram: View {
         return GeometryReader { geometry in
             // Диаграмма с анимацией масштаба и прозрачности
             ZStack {
-                // Используем id для явного обновления всего содержимого
-                ForEach(normalizedSlices, id: \.model.id) { entry in
-                    let idx = animatableSlices.firstIndex(where: { $0.id == entry.model.id }) ?? 0
-                    let start = calculateStartAngle(index: idx)
-                    let norm = entry.normalizedValue
-                    let bgEnd = start + .degrees(360 * norm)
-                    let fgPortion = entry.model.currentValue * norm
-                    let fgEnd = start + .degrees(360 * fgPortion)
-                    
-                    // Вычисляем средний угол для размещения метки сектора
-                    let midAngle = start + (bgEnd - start) / 2
-
-                    // Фоновый слой
-                    PieSimpleSliceView(
-                        model: .init(
-                            color: entry.model.color.lighten(),
-                            startAngle: start,
-                            endAngle: bgEnd,
-                            cornerRadius: cornerRadius
-                        )
-                    )
-                    .id("\(entry.model.id)-bg")
-                    .contentShape(PieSliceShape(
-                        startAngle: start,
-                        endAngle: bgEnd,
-                        cornerRadius: cornerRadius
-                    ))
-                    .onTapGesture {
-                        if isInteractive {
-                            navigateToSubmodels(of: entry.model)
-                        }
-                    }
-                    .zIndex(1)
-
-                    // Слой прогресса
-                    PieSimpleSliceView(
-                        model: .init(
-                            color: entry.model.color,
-                            startAngle: start,
-                            endAngle: fgEnd,
-                            cornerRadius: cornerRadius
-                        )
-                    )
-                    .id("\(entry.model.id)-fg")
-                    .contentShape(PieSliceShape(
-                        startAngle: start,
-                        endAngle: fgEnd,
-                        cornerRadius: cornerRadius
-                    ))
-                    .onTapGesture {
-                        if isInteractive {
-                            navigateToSubmodels(of: entry.model)
-                        }
-                    }
-                    .zIndex(2)
-
-                    if entry.model.subModel != nil && !(entry.model.subModel?.isEmpty ?? true) && isInteractive {
-                        // Вычисляем позицию для индикатора
-                        let midAngle = (start + bgEnd) / 2
-                        let radius = chartSize / 2.5
-                        let indicatorX = chartSize / 2 + cos(midAngle.radians) * radius
-                        let indicatorY = chartSize / 2 + sin(midAngle.radians) * radius
-
-                        ZStack {
-                            // Светящийся круг
-                            Circle()
-                                .fill(entry.model.color.opacity(0.3))
-                                .blur(radius: 4)
-                                .frame(width: 30, height: 30)
-
-                            // Индикатор в виде круга со стрелкой
-                            Circle()
-                                .fill(.white)
-                                .frame(width: 22, height: 22)
-                                .overlay {
-                                    Image(systemName: "chevron.down")
-                                        .font(MMFonts.subCaption)
-                                        .foregroundColor(entry.model.color)
-                                        .rotationEffect(.radians(midAngle.radians - .pi/2))
-                                }
-                                .shadow(color: .black.opacity(0.2), radius: 2)
-                        }
-                        .position(x: indicatorX, y: indicatorY)
-                        .zIndex(5)
-                    }
-                }
-
-                // Центральный круг
-                Circle()
-                    .foregroundStyle(.white)
-                    .frame(width: chartSize / 1.5, height: chartSize / 1.5)
-                    .shadow(color: .black.opacity(0.1), radius: 2)
-                    .contentShape(Circle())
-                    .onTapGesture {
-                        if isInteractive {
-                            navigateToParentLevel()
-                        }
-                    }
-                    .zIndex(3)
-                
-                if showCenterLabel {
-                    let present = (animatableSlices.reduce(0.0) { $0 + $1.currentValue }) / Double(animatableSlices.isEmpty ? 1 : animatableSlices.count)
-                    VStack(spacing: 6) {
-                        if currentLevel > 0 && isInteractive {
-                            // Индикатор перехода на уровень выше в центре
-                            ZStack {
-                                // Светящийся эффект
-                                Circle()
-                                    .fill(Color.blue.opacity(0.2))
-                                    .frame(width: 30, height: 30)
-                                    .blur(radius: 4)
-                                
-                                // Иконка
-                                Circle()
-                                    .fill(.white)
-                                    .frame(width: 26, height: 26)
-                                    .overlay {
-                                        Image(systemName: "arrow.up")
-                                            .font(MMFonts.caption)
-                                            .foregroundColor(.blue)
-                                    }
-                                    .shadow(color: .black.opacity(0.2), radius: 1)
-                            }
-                            .frame(maxWidth: 20, maxHeight: 20)
-                        }
-                        
-                        // Название текущего уровня
-                        Text(currentLevel == 0 ? diagramTitle : currentTitle)
-                            .font(MMFonts.body)
-                            .foregroundColor(.primary)
-                            .lineLimit(2)
-                            .multilineTextAlignment(.center)
-                            .minimumScaleFactor(0.7)
-                        
-                        Text("Выполнено \(Int(present * 100))%")
-                            .fontWeight(.semibold)
-                    }
-                    .frame(width: chartSize / 1.5, height: chartSize / 1.5)
-                    .zIndex(4)
-                }
-                
-                // Отдельный слой для меток секторов, чтобы они отображались поверх всего
-                ForEach(normalizedSlices, id: \.model.id) { entry in
-                    if entry.normalizedValue > 0.05 { // Показываем метку только для достаточно больших секторов
-                        // Рассчитываем позицию для метки в середине сектора на краю центрального круга
-                        let start = calculateStartAngle(index: animatableSlices.firstIndex(where: { $0.id == entry.model.id }) ?? 0)
-                        let norm = entry.normalizedValue
-                        let bgEnd = start + .degrees(360 * norm)
-                        let midAngle = start + (bgEnd - start) / 2
-                        let innerCircleRadius = chartSize / 3 // Радиус центрального круга
-                        
-                        // Рассчитываем координаты метки на краю центрального круга
-                        let xPos = chartSize/2 + cos(midAngle.radians) * innerCircleRadius
-                        let yPos = chartSize/2 + sin(midAngle.radians) * innerCircleRadius
-                        
-                        ZStack {
-                            // Светящийся фон для лучшего выделения
-                            Circle()
-                                .fill(entry.model.color.opacity(0.3))
-                                .blur(radius: 2)
-                                .frame(width: 26, height: 26)
-                            
-                            // Фон метки
-                            Circle()
-                                .fill(entry.model.color)
-                                .frame(width: 24, height: 24)
-                                .shadow(color: .black.opacity(0.2), radius: 1, x: 0, y: 1)
-                            
-                            // Инициалы или небольшая иконка для категории
-                            Text(categoryInitials(of: entry.model.title))
-                                .font(MMFonts.subCaption)
-                                .foregroundColor(.white)
-                        }
-                        .position(x: xPos, y: yPos)
-                        .opacity(opacity) // Анимируем вместе с диаграммой
-                        .zIndex(10) // Отображаем поверх всех остальных элементов
-                    }
-                }
+                pieSlicesView(chartSize: chartSize)
+                centerCircleView(chartSize: chartSize)
+                centerLabelView(chartSize: chartSize)
+                sectorLabelsView(chartSize: chartSize)
             }
             .scaleEffect(scale)
             .opacity(opacity)
@@ -525,6 +351,197 @@ struct NewPieDiagram: View {
         .frame(width: chartSize, height: chartSize)
         .padding(.horizontal, legendOnSide ? 0 : 8)
         .padding(.vertical, 8)
+    }
+    
+    @ViewBuilder
+    private func pieSlicesView(chartSize: CGFloat) -> some View {
+        // Используем id для явного обновления всего содержимого
+        ForEach(normalizedSlices, id: \.model.id) { entry in
+            let idx = animatableSlices.firstIndex(where: { $0.id == entry.model.id }) ?? 0
+            let start = calculateStartAngle(index: idx)
+            let norm = entry.normalizedValue
+            let bgEnd = start + .degrees(360 * norm)
+            let fgPortion = entry.model.currentValue * norm
+            let fgEnd = start + .degrees(360 * fgPortion)
+            
+            // Вычисляем средний угол для размещения метки сектора
+            let midAngle = start + (bgEnd - start) / 2
+
+            // Фоновый слой
+            PieSimpleSliceView(
+                model: .init(
+                    color: entry.model.color.lighter(by: 0.3),
+                    startAngle: start,
+                    endAngle: bgEnd,
+                    cornerRadius: cornerRadius
+                )
+            )
+            .id("\(entry.model.id)-bg")
+            .contentShape(PieSliceShape(
+                startAngle: start,
+                endAngle: bgEnd,
+                cornerRadius: cornerRadius
+            ))
+            .onTapGesture {
+                if isInteractive {
+                    navigateToSubmodels(of: entry.model)
+                }
+            }
+            .zIndex(1)
+
+            // Слой прогресса
+            PieSimpleSliceView(
+                model: .init(
+                    color: entry.model.color,
+                    startAngle: start,
+                    endAngle: fgEnd,
+                    cornerRadius: cornerRadius
+                )
+            )
+            .id("\(entry.model.id)-fg")
+            .contentShape(PieSliceShape(
+                startAngle: start,
+                endAngle: fgEnd,
+                cornerRadius: cornerRadius
+            ))
+            .onTapGesture {
+                if isInteractive {
+                    navigateToSubmodels(of: entry.model)
+                }
+            }
+            .zIndex(2)
+
+            if entry.model.subModel != nil && !(entry.model.subModel?.isEmpty ?? true) && isInteractive {
+                // Вычисляем позицию для индикатора
+                let midAngle = (start + bgEnd) / 2
+                let radius = chartSize / 2.5
+                let indicatorX = chartSize / 2 + cos(midAngle.radians) * radius
+                let indicatorY = chartSize / 2 + sin(midAngle.radians) * radius
+
+                ZStack {
+                    // Светящийся круг
+                    Circle()
+                        .fill(entry.model.color.opacity(0.3))
+                        .blur(radius: 4)
+                        .frame(width: 30, height: 30)
+
+                    // Индикатор в виде круга со стрелкой
+                    Circle()
+                        .fill(.white)
+                        .frame(width: 22, height: 22)
+                        .overlay {
+                            Image(systemName: "chevron.down")
+                                .font(MMFonts.subCaption)
+                                .foregroundColor(entry.model.color)
+                                .rotationEffect(.radians(midAngle.radians - .pi/2))
+                        }
+                        .shadow(color: .black.opacity(0.2), radius: 2)
+                }
+                .position(x: indicatorX, y: indicatorY)
+                .zIndex(5)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func centerCircleView(chartSize: CGFloat) -> some View {
+        // Центральный круг
+        Circle()
+            .foregroundStyle(.white)
+            .frame(width: chartSize / 1.5, height: chartSize / 1.5)
+            .shadow(color: .black.opacity(0.1), radius: 2)
+            .contentShape(Circle())
+            .onTapGesture {
+                if isInteractive {
+                    navigateToParentLevel()
+                }
+            }
+            .zIndex(3)
+    }
+    
+    @ViewBuilder
+    private func centerLabelView(chartSize: CGFloat) -> some View {
+        if showCenterLabel {
+            let present = (animatableSlices.reduce(0.0) { $0 + $1.currentValue }) / Double(animatableSlices.isEmpty ? 1 : animatableSlices.count)
+            VStack(spacing: 6) {
+                if currentLevel > 0 && isInteractive {
+                    // Индикатор перехода на уровень выше в центре
+                    ZStack {
+                        // Светящийся эффект
+                        Circle()
+                            .fill(Color.blue.opacity(0.2))
+                            .frame(width: 30, height: 30)
+                            .blur(radius: 4)
+                        
+                        // Иконка
+                        Circle()
+                            .fill(.white)
+                            .frame(width: 26, height: 26)
+                            .overlay {
+                                Image(systemName: "arrow.up")
+                                    .font(MMFonts.caption)
+                                    .foregroundColor(.blue)
+                            }
+                            .shadow(color: .black.opacity(0.2), radius: 1)
+                    }
+                    .frame(maxWidth: 20, maxHeight: 20)
+                }
+                
+                // Название текущего уровня
+                Text(currentLevel == 0 ? diagramTitle : currentTitle)
+                    .font(MMFonts.body)
+                    .foregroundColor(.primary)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .minimumScaleFactor(0.7)
+                
+                Text("Выполнено \(Int(present * 100))%")
+                    .fontWeight(.semibold)
+            }
+            .frame(width: chartSize / 1.5, height: chartSize / 1.5)
+            .zIndex(4)
+        }
+    }
+    
+    @ViewBuilder
+    private func sectorLabelsView(chartSize: CGFloat) -> some View {
+        // Отдельный слой для меток секторов, чтобы они отображались поверх всего
+        ForEach(normalizedSlices, id: \.model.id) { entry in
+            if entry.normalizedValue > 0.05 { // Показываем метку только для достаточно больших секторов
+                // Рассчитываем позицию для метки в середине сектора на краю центрального круга
+                let start = calculateStartAngle(index: animatableSlices.firstIndex(where: { $0.id == entry.model.id }) ?? 0)
+                let norm = entry.normalizedValue
+                let bgEnd = start + .degrees(360 * norm)
+                let midAngle = start + (bgEnd - start) / 2
+                let innerCircleRadius = chartSize / 3 // Радиус центрального круга
+                
+                // Рассчитываем координаты метки на краю центрального круга
+                let xPos = chartSize/2 + cos(midAngle.radians) * innerCircleRadius
+                let yPos = chartSize/2 + sin(midAngle.radians) * innerCircleRadius
+                
+                ZStack {
+                    // Светящийся фон для лучшего выделения
+                    Circle()
+                        .fill(entry.model.color.opacity(0.3))
+                        .blur(radius: 2)
+                        .frame(width: 26, height: 26)
+                    
+                    // Фон метки
+                    Circle()
+                        .fill(entry.model.color)
+                        .frame(width: 24, height: 24)
+                        .shadow(color: .black.opacity(0.2), radius: 1, x: 0, y: 1)
+                    
+                    // Инициалы или небольшая иконка для категории
+                    Text(categoryInitials(of: entry.model.title))
+                        .font(MMFonts.subCaption)
+                        .foregroundColor(.white)
+                }
+                .position(x: xPos, y: yPos)
+                .opacity(opacity) // Анимируем вместе с диаграммой
+                .zIndex(10) // Отображаем поверх всех остальных элементов
+            }
+        }
     }
     
     // Получение инициалов или первой буквы названия категории/цели для отображения на метке
@@ -665,80 +682,3 @@ extension PieModel: Animatable {
     }
 }
 
-#Preview {
-    @Previewable @State var value = PieModel(totalValue: 0.3, currentValue: 0.2, color: .red, title: "Категория 1")
-
-    @Previewable @State var value2 = [
-        PieModel(
-            totalValue: 0.3, 
-            currentValue: 0.2, 
-            subModel: [
-                PieModel(totalValue: 0.1, currentValue: 0.3, color: .orange, title: "Подкатегория 1.1"),
-                PieModel(totalValue: 0.1, currentValue: 0.7, color: .pink, title: "Подкатегория 1.2"),
-                PieModel(totalValue: 0.1, currentValue: 0.4, color: .red, title: "Подкатегория 1.3"),
-                PieModel(totalValue: 0.1, currentValue: 0.6, color: .orange, title: "Подкатегория 1.4"),
-
-//                PieModel(totalValue: 0.1, currentValue: 0.2, color: .orange.opacity(0.7), title: "Подкатегория 1.7"),
-//                PieModel(totalValue: 0.1, currentValue: 0.9, color: .pink.opacity(0.8), title: "Подкатегория 1.8"),
-//                PieModel(totalValue: 0.1, currentValue: 0.7, color: .red.opacity(0.6), title: "Подкатегория 1.9"),
-//                PieModel(totalValue: 0.1, currentValue: 0.3, color: .orange.opacity(0.9), title: "Подкатегория 1.10")
-            ],
-            color: .red, 
-            title: "Здоровье"
-        ),
-        PieModel(
-            totalValue: 0.4, 
-            currentValue: 0.3, 
-            subModel: [
-                PieModel(totalValue: 0.3, currentValue: 0.6, color: .mint, title: "Подкатегория 2.1"),
-                PieModel(totalValue: 0.3, currentValue: 0.4, color: .teal, title: "Подкатегория 2.2"),
-                PieModel(totalValue: 0.4, currentValue: 0.2, color: .cyan, title: "Подкатегория 2.3")
-            ],
-            color: .green, 
-            title: "Бизнес"
-        ),
-        PieModel(totalValue: 0.3, currentValue: 0.6,             subModel: [
-            PieModel(totalValue: 0.3, currentValue: 0.6, color: .mint, title: "Подкатегория 2.1"),
-            PieModel(totalValue: 0.3, currentValue: 0.4, color: .teal, title: "Подкатегория 2.2"),
-            PieModel(totalValue: 0.4, currentValue: 0.2, color: .cyan, title: "Подкатегория 2.3")
-        ],
-                 color: .blue, title: "Категория 3"),
-        PieModel(totalValue: 0.3, currentValue: 0.9, color: .yellow, title: "Категория 4")
-    ]
-    
-    @Previewable @State var showLabels = true
-    @Previewable @State var isInteractive = true
-    
-
-        VStack {
-//            TabView {
-                NewPieDiagram(
-                    slices: value2,
-                    title: "Стандартный режим",
-                    showCenterLabel: $showLabels,
-                    isInteractive: $isInteractive,
-                    currentLevel: .constant(0)
-                )
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-//                NewPieDiagram(
-//                    slices: value2,
-//                    title: "С легендой сбоку",
-//                    legendOnSide: true,
-//                    showCenterLabel: $showLabels,
-//                    isInteractive: $isInteractive
-//                )
-//                .frame(maxWidth: .infinity, maxHeight: .infinity)
-//            }
-//            .tabViewStyle(.page)
-
-            // Управляющие переключатели
-            VStack {
-                Toggle("Показывать надписи", isOn: $showLabels.animation())
-                Toggle("Разрешить взаимодействие", isOn: $isInteractive.animation())
-            }
-            .padding()
-            .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.1)))
-            .padding(.horizontal)
-        }
-
-}

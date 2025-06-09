@@ -92,7 +92,7 @@ struct HidenProfile: View {
     }
     
     @ViewBuilder
-    private func emptyState() -> some View {
+    func emptyState() -> some View {
         VStack {
             VStack(spacing: 16) {
                 Image(systemName: "eye.slash.circle")
@@ -129,42 +129,6 @@ struct HidenProfile: View {
     }
 }
 
-#Preview("1") {
-    Text("dfd")
-}
-
 #Preview {
-    HidenProfile(viewModel: HidenProfileViewModel())
+    HidenProfile(viewModel: .init(hidenIds: [0])).emptyState()
 }
-
-#Preview("With profiles") {
-    let viewModel = HidenProfileViewModel()
-    viewModel.profiles = [
-        UserProfileResultDto.getTestUser(),
-        UserProfileResultDto(
-            id: 2,
-            externalId: 2,
-            username: "test_user",
-            fullName: "Тестовый Пользователь",
-            userProfileStatus: nil,
-            userPaymentStatus: nil,
-            isDeleted: false,
-            creationDateTime: nil,
-            lastUpdatingDateTime: nil,
-            userGroups: nil,
-            comment: nil,
-            photoUrl: nil,
-            userTargets: nil,
-            targetCalculationInfo: nil,
-            location: "Санкт-Петербург",
-            phoneNumber: nil,
-            activitySphere: nil,
-            paymentCalculationInfo: nil,
-            biography: nil,
-            forUserHideThisExtIdUsersEvents: nil
-        )
-    ]
-    return HidenProfile(viewModel: viewModel)
-}
-
-

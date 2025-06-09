@@ -239,16 +239,3 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
 	}
 }
 
-#Preview {
-    Group {
-        TargetEditView<TargetsViewModel>(target: .init(title: "Test",
-                                                   targetStatus: .inProgress,
-                                                   subTargets: [.init(title: "TestSub", targetSubStatus: .notDone, creationDateTime: Date.now.toApiString)]
-                                                  ), isCreateTarget: false)
-            .environmentObject(TargetsViewModel())
-        
-//        TargetEditView<TargetsViewModel>(category: .family, isCreateTarget: true)
-//            .environmentObject(TargetsViewModel())
-    }
-}
-

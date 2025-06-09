@@ -50,6 +50,3 @@ struct ChecksView: View {
     }
 }
 
-#Preview {
-    ChecksView()
-}

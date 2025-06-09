@@ -26,18 +26,3 @@ struct TextEditorWithPalceHolder: View {
     }
 }
 
-#Preview {
-    @Previewable @State var text: String = ""
-    TextEditorWithPalceHolder(palceHolder: "sdds", textBinding: $text)
-}
-
-#Preview {
-    Group {
-		TargetEditView<TargetsViewModel>(target: .init(id: 0,
-													   title: "Test",
-                                                   targetStatus: .inProgress,
-                                                   subTargets: [.init(title: "TestSub", targetSubStatus: .notDone, creationDateTime: Date.now.toApiString)]
-                                                  ), isCreateTarget: false)
-            .environmentObject(TargetsViewModel())
-    }
-}

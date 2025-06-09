@@ -109,21 +109,3 @@ private struct IaconWithName: View {
 }
 
 
-#Preview {
-    IaconWithName(type: .PAYMENT_FULL_PAID)
-    IaconWithName(type: .PAYMENT_WAIT)
-    IaconWithName(type: .PAYMENT_CANCELED)
-    IaconWithName(type: .PAYMENT_OVERDUE)
-    IaconWithName(type: .RECEIPT_SBP)
-    IaconWithName(type: .RECEIPT_CASH)
-    IaconWithName(type: .RECEIPT_CRYPTO)
-    IaconWithName(type: .RECEIPT_CARD)
-    Divider()
-    IaconWithName(type: .TARGET_DRAFT)
-    IaconWithName(type: .TARGET_IN_PROGRESS)
-    IaconWithName(type: .TARGET_DONE)
-    IaconWithName(type: .TARGET_DONE_EXPIRED)
-    IaconWithName(type: .TARGET_CANCELLED)
-    IaconWithName(type: .TARGET_FAILED)
-    IaconWithName(type: .TARGET_EXPIRED)
-}

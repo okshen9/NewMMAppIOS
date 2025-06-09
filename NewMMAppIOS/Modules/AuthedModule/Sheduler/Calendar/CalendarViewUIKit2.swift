@@ -423,15 +423,15 @@ private extension Binding {
 // MARK: - Preview
 
 
-struct CalendarView_Previews: PreviewProvider {
-    
-	static var previews: some View {
-        CalendarViewUIKit2()
-//            .decorating(<#T##dateComponents: Set<DateComponents>##Set<DateComponents>#>, customView: <#T##() -> View#>)
-            .frame(height: 500)
-            .background(.green)
-	}
-}
+//struct CalendarView_Previews: PreviewProvider {
+//    
+//	static var previews: some View {
+//        CalendarViewUIKit2()
+////            .decorating(<#T##dateComponents: Set<DateComponents>##Set<DateComponents>#>, customView: <#T##() -> View#>)
+//            .frame(height: 500)
+//            .background(.green)
+//	}
+//}
 
 extension UICalendarView {
     func reloadDecorationsForVisibleMonth(animated: Bool) {

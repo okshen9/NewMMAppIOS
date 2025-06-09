@@ -67,6 +67,3 @@ struct StatusTargetIndicatorView: View {
 }
 
 
-#Preview {
-	StatusTargetIndicatorView(category: .family, percentage: 100, status: .cancelled, enable: false)
-}

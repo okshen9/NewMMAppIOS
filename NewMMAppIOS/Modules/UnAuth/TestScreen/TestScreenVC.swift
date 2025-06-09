@@ -153,6 +153,3 @@ struct TestScreenVC: View {
 	}
 }
 
-#Preview {
-	TestScreenVC(appStateService: AppNavigationStateService())
-}

@@ -163,6 +163,3 @@ struct FeedView: View {
     }
 }
 
-#Preview {
-    FeedView()
-}

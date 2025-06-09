@@ -98,6 +98,3 @@ struct PaymentRowView: View {
     }
 }
 
-#Preview {
-	PaymentRowView(payment: PaymentRequestResponseDto(paymentRequestStatus: .wait))
-}

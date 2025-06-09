@@ -35,6 +35,7 @@ class HidenProfileViewModel: ObservableObject {
                 
                 guard let hiddenIds = self?.hidenIds, !hiddenIds.isEmpty else {
                     self?.profiles = []
+                    await self?.setIsLoading(false)
                     return
                 }
                 

@@ -271,17 +271,3 @@ struct TargetsView: View {
     }
 }
 
-#Preview {
-    TargetsView()
-}
-
-// MARK: - Превью с моковыми данными
-struct MockTargetsView: View {
-    var body: some View {
-        TargetsView()
-    }
-}
-
-#Preview {
-    MockTargetsView()
-}

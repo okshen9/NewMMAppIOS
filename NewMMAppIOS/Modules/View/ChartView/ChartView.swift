@@ -261,18 +261,18 @@ struct PiaView: View {
     }
 }
 
-struct PiaView_Previews: PreviewProvider {
-    static var previews: some View {
-        let slis = [
-            PiaViewFractionModel(color: .mainRed, allStats: 2, currnetValue: 1.5, name: "Семья"),
-            PiaViewFractionModel(color: .green, allStats: 4, currnetValue: 1.5, name: "Здоровье"),
-            PiaViewFractionModel(color: .blue, allStats: 3, currnetValue: 0.9, name: "Личное"),
-            PiaViewFractionModel(color: .yellow, allStats: 7, currnetValue: 4, name: "Бизнес"),
-        ]
-//        PiaView(values: [1300, 500, 300, 600, 500])
-        PiaView(piaMdels: slis, selectedFract: Binding<PiaViewFractionModel?>.constant(nil))
-    }
-}
+//struct PiaView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        let slis = [
+//            PiaViewFractionModel(color: .mainRed, allStats: 2, currnetValue: 1.5, name: "Семья"),
+//            PiaViewFractionModel(color: .green, allStats: 4, currnetValue: 1.5, name: "Здоровье"),
+//            PiaViewFractionModel(color: .blue, allStats: 3, currnetValue: 0.9, name: "Личное"),
+//            PiaViewFractionModel(color: .yellow, allStats: 7, currnetValue: 4, name: "Бизнес"),
+//        ]
+////        PiaView(values: [1300, 500, 300, 600, 500])
+//        PiaView(piaMdels: slis, selectedFract: Binding<PiaViewFractionModel?>.constant(nil))
+//    }
+//}
 
 extension PiaView {
     private var slices: [PortfolioSliceData] {
@@ -294,6 +294,3 @@ extension PiaView {
 }
 
 //
-//#Preview {
-//    PiaView()
-//}

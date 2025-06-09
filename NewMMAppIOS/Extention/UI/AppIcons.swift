@@ -243,61 +243,7 @@ extension AppIcons {
 	}
 }
 
-#Preview {
-	HStack(alignment: .top) {
-		VStack(alignment: .leading, spacing: 8) {
-			Text("Payment")
-			ForEach(Array(PaymentRequestStatus.allCases.enumerated()), id: \.1) { index, status  in
-				HStack {
-					AppIcons.Payment.coloredIcon(for: status)
-					Text(status.rawValue)
-						.font(MMFonts.caption)
-				}
-			}
-		}
-		VStack(alignment: .leading, spacing: 8) {
-			Text("Target")
-			ForEach(Array(TargetStatus.allCases.enumerated()), id: \.1) { index, status  in
-				HStack {
-					AppIcons.Target.coloredIcon(for: status)
-					Text(status.title)
-						.font(MMFonts.caption)
-				}
-			}
-		}
-		VStack(alignment: .leading, spacing: 8) {
-			Text("SubTarget")
-            ForEach(Array(TargetSubStatus.allCases.enumerated()), id: \.1) { index, status  in
-                HStack {
-                    AppIcons.SubTarget.coloredIcon(
-                        for: status,
-                        backColor: .white)
-                    .frameRect(22)
-                    Text(status.title)
-                        .font(MMFonts.caption)
-                }
-            }
-//            HStack {
-//                AppIcons.SubTarget.coloredIcon(for: .done, backColor: .white)
-//                    .frameRect(22)
-////                    .bred()
-//                Text(TargetSubStatus.done.title)
-//                    .font(MMFonts.caption)
-//            }
-//            SubTargetInProgressView(backColor: .white, fiilColor: .green)
-//                .frameRect(22)
-//            SubTargetDoneView(backColor: .white, fiilColor: .green)
-//                .frameRect(22)
-            Image("mm.subarget.done.clock")
-            AppIcons.General.combined
-            AppIcons.General.cardCombined
-            AppIcons.General.targetCombined
-//                .bred()
-		}
-	}
-}
-
-// Костыли
+// MARK: - Helper Views
 fileprivate struct SubTargetInProgressView: View {
     @State var backColor: Color
     @State var fiilColor: Color
@@ -309,18 +255,9 @@ fileprivate struct SubTargetInProgressView: View {
             Image(systemName: "circle")
                 .resizable()
                 .foregroundStyle(.gray)
-                .frame(width: gwidth * 0.8,
-                       height: gheight * 0.8)
-                .overlay(alignment: .bottomTrailing, content: {
+                .overlay(content: {
                     ZStack {
-                        Image(systemName: "star.circle.fill")
-                            .resizable()
-                            .foregroundStyle(fiilColor)
-                            .frame(width: gwidth * 0.45, height: gheight * 0.45)
-                            .background(backColor)
-                            .cornerRadius(gwidth * 0.5)
-                        
-                        Image(systemName: "circle")
+                        Image(systemName: "circle.fill")
                             .resizable()
                             .foregroundStyle(backColor)
                             .frame(width: gwidth * 0.5, height: gheight * 0.5)
@@ -343,18 +280,9 @@ fileprivate struct SubTargetDoneView: View {
             Image(systemName: "checkmark.circle.fill")
                 .resizable()
                 .foregroundStyle(fiilColor)
-                .frame(width: gwidth * 0.8,
-                       height: gheight * 0.8)
-                .overlay(alignment: .bottomTrailing, content: {
+                .overlay(content: {
                     ZStack {
-                        Image(systemName: "star.circle.fill")
-                            .resizable()
-                            .foregroundStyle(fiilColor)
-                            .frame(width: gwidth * 0.45, height: gheight * 0.45)
-                            .background(backColor)
-                            .cornerRadius(gwidth * 0.5)
-                        
-                        Image(systemName: "circle")
+                        Image(systemName: "circle.fill")
                             .resizable()
                             .foregroundStyle(backColor)
                             .frame(width: gwidth * 0.5, height: gheight * 0.5)
@@ -362,5 +290,7 @@ fileprivate struct SubTargetDoneView: View {
                     .offset(x: gwidth * 0.2, y: gwidth * 0.2)
                 })
         }
+        .frame(idealWidth: 20, idealHeight: 20)
     }
 }
+

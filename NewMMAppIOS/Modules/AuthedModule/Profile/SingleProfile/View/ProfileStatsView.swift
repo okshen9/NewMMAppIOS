@@ -33,6 +33,3 @@ struct ProfileStatsView: View {
     }
 }
 
-#Preview {
-    ProfileStatsView(progress: 0.5, lineWidth: 4, title: "Вовлек: 20/40 \nTesting")
-}

@@ -50,11 +50,3 @@ struct ValidatedTextField: View {
     }
 }
 
-#Preview {
-    ScrollView {
-        VStack {
-            ValidatedTextField(title: "test", text: .constant(""), error: "error")
-            ValidatedTextField(title: "test", text: .constant(""), error: "error")
-        }
-    }
-}

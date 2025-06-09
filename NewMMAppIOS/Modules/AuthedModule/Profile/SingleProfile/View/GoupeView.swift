@@ -44,7 +44,3 @@ struct GroupButton: View {
     }
 }
 
-#Preview {
-    GroupButton(title: "Gjnjr Fdssdffsfsdfsdf", subTitle: "nil", action: {})
-		.frame(width: 180)
-}

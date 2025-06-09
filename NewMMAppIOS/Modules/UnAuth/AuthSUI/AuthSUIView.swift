@@ -156,6 +156,3 @@ extension AuthSUIView {
     }
 }
 
-#Preview {
-    AuthSUIView()
-}

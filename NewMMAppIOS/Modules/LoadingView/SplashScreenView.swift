@@ -46,8 +46,8 @@ struct LoadingViewScreenView: View {
     }
 }
 
-struct LoadingViewScreenView_Previews: PreviewProvider {
-    static var previews: some View {
-        LoadingViewScreenView()
-    }
-}
+//struct LoadingViewScreenView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        LoadingViewScreenView()
+//    }
+//}

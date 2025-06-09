@@ -111,7 +111,3 @@ struct MapView: View {
     }
 }
 
-#Preview {
-    MapView(canInteactive: true, viewModel: .init(nameCity: "Саратов", nameUser: "Артем"))
-        .frame(height: 200)
-}

@@ -107,14 +107,3 @@ struct CategoryPieChartView: View {
     }
 }
 
-#Preview {
-    CategoryPieChartView(
-        tasks: [
-            TaskProgress(progress: 0.75, color: .blue, name: "Бизнес", value: 0.25),
-            TaskProgress(progress: 0.5, color: .green, name: "Личное", value: 0.25),
-            TaskProgress(progress: 0.9, color: .orange, name: "Семья", value: 0.25),
-            TaskProgress(progress: 0.9, color: .yellow, name: "Здоровье", value: 0.25)
-        ],
-        selectedCategory: .constant(nil)
-    )
-} 

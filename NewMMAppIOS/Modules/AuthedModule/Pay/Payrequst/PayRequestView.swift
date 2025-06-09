@@ -110,32 +110,3 @@ struct PayRequestView: View {
 	}
 }
 
-#Preview {
-	@Previewable @StateObject var viewModel = PayRequestViewModel()
-	viewModel.payRequest = .init()
-	viewModel.isLoading = false
-	return PayRequestView(viewModel: viewModel)
-}
-
-
-#Preview("2") {
-	Text("У вас нет платежей")
-		.font(.title2)
-		.fontWeight(.bold)
-		.foregroundColor(.secondary)
-}
-
-#Preview("list") {
-	PayRequestView().paymentList([
-		PaymentRequestResponseDto(id: 1, amount: 3000, dueDate: Date.tomorrow.toApiString, paymentRequestStatus: .overdue),
-		PaymentRequestResponseDto(id: 2, amount: 200, dueDate: Date.tomorrow.toApiString, paymentRequestStatus: .canceled),
-		PaymentRequestResponseDto(id: 3, amount: 300, dueDate: Date.tomorrow.toApiString, paymentRequestStatus: .fullPaid),
-		PaymentRequestResponseDto(id: 4, amount: 300, dueDate: Date.tomorrow.toApiString, paymentRequestStatus: .wait)
-	])
-}
-
-#Preview("empty") {
-	PayRequestView()
-		.emptyPayment
-}
-

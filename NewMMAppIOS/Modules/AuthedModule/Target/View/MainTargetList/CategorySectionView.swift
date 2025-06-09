@@ -143,24 +143,3 @@ struct CategorySectionView: View {
 }
 
 // MARK: - Preview Provider
-#Preview {
-    CategorySectionView(
-        category: .money,
-        targets: [
-            UserTargetDtoModel(
-                id: 1,
-//                title: "Test Tarsdf sdf sdf sdfdsfsdfsdfds fsdf sd fdfds fdsf sdf sdf sdfds f sdf sdf sdfsd fsd fget",
-//				title: "Task ee",
-				title: "Task eep[ooopopopopopopiiopopioipopi opiopi opi opi opi opi piopioopiopopopiopiiop l dg g dgfd fg dfgdgf gfddfgdfgnjuimimiioiiiklkj",
-                description: "Description d dsf gdfgdfg fdg dgdfg dsfg dsf gdfg sdf gds dfsg dfg",
-                percentage: 75,
-				targetStatus: .inProgress,
-				subTargets: [.init(id: 1, title: "Subtarget 1", description: "sdfsdfdsdf sdfsd fsd sfds fdsgdgsdfg dfg dfg dfs dfdfg dfdhds dsffssdf hsdfhdsfhsdhgdh"),
-													   .init(id: 2, title: "Subtarget 2")],
-				category: .money
-            )
-        ],
-        onEdit: {}
-    )
-    .environmentObject(TargetsViewModel())
-}

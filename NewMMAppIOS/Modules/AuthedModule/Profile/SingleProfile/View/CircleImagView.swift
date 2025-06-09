@@ -44,7 +44,7 @@ struct CircleImagView: View {
         Image(.MM)
             .resizable(resizingMode: .stretch)
             .renderingMode(.template)
-            .padding(40)
+            .padding(10)
             .foregroundStyle(Color.gray)
             .background(Color.white)
     }
@@ -60,5 +60,6 @@ extension CircleImagView {
 
 
 #Preview {
-    CircleImagView(photoUrl: URL(string:"https://t.me/i/userpic/320/NEDwDHOitx536FBY2b5uFZtNQ8CdTddB4s6XUpfu4-Y.jpg"))
+    HiddenProfileCell(profile: .getTestUser(), onUnhide: {}, openTelegramChat: {tt in })
+//    Text("s")
 }

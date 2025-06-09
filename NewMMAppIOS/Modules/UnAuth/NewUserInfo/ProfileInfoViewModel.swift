@@ -15,6 +15,7 @@ class ProfileInfoViewModel: ObservableObject {
     @Published var shouldNavigateToMain = false
     @Published var navPath = UserInfoViewModelPath.toInfoView
     @Published var isLoaded = false
+    
     @Published var hasError = false
 
     let isCanEditTelegramUsername: Bool
@@ -91,7 +92,7 @@ class ProfileInfoViewModel: ObservableObject {
         return containsFormatting
     }
     
-    // Функция сохранения профиля (адаптирована из запроса)
+    /// Функция сохранения профиля (адаптирована из запроса)
     func saveProfile() async {
         //        await navigateToMain()
         //        return
@@ -162,6 +163,23 @@ class ProfileInfoViewModel: ObservableObject {
                 )
             }
             print(error)
+        }
+    }
+    
+    /// Функция сохранения профиля (адаптирована из запроса)
+    func deleteProfile() async {
+        await setIsLoaded(true)
+        do {
+            // TODO: delete profile
+            try await apiFactory.patchMe(profileData:
+                                            EditProfileBodyDTO (
+                                                isDeleted: true
+                                            )
+            )
+        } catch {
+            await ToastManager.shared.show(
+                ToastModel(message: "Что-то пошло не так", icon: "xmark.app", duration: 2)
+            )
         }
     }
     

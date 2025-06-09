@@ -118,17 +118,3 @@ struct SubTargetRowView<ViewModel: SubTargetRowViewModelProtocol>: View {
     }
 }
 
-#Preview {
-    @Previewable @State var showDescription: Bool = false
-    SubTargetRowView<TargetsViewModel>(
-        showDescription: $showDescription,
-        subTarget: .init(
-            title: "Test",
-            description: "Тестовое описание подцели",
-            targetSubStatus: .done
-        ),
-		parentTarget: .init(id: 0,
-							title: "Parent Target")
-    )
-    .environmentObject(TargetsViewModel())
-}
