@@ -255,9 +255,18 @@ fileprivate struct SubTargetInProgressView: View {
             Image(systemName: "circle")
                 .resizable()
                 .foregroundStyle(.gray)
-                .overlay(content: {
+                .frame(width: gwidth * 0.8,
+                       height: gheight * 0.8)
+                .overlay(alignment: .bottomTrailing, content: {
                     ZStack {
-                        Image(systemName: "circle.fill")
+                        Image(systemName: "star.circle.fill")
+                            .resizable()
+                            .foregroundStyle(fiilColor)
+                            .frame(width: gwidth * 0.45, height: gheight * 0.45)
+                            .background(backColor)
+                            .cornerRadius(gwidth * 0.5)
+                        
+                        Image(systemName: "circle")
                             .resizable()
                             .foregroundStyle(backColor)
                             .frame(width: gwidth * 0.5, height: gheight * 0.5)
@@ -280,9 +289,18 @@ fileprivate struct SubTargetDoneView: View {
             Image(systemName: "checkmark.circle.fill")
                 .resizable()
                 .foregroundStyle(fiilColor)
-                .overlay(content: {
+                .frame(width: gwidth * 0.8,
+                       height: gheight * 0.8)
+                .overlay(alignment: .bottomTrailing, content: {
                     ZStack {
-                        Image(systemName: "circle.fill")
+                        Image(systemName: "star.circle.fill")
+                            .resizable()
+                            .foregroundStyle(fiilColor)
+                            .frame(width: gwidth * 0.45, height: gheight * 0.45)
+                            .background(backColor)
+                            .cornerRadius(gwidth * 0.5)
+                        
+                        Image(systemName: "circle")
                             .resizable()
                             .foregroundStyle(backColor)
                             .frame(width: gwidth * 0.5, height: gheight * 0.5)
@@ -291,6 +309,459 @@ fileprivate struct SubTargetDoneView: View {
                 })
         }
         .frame(idealWidth: 20, idealHeight: 20)
+    }
+}
+
+// MARK: - Previews
+#Preview("General Icons") {
+    VStack(spacing: 20) {
+        Text("General Icons")
+            .font(.title2)
+            .bold()
+        
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 16) {
+            VStack {
+                AppIcons.General.combined
+                    .font(.title)
+                Text("Combined")
+                    .font(.caption)
+            }
+            
+            VStack {
+                AppIcons.General.cardCombined
+                    .font(.title)
+                Text("Card Combined")
+                    .font(.caption)
+            }
+            
+            VStack {
+                AppIcons.General.targetCombined
+                    .font(.title)
+                Text("Target Combined")
+                    .font(.caption)
+            }
+            
+            VStack {
+                AppIcons.General.calendar
+                    .font(.title)
+                Text("Calendar")
+                    .font(.caption)
+            }
+            
+            VStack {
+                AppIcons.General.add
+                    .font(.title)
+                Text("Add")
+                    .font(.caption)
+            }
+            
+            VStack {
+                AppIcons.General.expand
+                    .font(.title)
+                Text("Expand")
+                    .font(.caption)
+            }
+            
+            VStack {
+                AppIcons.General.collapse
+                    .font(.title)
+                Text("Collapse")
+                    .font(.caption)
+            }
+            
+            VStack {
+                AppIcons.General.arrowTurnDownRight
+                    .font(.title)
+                Text("Arrow Turn")
+                    .font(.caption)
+            }
+        }
+    }
+    .padding()
+}
+
+#Preview("Payment Icons") {
+    VStack(spacing: 20) {
+        Text("Payment Icons")
+            .font(.title2)
+            .bold()
+        
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 16) {
+            VStack {
+                AppIcons.Payment.coloredIcon(for: .wait)
+                    .font(.title)
+                Text("Wait")
+                    .font(.caption)
+                Text("(.wait)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            VStack {
+                AppIcons.Payment.coloredIcon(for: .fullPaid)
+                    .font(.title)
+                Text("Full Paid")
+                    .font(.caption)
+                Text("(.fullPaid)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            VStack {
+                AppIcons.Payment.coloredIcon(for: .canceled)
+                    .font(.title)
+                Text("Canceled")
+                    .font(.caption)
+                Text("(.canceled)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            VStack {
+                AppIcons.Payment.coloredIcon(for: .overdue)
+                    .font(.title)
+                Text("Overdue")
+                    .font(.caption)
+                Text("(.overdue)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            VStack {
+                AppIcons.Payment.coloredIcon(for: nil)
+                    .font(.title)
+                Text("Default")
+                    .font(.caption)
+                Text("(nil)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+    .padding()
+}
+
+#Preview("Target Icons") {
+    VStack(spacing: 20) {
+        Text("Target Icons")
+            .font(.title2)
+            .bold()
+        
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 16) {
+            VStack {
+                AppIcons.Target.coloredIcon(for: .inProgress)
+                    .font(.title)
+                Text("In Progress")
+                    .font(.caption)
+                Text("(.inProgress)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            VStack {
+                AppIcons.Target.coloredIcon(for: .done)
+                    .font(.title)
+                Text("Done")
+                    .font(.caption)
+                Text("(.done)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            VStack {
+                AppIcons.Target.coloredIcon(for: .doneExpired)
+                    .font(.title)
+                Text("Done Expired")
+                    .font(.caption)
+                Text("(.doneExpired)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            VStack {
+                AppIcons.Target.coloredIcon(for: .expired)
+                    .font(.title)
+                Text("Expired")
+                    .font(.caption)
+                Text("(.expired)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            VStack {
+                AppIcons.Target.coloredIcon(for: .draft)
+                    .font(.title)
+                Text("Draft")
+                    .font(.caption)
+                Text("(.draft)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            VStack {
+                AppIcons.Target.coloredIcon(for: .cancelled)
+                    .font(.title)
+                Text("Cancelled")
+                    .font(.caption)
+                Text("(.cancelled)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            VStack {
+                AppIcons.Target.coloredIcon(for: .failed)
+                    .font(.title)
+                Text("Failed")
+                    .font(.caption)
+                Text("(.failed)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            VStack {
+                AppIcons.Target.coloredIcon(for: .unknown)
+                    .font(.title)
+                Text("Unknown")
+                    .font(.caption)
+                Text("(.unknown)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+    .padding()
+}
+
+#Preview("SubTarget Icons") {
+    VStack(spacing: 20) {
+        Text("SubTarget Icons")
+            .font(.title2)
+            .bold()
+        
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 16) {
+            VStack {
+                AppIcons.SubTarget.coloredIcon(for: .inProgress, backColor: .black)
+                    .frame(width: 30, height: 30)
+                Text("In Progress")
+                    .font(.caption)
+                Text("(.inProgress)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            VStack {
+                AppIcons.SubTarget.coloredIcon(for: .notDone, backColor: .blue)
+                    .frame(width: 30, height: 30)
+                Text("Not Done")
+                    .font(.caption)
+                Text("(.notDone)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            VStack {
+                AppIcons.SubTarget.coloredIcon(for: .done, backColor: .blue)
+                    .frame(width: 30, height: 30)
+                Text("Done")
+                    .font(.caption)
+                Text("(.done)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            VStack {
+                AppIcons.SubTarget.coloredIcon(for: .expiredDone, backColor: .blue)
+                    .frame(width: 30, height: 30)
+                Text("Expired Done")
+                    .font(.caption)
+                Text("(.expiredDone)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            VStack {
+                AppIcons.SubTarget.coloredIcon(for: .expired, backColor: .blue)
+                    .frame(width: 30, height: 30)
+                Text("Expired")
+                    .font(.caption)
+                Text("(.expired)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            VStack {
+                AppIcons.SubTarget.coloredIcon(for: .failed, backColor: .blue)
+                    .frame(width: 30, height: 30)
+                Text("Failed")
+                    .font(.caption)
+                Text("(.failed)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            VStack {
+                AppIcons.SubTarget.coloredIcon(for: .unknown, backColor: .blue)
+                    .frame(width: 30, height: 30)
+                Text("Unknown")
+                    .font(.caption)
+                Text("(.unknown)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+    .padding()
+}
+
+#Preview("All Icons Overview") {
+    ScrollView {
+        VStack(spacing: 30) {
+            Text("All App Icons Overview")
+                .font(.title)
+                .bold()
+            
+            // General Section
+            VStack(spacing: 15) {
+                Text("General Icons")
+                    .font(.title2)
+                    .bold()
+                
+                HStack(spacing: 20) {
+                    VStack {
+                        AppIcons.General.combined
+                            .font(.title)
+                        Text("Combined")
+                            .font(.caption)
+                    }
+                    
+                    VStack {
+                        AppIcons.General.cardCombined
+                            .font(.title)
+                        Text("Card")
+                            .font(.caption)
+                    }
+                    
+                    VStack {
+                        AppIcons.General.targetCombined
+                            .font(.title)
+                        Text("Target")
+                            .font(.caption)
+                    }
+                }
+            }
+            
+            // Payment Section
+            VStack(spacing: 15) {
+                Text("Payment States")
+                    .font(.title2)
+                    .bold()
+                
+                HStack(spacing: 15) {
+                    VStack {
+                        AppIcons.Payment.coloredIcon(for: .wait)
+                            .font(.title)
+                        Text("Wait")
+                            .font(.caption)
+                    }
+                    
+                    VStack {
+                        AppIcons.Payment.coloredIcon(for: .fullPaid)
+                            .font(.title)
+                        Text("Paid")
+                            .font(.caption)
+                    }
+                    
+                    VStack {
+                        AppIcons.Payment.coloredIcon(for: .canceled)
+                            .font(.title)
+                        Text("Canceled")
+                            .font(.caption)
+                    }
+                    
+                    VStack {
+                        AppIcons.Payment.coloredIcon(for: .overdue)
+                            .font(.title)
+                        Text("Overdue")
+                            .font(.caption)
+                    }
+                }
+            }
+            
+            // Target Section
+            VStack(spacing: 15) {
+                Text("Target States")
+                    .font(.title2)
+                    .bold()
+                
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 10) {
+                    VStack {
+                        AppIcons.Target.coloredIcon(for: .inProgress)
+                            .font(.title2)
+                        Text("Progress")
+                            .font(.caption2)
+                    }
+                    
+                    VStack {
+                        AppIcons.Target.coloredIcon(for: .done)
+                            .font(.title2)
+                        Text("Done")
+                            .font(.caption2)
+                    }
+                    
+                    VStack {
+                        AppIcons.Target.coloredIcon(for: .expired)
+                            .font(.title2)
+                        Text("Expired")
+                            .font(.caption2)
+                    }
+                    
+                    VStack {
+                        AppIcons.Target.coloredIcon(for: .draft)
+                            .font(.title2)
+                        Text("Draft")
+                            .font(.caption2)
+                    }
+                }
+            }
+            
+            // SubTarget Section
+            VStack(spacing: 15) {
+                Text("SubTarget States")
+                    .font(.title2)
+                    .bold()
+                
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 10) {
+                    VStack {
+                        AppIcons.SubTarget.coloredIcon(for: .inProgress, backColor: .blue)
+                            .frame(width: 25, height: 25)
+                        Text("Progress")
+                            .font(.caption2)
+                    }
+                    
+                    VStack {
+                        AppIcons.SubTarget.coloredIcon(for: .done, backColor: .blue)
+                            .frame(width: 25, height: 25)
+                        Text("Done")
+                            .font(.caption2)
+                    }
+                    
+                    VStack {
+                        AppIcons.SubTarget.coloredIcon(for: .expired, backColor: .blue)
+                            .frame(width: 25, height: 25)
+                        Text("Expired")
+                            .font(.caption2)
+                    }
+                    
+                    VStack {
+                        AppIcons.SubTarget.coloredIcon(for: .failed, backColor: .blue)
+                            .frame(width: 25, height: 25)
+                        Text("Failed")
+                            .font(.caption2)
+                    }
+                }
+            }
+        }
+        .padding()
     }
 }
 
