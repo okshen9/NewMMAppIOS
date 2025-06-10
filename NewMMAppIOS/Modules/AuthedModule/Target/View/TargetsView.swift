@@ -38,7 +38,11 @@ struct TargetsView: View {
 			.toolbar {
 				ToolbarItem(placement: .navigationBarTrailing) {
 					Button(action: {
-						showAddTarget = true
+                        if viewModel.targets.isEmpty {
+                            viewModel.showPrivateAlert = true
+                        } else {
+                            showAddTarget = true
+                        }
 					}) {
 						Image(systemName: "plus")
 							.foregroundColor(.mainRed)
@@ -56,6 +60,15 @@ struct TargetsView: View {
 					dismissButton: .default(Text("OK"))
 				)
 			}
+            .alert("Согласие на публикацию целей.", isPresented: $viewModel.showPrivateAlert) {
+                            Button("Отмена", role: .cancel) { }
+                            Button("Согласен", role: .destructive) {
+                                showAddTarget = true
+                            }
+            } message: {
+                Text("Цели после создания будут доступны менторам и другим пользователям. Это часть механики клуба Мастермайнд.")
+            }
+            
 		}
 		.onChange(of: viewModel.errorMessage) { _, newValue in
 			showErrorAlert = newValue != nil
@@ -90,7 +103,11 @@ struct TargetsView: View {
                 .padding(.horizontal, 20)
             
             Button(action: {
-                showAddTarget = true
+                if viewModel.targets.isEmpty {
+                    viewModel.showPrivateAlert = true
+                } else {
+                    showAddTarget = true
+                }
             }) {
                 Text("Создать цель")
                     .fontWeight(.medium)

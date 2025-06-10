@@ -23,6 +23,9 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
     @Published var groupedTargets: [TargetCategory: [UserTargetDtoModel]] = [:]
 	@Published var showDiscardChangesAlert = false
     
+    /// Показать алерт, что цели будут общедоступны
+    @Published var showPrivateAlert = false
+    
     // MARK: - Private Properties
     private let networkService = ServiceBuilder.shared
     
