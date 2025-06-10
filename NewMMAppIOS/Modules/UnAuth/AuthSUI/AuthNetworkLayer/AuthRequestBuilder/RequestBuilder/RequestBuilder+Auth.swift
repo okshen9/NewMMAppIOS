@@ -83,5 +83,14 @@ extension APIFactory: AuthRequestProtocol {
         return urlRequest
     }
 
-    
+    func drafthMe() throws -> URLRequest {
+        let helper = AuthRequestHelper.draftMe
+        let url = try urlBuilder.buildURL(path: helper.path)
+        let urlRequest = try requestBuilder.buildURLRequest(
+            url: url,
+            query: helper.query,
+            method: helper.method,
+            tokenNeccessity: .mandatory)
+        return urlRequest
+    }
 }

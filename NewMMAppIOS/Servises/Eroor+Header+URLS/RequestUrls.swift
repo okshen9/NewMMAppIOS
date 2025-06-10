@@ -43,6 +43,8 @@ enum RequestUrls {
     /// работа с группами
     static let userGroup = "/group"
     
+    /// Увыставляет в аккаунте роль драфт
+    static let draftMe = "/user/auth/draft/me"
     
     
     // MARK: - Цели

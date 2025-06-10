@@ -25,4 +25,7 @@ protocol AuthRequestProtocol {
 
     /// PATCH/user-profile
     func patchMe(profileData: EditProfileBodyDTO) throws -> URLRequest
+    
+    /// удаляет аккаунт - выставляет роль драфт
+    func drafthMe() throws -> URLRequest
 }

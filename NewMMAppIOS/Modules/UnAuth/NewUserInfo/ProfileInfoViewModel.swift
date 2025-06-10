@@ -14,7 +14,8 @@ class ProfileInfoViewModel: ObservableObject {
     @Published var isValid = false
     @Published var shouldNavigateToMain = false
     @Published var navPath = UserInfoViewModelPath.toInfoView
-    @Published var isLoaded = false
+    @Published var isLoading = false
+    @Published var isDeleting = false
     
     @Published var hasError = false
 
@@ -121,18 +122,37 @@ class ProfileInfoViewModel: ObservableObject {
                 self.needUpdateAction()
                 await navigationTo(.dismiss)
             } else {
-                let finalUser = try await apiFactory.createProfile(profileData: CreateUserProfileBodyModel(
-                    externalId: nil, // Предполагаем, что ID будет получен позже
-                    username: userProfile.telegramUsername,
-                    fullName: userProfile.firstName,
-                    userProfileStatus: nil,
-                    userPaymentStatus: nil,
-                    photoUrl: UserRepository.shared.getUrlPhotoFromTGData(), // Поле не указано в списке, оставляем пустым
-                    location: userProfile.city,
-                    phoneNumber: userProfile.phoneNumber,
-                    biography: userProfile.about,
-                    activitySphere: userProfile.occupation
-                ))
+                let profileUserModel = try? await apiFactory.getProfileMe()
+                var finalUser: UserProfileResultDto
+                if !profileUserModel.isNil {
+                    finalUser = try await apiFactory.patchMe(profileData:
+                                                                EditProfileBodyDTO(
+                                                                    username: userProfile.telegramUsername,
+                                                                    fullName: userProfile.firstName,
+                                                                    userProfileStatus: profileModel?.userProfileStatus,
+                                                                    userPaymentStatus: profileModel?.userPaymentStatus,
+                                                                    isDeleted: profileModel?.isDeleted,
+                                                                    comment: profileModel?.comment,
+                                                                    photoUrl: profileModel?.photoUrl,
+                                                                    location: userProfile.city,
+                                                                    phoneNumber: userProfile.phoneNumber,
+                                                                    activitySphere: userProfile.occupation,
+                                                                    biography: userProfile.about
+                                                                ))
+                } else {
+                    finalUser = try await apiFactory.createProfile(profileData: CreateUserProfileBodyModel(
+                        externalId: nil, // Предполагаем, что ID будет получен позже
+                        username: userProfile.telegramUsername,
+                        fullName: userProfile.firstName,
+                        userProfileStatus: nil,
+                        userPaymentStatus: nil,
+                        photoUrl: UserRepository.shared.getUrlPhotoFromTGData(), // Поле не указано в списке, оставляем пустым
+                        location: userProfile.city,
+                        phoneNumber: userProfile.phoneNumber,
+                        biography: userProfile.about,
+                        activitySphere: userProfile.occupation
+                    ))
+                }
                 guard let refreshJWT = UserRepository.shared.refreshJWT,
                       let updatedAuthUser = try await apiFactory.refreshJWT(refreshModel: .init(refreshToken: refreshJWT)) else {
                     await navigationTo(.toInfoView)
@@ -168,15 +188,13 @@ class ProfileInfoViewModel: ObservableObject {
     
     /// Функция сохранения профиля (адаптирована из запроса)
     func deleteProfile() async {
-        await setIsLoaded(true)
+        await setIsDeleting(true)
         do {
             // TODO: delete profile
-            try await apiFactory.patchMe(profileData:
-                                            EditProfileBodyDTO (
-                                                isDeleted: true
-                                            )
-            )
+            try await apiFactory.drafthMe()
+            await setIsDeleting(false)
         } catch {
+            await setIsDeleting(false)
             await ToastManager.shared.show(
                 ToastModel(message: "Что-то пошло не так", icon: "xmark.app", duration: 2)
             )
@@ -190,7 +208,12 @@ class ProfileInfoViewModel: ObservableObject {
 
     @MainActor
     func setIsLoaded(_ isActive: Bool) {
-        self.isLoaded = isActive
+        self.isLoading = isActive
+    }
+    
+    @MainActor
+    func setIsDeleting(_ isActive: Bool) {
+        self.isDeleting = isActive
     }
 }
 

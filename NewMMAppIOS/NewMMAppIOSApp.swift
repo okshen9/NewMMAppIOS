@@ -27,7 +27,7 @@ struct NewMMAppIOSApp: App {
                     TabBarView()
                         .withToast()
 
-                case .unAuthorized:
+                case let .unAuthorized(isReset):
                     NavigationStack(path: $authNavigationManager.path) {
                         AuthSUIView()
                             .navigationDestination(for: AuthRoute.self) { route in
@@ -47,6 +47,13 @@ struct NewMMAppIOSApp: App {
                     .withToast()
                 }
             }
+            .onChange(of: appStateService.state) { oldVal, newVal in
+                if case let .unAuthorized(isReset) = newVal,
+                   newVal != oldVal,
+                   isReset {
+                    authNavigationManager.popToRoot()
+                }
+            }
             .preferredColorScheme(.light)
             .onAppear {
                 // Настройка ServiceBuilder после инициализации StateObject
@@ -57,7 +64,7 @@ struct NewMMAppIOSApp: App {
                 ((UserRepository.shared.roles?.contains(Roles.user.rawValue)).orFalse ||
                 (UserRepository.shared.roles?.contains(Roles.admin.rawValue)).orFalse) &&
                 !UserRepository.shared.jwt.isEmptyOrNil && !UserRepository.shared.refreshJWT.isEmptyOrNil
-                ? .authorized : .unAuthorized
+                ? .authorized : .unAuthorized(true)
                 appStateService.setNewState(newState)
             }
             .onShakeGesture {

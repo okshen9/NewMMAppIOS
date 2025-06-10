@@ -21,7 +21,11 @@ enum AuthRequestHelper {
     /// /user/auth/refresh
     case authuserRefreshJWT
     
+    ///  Получить профиль по id
     case getUserProfile(Int)
+    
+    /// Сделать свой аккаунт ролью драфт - удаление аккаунта
+    case draftMe
 
     /// Массив параметров
     var query: QueryItemsRepresentable? {
@@ -37,6 +41,8 @@ enum AuthRequestHelper {
         case .getUserProfile(_):
             return nil
         case .patchMe:
+            return nil
+        case .draftMe:
             return nil
         }
     }
@@ -57,6 +63,8 @@ enum AuthRequestHelper {
             return RequestUrls.authuserRefresh
         case .getUserProfile(let externalId):
             return "\(RequestUrls.userProfile)/\(externalId)"
+        case .draftMe:
+            return RequestUrls.draftMe
         }
     }
 
@@ -69,6 +77,8 @@ enum AuthRequestHelper {
             return .post
         case .patchMe:
             return .patch
+        case .draftMe:
+            return .delete
         }
     }
 }

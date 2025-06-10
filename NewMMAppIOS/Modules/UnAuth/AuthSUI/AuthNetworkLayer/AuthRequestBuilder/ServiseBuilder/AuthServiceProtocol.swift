@@ -26,4 +26,7 @@ protocol AuthServiceProtocol {
 
     /// PATCH/user-profile
     func patchMe(profileData: EditProfileBodyDTO) async throws -> UserProfileResultDto
+    
+    /// удаляет аккаунт - выставляет роль драфт
+    func drafthMe() async throws -> AuthUserDtoResult
 }

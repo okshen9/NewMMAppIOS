@@ -7,6 +7,30 @@
 
 import Foundation
 
+enum PaymentRequestStatus: String, UnknownCasedEnum, Codable, Hashable {
+    case unknown = "UNKNOWN"
+    
+    case fullPaid = "FULL_PAID"
+    case wait = "WAIT"
+    case canceled = "CANCELED"
+    case overdue = "OVERDUE"
+    
+    var description: String {
+        switch self {
+        case .fullPaid:
+            return "Оплачено"
+        case .wait:
+            return "Ожидает оплаты"
+        case .canceled:
+            return "Запрос отменен"
+        case .overdue:
+            return "Просрочено"
+        case .unknown:
+            return "Нет информации"
+        }
+    }
+}
+
 struct PaymentRequestResponseDto: Codable, Equatable {
     let id: Int?
     let externalId: Int?
@@ -41,29 +65,5 @@ struct PaymentRequestResponseDto: Codable, Equatable {
         self.comment = comment ?? "Какой-то комент"
         self.paymentRequestStatus = paymentRequestStatus ?? PaymentRequestStatus.overdue
         self.userProfilePreview = userProfilePreview ?? UserRepository.shared.userProfile
-    }
-}
-
-enum PaymentRequestStatus: String, UnknownCasedEnum, Codable, Hashable {
-    case unknown = "UNKNOWN"
-    
-    case fullPaid = "FULL_PAID"
-    case wait = "WAIT"
-    case canceled = "CANCELED"
-    case overdue = "OVERDUE"
-    
-    var description: String {
-        switch self {
-        case .fullPaid:
-            return "Оплачено"
-        case .wait:
-            return "Ожидает оплаты"
-        case .canceled:
-            return "Запрос отменен"
-        case .overdue:
-            return "Просрочено"
-        case .unknown:
-            return "Нет информации"
-        }
     }
 }

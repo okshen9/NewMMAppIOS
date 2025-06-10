@@ -15,7 +15,9 @@ protocol BasicEventCell: View {
 struct NewFeedCell: BasicEventCell {
     var onHeaderTap: () -> Void
     var onHideUser: ((Int) async -> Bool)
-    var showHidenTogle: Bool = true
+    var showHidenTogle: Bool {
+        event.creatorExternalId != UserRepository.shared.externalId?.toString
+    }
     @State var isLoading = false
     @State private var showHideUserAlert = false
     @State private var userToHide: (externalId: Int, name: String)?

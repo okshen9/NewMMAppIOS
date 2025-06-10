@@ -10,16 +10,21 @@ import SwiftUI
 
 @MainActor
 class AppNavigationStateService: ObservableObject {
-    @Published private(set) var state: AppState = .unAuthorized
+    @Published private(set) var state: AppState = .unAuthorized(false)
 
+    
     func setNewState(_ newState: AppState) {
-        withAnimation {
-            self.state = newState
+        Task.detached {
+            await MainActor.run {
+                withAnimation {
+                    self.state = newState
+                }
+            }
         }
     }
 
-    enum AppState {
-        case unAuthorized
+    enum AppState: Equatable {
+        case unAuthorized(Bool)
         case authorized
     }
 }

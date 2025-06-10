@@ -10,7 +10,6 @@ import Foundation
 /// Создание сервис реквеста
 extension ServiceBuilder: AuthServiceProtocol {
     
-    
     /// /user/auth/telegram/callback
     func sendTGToken(model: AuthQueryModel) async throws -> AuthTGRequestModel {
         try await performRequest {
@@ -50,6 +49,12 @@ extension ServiceBuilder: AuthServiceProtocol {
     func patchMe(profileData: EditProfileBodyDTO) async throws -> UserProfileResultDto {
         try await performRequest {
             try apiFactory.patchMe(profileData: profileData)
+        }
+    }
+    
+    func drafthMe() async throws -> AuthUserDtoResult {
+        try await performRequest {
+            try apiFactory.drafthMe()
         }
     }
 }

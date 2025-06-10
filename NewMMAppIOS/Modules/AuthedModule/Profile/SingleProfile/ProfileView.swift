@@ -252,8 +252,8 @@ struct ProfileView: View {
                 }
             } else if let feedEvents = viewModel.feedEvents, !feedEvents.isEmpty {
                 ForEach(feedEvents) { event in
-                    let showHidenTogle = event.creatorExternalId == viewModel.userRepository.externalId?.toString
-                    NewFeedCell(onHeaderTap: {}, onHideUser: {_ in true}, showHidenTogle: showHidenTogle, event: event)
+//                    let showHidenTogle = event.creatorExternalId == viewModel.userRepository.externalId?.toString
+                    NewFeedCell(onHeaderTap: {}, onHideUser: {_ in true}, event: event)
                 }
                 
                 if !viewModel.isAll {
@@ -398,7 +398,7 @@ struct ProfileView: View {
                 }
                 Button("Выйти", action: {
                     viewModel.logout()
-                    appStateService.setNewState(.unAuthorized)
+                    appStateService.setNewState(.unAuthorized(true))
                 })
             } else {
                 Button(action: {

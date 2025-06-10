@@ -60,7 +60,7 @@ class HidenProfileViewModel: ObservableObject {
         }
     }
     
-    /// Скрыть неподходящие эвенты
+    /// Перестать скрывать контент пользователя
     /// - Parameter externalId: id который надо убрать из игнорирования
     func unhideProfile(externalId: Int) async -> UserProfileResultDto? {
         do {

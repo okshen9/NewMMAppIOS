@@ -75,7 +75,7 @@ struct ProfileInfoView: View {
                         await viewModel.saveProfile()
                     }
                 }) {
-                    if !viewModel.isLoaded {
+                    if !viewModel.isLoading {
                         Text("Сохранить")
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -92,14 +92,14 @@ struct ProfileInfoView: View {
                             .cornerRadius(16)
                     }
                 }
-                .disabled(!viewModel.isValid || viewModel.isLoaded)
+                .disabled(!viewModel.isValid || viewModel.isLoading)
                 
                 
                 if viewModel.isEditProfile {
                     Button(action: {
                         showDeleteAlert = true
                     }) {
-                        if !viewModel.isLoaded {
+                        if !viewModel.isDeleting {
                             Text("Удалить аккаунт")
                                 .font(MMFonts.caption)
                                 .frame(maxWidth: .infinity)
@@ -109,9 +109,7 @@ struct ProfileInfoView: View {
                         } else {
                             ProgressView()
                                 .progressViewStyle(CircularProgressViewStyle())
-                                .frame(maxWidth: .infinity)
                                 .padding()
-                                .background(Color.gray.opacity(0.3))
                                 .foregroundColor(.white)
                                 .cornerRadius(16)
                         }
@@ -137,8 +135,9 @@ struct ProfileInfoView: View {
                     }
                 }
             }
-            .disabled(viewModel.isLoaded) // Блокируем взаимодействие с формой при загрузке
+            .disabled(viewModel.isLoading) // Блокируем взаимодействие с формой при загрузке
         }
+        .disabled(viewModel.isDeleting || viewModel.isLoading)
         .scrollDismissesKeyboard(.interactively)
         .navigationTitle("Данные профиля")
         .navigationBarTitleDisplayMode(.inline)
@@ -170,14 +169,13 @@ struct ProfileInfoView: View {
             Button("Отмена", role: .cancel) {}
             Button("Да", role: .destructive) {
                 Task {
-                    await viewModel.saveProfile()
-                    dismiss()
+                    await viewModel.deleteProfile()
                     UserRepository.shared.clearAll()
-                    appStateServise.setNewState(.unAuthorized)
+                    appStateServise.setNewState(.unAuthorized(true))
                 }
             }
         } message: {
-            Text("Ващ аккаунт будет будет удален.")
+            Text("Ваш аккаунт будет удален.")
         }
         .interactiveDismissDisabled(true) // Блокируем свайп
         .navigationBarBackButtonHidden()

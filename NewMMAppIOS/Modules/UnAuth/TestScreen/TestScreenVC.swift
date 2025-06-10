@@ -26,7 +26,7 @@ struct TestScreenVC: View {
 							}
 							systemService.prodServ = stand
 							UserRepository.shared.clearAll()
-							appStateService.setNewState(.unAuthorized)
+							appStateService.setNewState(.unAuthorized(true))
 						},
 						label: {
 							HStack {
