@@ -23,7 +23,7 @@ struct AuthSUIView: View {
 
             VStack(spacing: 20) {
                 if !viewModel.showWebView {
-                    Image("man")
+                    Image("mastermind")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 200, height: 200)
@@ -44,6 +44,8 @@ struct AuthSUIView: View {
                                 viewModel.telegramCallBack(tgKey: demoKey)
                             }
                         }
+                    brandingPoint()
+                        .padding(.top, -100)
 
                     Spacer()
                 }
@@ -95,6 +97,7 @@ struct AuthSUIView: View {
                 .foregroundColor(.headerText)
 
             telegramButton
+                .disabled(viewModel.isLoding)
 
             Spacer()
 
@@ -139,9 +142,45 @@ struct AuthSUIView: View {
                     .foregroundColor(.primary)
             }
             .padding()
-            .background(Color.tgColor)
+            .background(Color.tgColor.lighter(by: viewModel.isLoding ? 0.3 : 0))
             .cornerRadius(16)
         }
+    }
+    
+    @ViewBuilder
+    func brandingPoint() -> some View {
+        HStack(alignment: .center, spacing: -16) {
+            Image("gold")
+                .resizable()
+                .frameRect(60)
+                .rotationEffect(.degrees(viewModel.isLoding ? 360 : 0))
+                .animation(
+                    Animation.linear(duration: 2)
+                        .repeatForever(autoreverses: false),
+                    value: viewModel.isLoding
+                )
+            Image("silver")
+                .resizable()
+                .frameRect(80)
+                .rotationEffect(.degrees(viewModel.isLoding ? -360 : 0))
+                .animation(
+                    Animation.linear(duration: 2)
+                        .repeatForever(autoreverses: false),
+                    value: viewModel.isLoding
+                )
+                .padding(.leading, 8)
+            Image("bronze")
+                .resizable()
+                .frameRect(70)
+                .rotationEffect(.degrees(viewModel.isLoding ? 360 : 0))
+                .animation(
+                    Animation.linear(duration: 2)
+                        .repeatForever(autoreverses: false),
+                    value: viewModel.isLoding
+                )
+        }
+        
+        
     }
 }
 
@@ -156,3 +195,8 @@ extension AuthSUIView {
     }
 }
 
+
+#Preview {
+    AuthSUIView()
+//    Text("")
+}

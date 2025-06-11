@@ -19,6 +19,9 @@ final class AuthSUIViewModel: NSObject, ObservableObject {
     
     /// дает возможность открыть демо режим
     @Published var enableDemo = false
+    
+    ///  Отображает идет ли загрузка
+    @Published var isLoding = false
 
     // MARK: - Methods
     /// проверяет есть ли ответ от телеги с данными в tgAuthResult
@@ -43,19 +46,21 @@ final class AuthSUIViewModel: NSObject, ObservableObject {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         self.navPath = .authView
                     }
+                    isLoding = false
                 }
                 await ToastManager.shared.show(.init(message: "Не удалось загрузить пользователя"))
+                
                 return
             }
             UserRepository.shared.setAuthUser(authModel)
-            await MainActor.run {
+            await MainActor.run { [weak self] in
                 // Сначала закрываем WebView
                 withAnimation {
-                    showWebView = false
+                    self?.showWebView = false
                 }
                 // Добавляем задержку перед изменением navPath
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    self.handleNavigation(for: authModel.authUserDto)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5.3) {
+                    self?.handleNavigation(for: authModel.authUserDto)
                 }
             }
         }
@@ -70,6 +75,7 @@ final class AuthSUIViewModel: NSObject, ObservableObject {
         } else {
             navPath = .toInfoView
         }
+        isLoding = false
     }
 
     /// Запрашиваем authUser
@@ -77,6 +83,7 @@ final class AuthSUIViewModel: NSObject, ObservableObject {
         do {
             return await try service.sendTGToken(model: authQueryModel)
         } catch {
+            isLoding = false
             print("neshko error \(error)")
             return nil
         }
@@ -90,6 +97,7 @@ extension AuthSUIViewModel: WKUIDelegate, WKNavigationDelegate {
         if let url = navigationAction.request.url,
            let tgKey = validateWebRequest(url: url) {
             UserRepository.shared.setTGData(tgKey)
+            self.isLoding = true
             telegramCallBack(tgKey: tgKey)
             decisionHandler(.cancel)
             return
