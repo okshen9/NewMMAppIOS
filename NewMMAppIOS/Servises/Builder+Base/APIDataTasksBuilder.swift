@@ -21,6 +21,7 @@ public class APIDataTasksBuilder {
         config.waitsForConnectivity = true
         config.timeoutIntervalForRequest = 5
 		var delegat: URLSessionDelegate? {
+            return UnsafeSSLDelegate()
 			if AppStateSystemService.shared.prodServ != .prod {
 				return UnsafeSSLDelegate()
 			} else {
@@ -135,7 +136,9 @@ extension APIDataTasksBuilder {
                     }
                     catch{
                         await MainActor.run {
-                            refreshManager.clearAll()
+                            Task {
+                                await refreshManager.clearAll()
+                            }
                             let authView = AuthSUIView()
                             let newViewController = UIHostingController(rootView: authView)
                             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,

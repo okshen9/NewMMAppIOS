@@ -29,7 +29,7 @@ final class PayRequestViewModel: ObservableObject {
     
     func updateProfile() async {
         do {
-            let externalId = userRepository.externalId ?? -1
+            let externalId = await userRepository.externalId ?? -1
             await setIsLoading(true)
             guard let updatetedProfile = try await serviceNetwork.getPaymentPlan(id: externalId) else { return }
 			loaded = true

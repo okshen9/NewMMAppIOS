@@ -28,13 +28,13 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
 
 
     var isMyProfile: Bool {
-		externalId == userRepository.userProfile?.externalId
+		externalId == UserRepository.snapshot.userProfile?.externalId
     }
     
     var isOtherProfile: Bool {
-        userRepository.userProfile?.externalId != nil &&
+        UserRepository.snapshot.userProfile?.externalId != nil &&
         externalId != nil &&
-        externalId != userRepository.userProfile?.externalId
+        externalId != UserRepository.snapshot.userProfile?.externalId
     }
 
     // MARK: - Private properties
@@ -44,7 +44,7 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
 
     init() {
         print("init ProfileViewModel() без параметров")
-		let profileId = userRepository.externalId
+		let profileId = UserRepository.snapshot.externalId
         self.externalId = profileId
 		self.initBaseSearch(profileId)
     }
@@ -170,7 +170,9 @@ final class ProfileViewModel: ObservableObject, SubscriptionStore {
     }
 
     func logout() {
-        userRepository.clearAll()
+        Task {
+            await userRepository.clearAll()
+        }
     }
 
     // MARK: - Navigation

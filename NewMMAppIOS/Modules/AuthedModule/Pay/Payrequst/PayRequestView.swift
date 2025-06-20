@@ -25,9 +25,7 @@ struct PayRequestView: View {
                     }
                     .refreshable {
                         if !viewModel.isLoading {
-                            Task.detached {
-                                await viewModel.updateProfile()
-                            }
+                            await viewModel.updateProfile()
                         }
                     }
                     
@@ -100,13 +98,10 @@ struct PayRequestView: View {
 			PaymentRowView(payment: payment)
 				.listRowSeparator(.hidden)
 		}
-		.listRowSpacing(-12)
-		.listStyle(.plain)
-		.refreshable {
-			Task.detached {
-				await viewModel.updateProfile()
-			}
+				.listRowSpacing(-12)
+				.listStyle(.plain)
+				.refreshable {
+					await viewModel.updateProfile()
+				}
 		}
 	}
-}
-

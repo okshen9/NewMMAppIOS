@@ -60,12 +60,19 @@ struct NewMMAppIOSApp: App {
                 ServiceBuilder.shared.setAppStateServise(appStateService)
 
                 // Установка начального состояния
-                let newState: AppNavigationStateService.AppState =
-                ((UserRepository.shared.roles?.contains(Roles.user.rawValue)).orFalse ||
-                (UserRepository.shared.roles?.contains(Roles.admin.rawValue)).orFalse) &&
-                !UserRepository.shared.jwt.isEmptyOrNil && !UserRepository.shared.refreshJWT.isEmptyOrNil
-                ? .authorized : .unAuthorized(true)
-                appStateService.setNewState(newState)
+                Task {
+                    let repository = UserRepository.shared
+                    let roles = await repository.roles
+                    let jwt = await repository.jwt
+                    let refreshJWT = await repository.refreshJWT
+
+                    let newState: AppNavigationStateService.AppState =
+                    ((roles?.contains(Roles.user.rawValue)).orFalse ||
+                    (roles?.contains(Roles.admin.rawValue)).orFalse) &&
+                    !jwt.isEmptyOrNil && !refreshJWT.isEmptyOrNil
+                    ? .authorized : .unAuthorized(true)
+                    appStateService.setNewState(newState)
+                }
             }
             .onShakeGesture {
 #if DEBUG

@@ -16,7 +16,7 @@ struct NewFeedCell: BasicEventCell {
     var onHeaderTap: () -> Void
     var onHideUser: ((Int) async -> Bool)
     var showHidenTogle: Bool {
-        event.creatorExternalId != UserRepository.shared.externalId?.toString
+        event.creatorExternalId != UserRepository.snapshot.externalId?.toString
     }
     @State var isLoading = false
     @State private var showHideUserAlert = false
@@ -138,4 +138,3 @@ struct NewFeedCell: BasicEventCell {
         }
     }
 }
-

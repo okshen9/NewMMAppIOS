@@ -32,7 +32,7 @@ final class MapViewModel: ObservableObject {
     init(nameCity: String, nameUser: String, currentUserLocation: String? = nil) {
         self.nameCity = nameCity
         self.nameUser = nameUser
-        self.currentUserLocation = currentUserLocation ?? UserRepository.shared.userProfile?.location
+        self.currentUserLocation = currentUserLocation ?? UserRepository.snapshot.userProfile?.location
     }
     
     /// Полчение координат города по названию

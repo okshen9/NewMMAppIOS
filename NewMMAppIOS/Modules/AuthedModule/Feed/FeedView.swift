@@ -20,7 +20,8 @@ struct FeedView: View {
                         shimerState()
                     } else {
                         if let feedEvents = viewModel.feedEvents, !feedEvents.isEmpty {
-                            ForEach(Array(feedEvents.enumerated()), id: \.element.id) { index, event in
+                            ForEach(feedEvents.indices, id: \.self) { index in
+                                let event = feedEvents[index]
                                 NewFeedCell(
                                     onHeaderTap: {
                                         if let externalId = Int(event.creatorExternalId.orEmpty) {
@@ -162,4 +163,3 @@ struct FeedView: View {
         }
     }
 }
-

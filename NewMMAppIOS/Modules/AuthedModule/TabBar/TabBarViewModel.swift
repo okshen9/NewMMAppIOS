@@ -11,7 +11,7 @@ class TabBarViewModel: ObservableObject {
     // MARK: - Init
     init() {
         // Пытаемся загрузить из репозитория при инициализации
-        self.user = userRepository.userProfile
+        self.user = UserRepository.snapshot.userProfile
         // Запускаем загрузку/обновление профиля в фоне
         fetchUserProfile()
     }
@@ -30,7 +30,7 @@ class TabBarViewModel: ObservableObject {
     // MARK: - Public Methods
     func fetchUserProfile() {
         // Проверяем, есть ли уже данные в репозитории
-        if userRepository.userProfile != nil && self.user != nil {
+        if UserRepository.snapshot.userProfile != nil && self.user != nil {
             print("User profile already loaded from repository.")
             // Можно добавить логику обновления данных в фоне, если нужно, но для старта это не требуется
              // self.user = userRepository.userProfile // Убедимся что опубликовано актуальное значение
@@ -42,7 +42,7 @@ class TabBarViewModel: ObservableObject {
             guard let self = self else { return }
             do {
                 let userProfile = try await self.service.getProfileMe()
-                self.userRepository.setUserProfile(userProfile)
+                await self.userRepository.setUserProfile(userProfile)
                 // Обновляем @Published свойство на главном потоке
                 await MainActor.run { 
                     self.user = userProfile

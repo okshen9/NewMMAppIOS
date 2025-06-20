@@ -44,9 +44,9 @@ class ProfileInfoViewModel: ObservableObject {
     }
     
     static func editProfileViewModel(needUpdateAction: @escaping () -> Void) -> ProfileInfoViewModel {
-        let userRepository = UserRepository.shared
-        let authModel = userRepository.authUser?.authUserDto
-        let profileModel = userRepository.userProfile
+        let snapshot = UserRepository.snapshot
+        let authModel = snapshot.authUser?.authUserDto
+        let profileModel = snapshot.userProfile
         return ProfileInfoViewModel(profileModel: profileModel, authModel: authModel, isEditProfile: true, needUpdateAction: needUpdateAction)
     }
     
@@ -116,8 +116,8 @@ class ProfileInfoViewModel: ObservableObject {
                                                                 )
                 )
                 // Сохраняем обновленный профиль в UserRepository
-                UserRepository.shared.setUserProfile(updatedUser)
-                UserRepository.shared.setRoles([(updatedUser.userProfileStatus) ?? ""])
+                await UserRepository.shared.setUserProfile(updatedUser)
+                await UserRepository.shared.setRoles([(updatedUser.userProfileStatus) ?? ""])
                 await setIsLoaded(false)
                 self.needUpdateAction()
                 await navigationTo(.dismiss)
@@ -146,20 +146,20 @@ class ProfileInfoViewModel: ObservableObject {
                         fullName: userProfile.firstName,
                         userProfileStatus: nil,
                         userPaymentStatus: nil,
-                        photoUrl: UserRepository.shared.getUrlPhotoFromTGData(), // Поле не указано в списке, оставляем пустым
+                        photoUrl: await UserRepository.shared.getUrlPhotoFromTGData(), // Поле не указано в списке, оставляем пустым
                         location: userProfile.city,
                         phoneNumber: userProfile.phoneNumber,
                         biography: userProfile.about,
                         activitySphere: userProfile.occupation
                     ))
                 }
-                guard let refreshJWT = UserRepository.shared.refreshJWT,
+                guard let refreshJWT = await UserRepository.shared.refreshJWT,
                       let updatedAuthUser = try await apiFactory.refreshJWT(refreshModel: .init(refreshToken: refreshJWT)) else {
                     await navigationTo(.toInfoView)
                     return
                 }
-                UserRepository.shared.setAuthUser(updatedAuthUser)
-                UserRepository.shared.setUserProfile(finalUser)
+                await UserRepository.shared.setAuthUser(updatedAuthUser)
+                await UserRepository.shared.setUserProfile(finalUser)
                 await setIsLoaded(false)
                 await navigationTo(.dismiss)
                 await navigationTo(.toMinView)

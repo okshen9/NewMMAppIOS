@@ -52,7 +52,7 @@ final class AuthSUIViewModel: NSObject, ObservableObject {
                 
                 return
             }
-            UserRepository.shared.setAuthUser(authModel)
+            await UserRepository.shared.setAuthUser(authModel)
             await MainActor.run { [weak self] in
                 // Сначала закрываем WebView
                 withAnimation {
@@ -96,7 +96,9 @@ extension AuthSUIViewModel: WKUIDelegate, WKNavigationDelegate {
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         if let url = navigationAction.request.url,
            let tgKey = validateWebRequest(url: url) {
-            UserRepository.shared.setTGData(tgKey)
+            Task {
+                await UserRepository.shared.setTGData(tgKey)
+            }
             self.isLoding = true
             telegramCallBack(tgKey: tgKey)
             decisionHandler(.cancel)

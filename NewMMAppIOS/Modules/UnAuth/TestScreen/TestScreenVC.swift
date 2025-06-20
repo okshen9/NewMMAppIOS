@@ -20,14 +20,16 @@ struct TestScreenVC: View {
 				ForEach(AppSystemTarget.allCases) { item in
 					Button(
 						action: {
-							guard let stand = AppSystemTarget(rawValue: item.rawValue) else {
-								print("Stand Не наден")
-								return
-							}
-							systemService.prodServ = stand
-							UserRepository.shared.clearAll()
-							appStateService.setNewState(.unAuthorized(true))
-						},
+								guard let stand = AppSystemTarget(rawValue: item.rawValue) else {
+									print("Stand Не наден")
+									return
+								}
+								systemService.prodServ = stand
+								Task {
+									await UserRepository.shared.clearAll()
+									appStateService.setNewState(.unAuthorized(true))
+								}
+							},
 						label: {
 							HStack {
 								Text(item.rawValue)
@@ -122,14 +124,14 @@ struct TestScreenVC: View {
 	}
 	
 	
-	func deletChashJWT() {
-		UserRepository.shared.clearAuth()
-	}
-	
-	func deletChashTg() {
-		UserRepository.shared.clearAll()
-		clearWebViewCache()
-	}
+		func deletChashJWT() async {
+			await UserRepository.shared.clearAuth()
+		}
+		
+		func deletChashTg() async {
+			await UserRepository.shared.clearAll()
+			clearWebViewCache()
+		}
 	
 	func clearWebViewCache() {
 		let websiteDataTypes = Set([
@@ -152,4 +154,3 @@ struct TestScreenVC: View {
 		}
 	}
 }
-

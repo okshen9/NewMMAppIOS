@@ -52,11 +52,14 @@ struct AuthSUIView: View {
                 contentView
             }
 
-            if viewModel.showWebView {
-				WebView(url: URL(string: RequestUrls.tgStand)!,
-                        navigationDelegate: viewModel,
-                        uiDelegate: viewModel)
-				.opacity(viewModel.showWebView ? 1 : 0)
+            if viewModel.showWebView,
+               let tgURL = URL(string: RequestUrls.tgStand) {
+                WebView(
+                    url: tgURL,
+                    navigationDelegate: viewModel,
+                    uiDelegate: viewModel
+                )
+                .opacity(viewModel.showWebView ? 1 : 0)
                 .edgesIgnoringSafeArea(.all)
                 .transition(.opacity)
                 .onDisappear(perform: {
@@ -76,8 +79,12 @@ struct AuthSUIView: View {
             case .toInfoView:
 //                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     if !viewModel.showWebView {
-                        let authUser = UserRepository.shared.authUser?.authUserDto
-                        navigationManager.navigate(to: .signup(profileModel: nil, authModel: authUser))
+                        Task {
+                            let authUser = await UserRepository.shared.authUser?.authUserDto
+                            await MainActor.run {
+                                navigationManager.navigate(to: .signup(profileModel: nil, authModel: authUser))
+                            }
+                        }
                     }
 //                }
             case .toMinView:
@@ -85,7 +92,14 @@ struct AuthSUIView: View {
             }
         }
         .sheet(isPresented: $showTerms, content: {
-            WebView(url: URL(string: "https://paymastermind.ru/privacy")!)
+            if let url = URL(string: "https://paymastermind.ru/privacy") {
+                WebView(url: url)
+            }
+        })
+        .sheet(isPresented: $showPrivacy, content: {
+            if let url = URL(string: "https://paymastermind.ru/privacy") {
+                WebView(url: url)
+            }
         })
 
     }

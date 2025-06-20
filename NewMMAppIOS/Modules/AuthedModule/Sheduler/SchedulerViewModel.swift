@@ -48,7 +48,7 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
     func updateData() async {
         do {
             await setIsLoading(true)
-            let externalId = userRepository.externalId ?? -1
+            let externalId = await userRepository.externalId ?? -1
             guard let targets = try await serviceNetwork.getUserTargets(externalId: externalId).userTargets,
                   let paymant = try await serviceNetwork.getPaymentPlan(id: externalId)
             else {
@@ -101,7 +101,7 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
     private func processPayments(payments: [PaymentRequestResponseDto], scheduleItems: inout [Date: [CalendatItem]]) {
         payments.forEach { payment in
             guard let dateOfPay = payment.dueDate?.dateFromApiString,
-                  let user = userRepository.userProfile ?? userPreview
+                  let user = UserRepository.snapshot.userProfile ?? userPreview
             else {
                 print("neshko1 ERROR")
                 return
@@ -122,7 +122,7 @@ class SchedulerViewModel: ObservableObject, SubscriptionStore {
     private func processTargets(targets: [UserTargetDtoModel], scheduleItems: inout [Date: [CalendatItem]]) {
         targets.forEach { target in
             guard let deadlineDate = target.deadLineDateTime?.dateFromStringISO8601,
-                  let user = userRepository.userProfile ?? userPreview
+                  let user = UserRepository.snapshot.userProfile ?? userPreview
             else { return }
             
             // Добавляем основную цель
@@ -189,5 +189,4 @@ extension SchedulerViewModel {
         static let title = "Выберите карту"
     }
 }
-
 

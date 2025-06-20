@@ -72,19 +72,10 @@ struct SchedulerView: View {
 			}
 			
 			
-			.scrollPosition(id: $hashebleDate.animation(.easeIn(duration: 0.3)), anchor: .top)
-			.refreshable {
-				for family in UIFont.familyNames.sorted() {
-					let _ = print("Family: \(family)")
-					let names = UIFont.fontNames(forFamilyName: family)
-					for name in names {
-						let _ = print("   Font: \(name)")
-					}
-				}
-				Task.detached {
+				.scrollPosition(id: $hashebleDate.animation(.easeIn(duration: 0.3)), anchor: .top)
+				.refreshable {
 					await viewModel.updateData()
 				}
-			}
 		}
 		.onChange(of: selectedDate) { oldState, newState in
 			hashebleDate = newState?.hashValue
@@ -99,19 +90,16 @@ struct SchedulerView: View {
     @ViewBuilder
 	private func eventList2() -> some View {
 		// MARK: - Events List
-		let filteredEvents = viewModel.scheduleListItems.filter { dateAndEvents in
-			if selectedDate == nil {
-				// Если нет выбранной даты, показываем все события
-				return true
-			} else {
-				// Используем startOfDay для сравнения только по дате, без учета времени
-				let selectedStartOfDay = Calendar.current.startOfDay(for: selectedDate!)
-				let entryStartOfDay = Calendar.current.startOfDay(for: dateAndEvents.key)
-				
-				// Сравниваем даты
-				return selectedStartOfDay == entryStartOfDay
+			let filteredEvents = viewModel.scheduleListItems.filter { dateAndEvents in
+				if let selectedDate {
+					let selectedStartOfDay = Calendar.current.startOfDay(for: selectedDate)
+					let entryStartOfDay = Calendar.current.startOfDay(for: dateAndEvents.key)
+					return selectedStartOfDay == entryStartOfDay
+				} else {
+					// Если нет выбранной даты, показываем все события
+					return true
+				}
 			}
-		}
 		
 		//        Group {
 		if filteredEvents.isEmpty {
@@ -320,18 +308,12 @@ struct SchedulerView: View {
         } else if Calendar.current.isDate(date, inSameDayAs: yesterday) {
             return "Вчера"
         } else {
-            let formatter = DateFormatter()
-            formatter.locale = Locale(identifier: "ru_RU")
-            formatter.dateFormat = "d MMMM"
-            return formatter.string(from: date)
+            return Constants.headerDateFormatter.string(from: date)
         }
     }
     
     private func dateString(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ru_RU")
-        formatter.dateFormat = "E, d MMM"
-        return formatter.string(from: date)
+        Constants.subtitleDateFormatter.string(from: date)
     }
 }
 
@@ -339,6 +321,17 @@ struct SchedulerView: View {
 extension SchedulerView {
     private enum Constants {
         static let title = "Выберите карту"
+        static let headerDateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "ru_RU")
+            formatter.dateFormat = "d MMMM"
+            return formatter
+        }()
+        static let subtitleDateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "ru_RU")
+            formatter.dateFormat = "E, d MMM"
+            return formatter
+        }()
     }
 }
-

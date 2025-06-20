@@ -33,7 +33,7 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
         let newEmptyTarget = UserTargetDtoModel(
             title: "",
             description: "",
-            userExternalId: UserRepository.shared.externalId,
+            userExternalId: UserRepository.snapshot.externalId,
             percentage: 0,
             deadLineDateTime: Date().addingTimeInterval(86400 * 7).toApiString,
             targetStatus: .draft,
@@ -238,4 +238,3 @@ struct TargetEditView<ViewModel: TargetEditViewProtocol>: View {
 		}
 	}
 }
-

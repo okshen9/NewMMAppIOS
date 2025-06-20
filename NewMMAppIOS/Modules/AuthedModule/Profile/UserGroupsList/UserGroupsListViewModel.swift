@@ -43,10 +43,7 @@ final class UserGroupsListViewModel: ObservableObject {
     
     /// Обновляет детальную информацию о группах (для pull-to-refresh)
     func refreshGroups() async {
-        // Создаем независимую задачу, которая не отменяется автоматически
-        await Task.detached { [weak self] in
-            await self?.loadDetailedGroupsInfo()
-        }.value
+        await loadDetailedGroupsInfo()
     }
     
     @MainActor
@@ -80,9 +77,9 @@ final class UserGroupsListViewModel: ObservableObject {
 
         // Запускаем параллельно задачи с передачей индекса
         await withTaskGroup(of: GroupResultDTOModel?.self) { taskGroup in
-            for (userGroup) in initialGroups {
+            for userGroup in initialGroups {
                 guard let id = userGroup.id else {
-                    print("UserGroupsListViewModel: initialGroups[\(index)].id == nil, пропускаем")
+                    print("UserGroupsListViewModel: пропускаем группу без id")
                     continue
                 }
                 taskGroup.addTask { [weak self] in
@@ -99,7 +96,7 @@ final class UserGroupsListViewModel: ObservableObject {
                 if let detail = maybeDetail {
                     groupList.append(detail)
                 } else {
-                    print("UserGroupsListViewModel: Не удалось загрузить подробности для группы с индексом \(index)")
+                    print("UserGroupsListViewModel: Не удалось загрузить подробности для одной из групп")
                 }
             }
         }

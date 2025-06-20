@@ -243,7 +243,7 @@ final class TargetEditViewModel: ObservableObject {
             id: originalTarget?.id,
             title: targetTitle.trimmingCharacters(in: .whitespacesAndNewlines),
             description: targetDescription.trimmingCharacters(in: .whitespacesAndNewlines),
-            userExternalId: UserRepository.shared.externalId,
+            userExternalId: UserRepository.snapshot.externalId,
             percentage: originalTarget?.percentage ?? 0,
 			deadLineDateTime: targetDeadline.endOfDay.toApiString,
             streamId: originalTarget?.streamId,
@@ -256,4 +256,3 @@ final class TargetEditViewModel: ObservableObject {
         )
     }
 }
-

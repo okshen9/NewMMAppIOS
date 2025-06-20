@@ -14,12 +14,8 @@ class AppNavigationStateService: ObservableObject {
 
     
     func setNewState(_ newState: AppState) {
-        Task.detached {
-            await MainActor.run {
-                withAnimation {
-                    self.state = newState
-                }
-            }
+        withAnimation {
+            state = newState
         }
     }
 

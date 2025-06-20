@@ -146,7 +146,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
         
         Task { [weak self] in
             do {
-                guard let self = self, let userExternalId = UserRepository.shared.userProfile?.externalId else {
+                guard let self = self, let userExternalId = await UserRepository.shared.userProfile?.externalId else {
                     await ToastManager.shared.show(.baseError)
                     return
                 }
@@ -239,7 +239,7 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
     @MainActor
     private func refreshTargetsData() async {
         do {
-            guard let userExternalId = UserRepository.shared.userProfile?.externalId else {
+            guard let userExternalId = await UserRepository.shared.userProfile?.externalId else {
                 await ToastManager.shared.show(.baseError)
                 return
             }
@@ -429,4 +429,3 @@ final class TargetsViewModel: ObservableObject, SubscriptionStore, SubViewScopeP
         }
     }
 }
-

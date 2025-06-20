@@ -170,7 +170,7 @@ struct ProfileInfoView: View {
             Button("Да", role: .destructive) {
                 Task {
                     await viewModel.deleteProfile()
-                    UserRepository.shared.clearAll()
+                    await UserRepository.shared.clearAll()
                     appStateServise.setNewState(.unAuthorized(true))
                 }
             }
@@ -181,5 +181,4 @@ struct ProfileInfoView: View {
         .navigationBarBackButtonHidden()
     }
 }
-
 

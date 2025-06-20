@@ -100,8 +100,8 @@ extension APIURLRequestsBuilder {
     ) throws {
         switch tokenNeccessity {
         case .mandatory:
-            
-            guard  let token =  UserRepository.shared.jwt else {
+
+            guard let token = UserRepository.snapshot.jwt ?? UserRepository.KeyChainStorage.jwtToken.getData() else {
                 throw ResponseError.invalidToken // или другой тип ошибки
             }
             request.setValue("Bearer \(token)", forHTTPHeaderField: HTTPHeader.authorization)

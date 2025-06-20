@@ -64,6 +64,6 @@ struct PaymentRequestResponseDto: Codable, Equatable {
         self.dueDate = dueDate ?? Date.nowWith(plus: .random(in: 0...10)).toApiString
         self.comment = comment ?? "Какой-то комент"
         self.paymentRequestStatus = paymentRequestStatus ?? PaymentRequestStatus.overdue
-        self.userProfilePreview = userProfilePreview ?? UserRepository.shared.userProfile
+        self.userProfilePreview = userProfilePreview ?? UserRepository.snapshot.userProfile
     }
 }

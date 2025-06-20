@@ -15,7 +15,7 @@ final class ProfileTargetViewModel: ObservableObject {
 
     private let externalId: Int
     var canEdit: Bool {
-        UserRepository.shared.userProfile?.externalId == externalId
+        UserRepository.snapshot.userProfile?.externalId == externalId
     }
     @Published var isLoading = true
     // Сгруппированные цели: ключ — категория, значение — массив целей

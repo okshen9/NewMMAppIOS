@@ -67,55 +67,50 @@ struct ProfileView: View {
         .onAppear {
             viewModel.onApper()
         }
-        .ignoresSafeArea(edges: .top)
         
     }
     
     
     @ViewBuilder
     func contentState(profile: UserProfileResultDto) -> some View {
+            let mapHeight = showMap ? Constants.heightExpandedMap : Constants.heightMiniMap
             VStack(alignment: .leading, spacing: 16) {
                 // Карта
-                ZStack {
-                    GeometryReader { geo in
-                        MapView(canInteactive: showMap,
-                                withSgift: !showMap,
-                                viewModel: .init(nameCity: viewModel.profile?.location ?? "Москва",
-                                                 nameUser: viewModel.profile?.fullName ?? "Пользователь без имени"))
-                        .padding(.horizontal, -16)
-                        .frame(height: showMap ? geo.size.height : Constants.heightMiniMap)
-                        .cornerRadius(20)
-                        .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
-                        .onTapGesture {
-                            if !showMap {
-                                // Предварительно снимаем фокус с клавиатуры
-                                UIApplication.shared.endEditing()
-                                
-                                // Используем более плавную анимацию при закрытии
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    showMap.toggle()
-                                }
-                            }
-                        }
-                        .overlay(
-                            Image(systemName: "chevron.up.circle.fill")
-                                .resizable()
-                                .foregroundColor(.mainRed)
-                                .onTapGesture {
-                                    UIApplication.shared.endEditing()
-                                    // Используем более плавную анимацию при закрытии
-                                    withAnimation(.easeInOut(duration: 0.3)) {
-                                        showMap.toggle()
-                                    }
-                                }
-                                .frame(width: 34, height: 34)
-                                .padding(16)
-                                .opacity(showMap ? 1 : 0),
-                            alignment: .bottomTrailing
-                        )
+                MapView(
+                    canInteactive: showMap,
+                    withSgift: !showMap,
+                    viewModel: .init(
+                        nameCity: viewModel.profile?.location ?? "Москва",
+                        nameUser: viewModel.profile?.fullName ?? "Пользователь без имени"
+                    }
+                )
+                .frame(maxWidth: .infinity)
+                .frame(height: mapHeight)
+                .cornerRadius(20)
+                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    guard !showMap else { return }
+                    UIApplication.shared.endEditing()
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        showMap = true
                     }
                 }
-				.frame(height: showMap ? UIScreen.main.bounds.height - Constants.offestBigMap : Constants.heightMiniMap)
+                .overlay(
+                    Image(systemName: "chevron.up.circle.fill")
+                        .resizable()
+                        .foregroundColor(.mainRed)
+                        .onTapGesture {
+                            UIApplication.shared.endEditing()
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                showMap.toggle()
+                            }
+                        }
+                        .frame(width: 34, height: 34)
+                        .padding(16)
+                        .opacity(showMap ? 1 : 0),
+                    alignment: .bottomTrailing
+                )
                 
                 // Профиль
                 HStack(alignment: .bottom) {
@@ -215,9 +210,9 @@ struct ProfileView: View {
         .animation(.easeInOut, value: selectedTab)
         .sheet(isPresented: $showEditProfile) {
             ProfileInfoView(viewModel: .editProfileViewModel(needUpdateAction: {
-                Task.detached(operation: {
+                Task {
                     await viewModel.updateProfile()
-                })
+                }
             }))
         }
         .sheet(isPresented: $showReport) {
@@ -241,7 +236,7 @@ struct ProfileView: View {
     
     @ViewBuilder
     func feedBlock() -> some View {
-        VStack(spacing: 16) {
+        LazyVStack(spacing: 16) {
             if viewModel.isFeedLoading && viewModel.feedEvents.isEmptyOrNil {
                 VStack(spacing: 12) {
                     ForEach(0..<3, id: \.self) { _ in
@@ -261,7 +256,7 @@ struct ProfileView: View {
                         .frame(height: 50)
                         .onAppear {
                             if !viewModel.paginatingLoading {
-                                Task.detached {
+                                Task {
                                     let _ = await viewModel.getNextEvents(resetSearch: false)
                                 }
                             }
@@ -501,9 +496,8 @@ extension ProfileView {
         static let imageUrl = URL(string: "https://t.me/i/userpic/320/yrCHD_HRHDVktpQhLHeDQ6TsYP-1SgldytAKXBHlux0.jpg")
         static let biographyText: String = "Этот пользователь пока не рассказал ничего о себе"
         static let activitySphereText: String = "Информация не указана"
-		static let heightMiniMap = 240.0
-		static let offestBigMap = 220.0
+			static let heightMiniMap = 240.0
+			static let heightExpandedMap = 460.0
     }
 
 }
-

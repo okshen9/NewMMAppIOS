@@ -64,7 +64,7 @@ class HidenProfileViewModel: ObservableObject {
     /// - Parameter externalId: id который надо убрать из игнорирования
     func unhideProfile(externalId: Int) async -> UserProfileResultDto? {
         do {
-            guard var userProfile = userRepository.userProfile else {
+            guard var userProfile = await userRepository.userProfile else {
                 throw NSError(domain: "SendReportError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid type"])
             }
             
@@ -74,12 +74,12 @@ class HidenProfileViewModel: ObservableObject {
             
             let edit = EditProfileBodyDTO(userProfile)
             let newUser = try await service.patchMe(profileData: edit)
-            userRepository.setUserProfile(newUser)
+            await userRepository.setUserProfile(newUser)
             
             // Обновляем локальный список скрытых ID
             hidenIds?.removeAll(where: { $0 == externalId })
             profiles.removeAll { $0.externalId == externalId }
-            UserRepository.shared.setUserProfile(newUser)
+            await UserRepository.shared.setUserProfile(newUser)
             
             return newUser
         }
