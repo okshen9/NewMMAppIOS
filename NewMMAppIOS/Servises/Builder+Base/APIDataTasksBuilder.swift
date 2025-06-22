@@ -20,15 +20,14 @@ public class APIDataTasksBuilder {
         let config = URLSessionConfiguration.default
         config.waitsForConnectivity = true
         config.timeoutIntervalForRequest = 5
-		var delegat: URLSessionDelegate? {
-            return UnsafeSSLDelegate()
+		let delegat: URLSessionDelegate? = {
 			if AppStateSystemService.shared.prodServ != .prod {
 				return UnsafeSSLDelegate()
 			} else {
 				return nil
 			}
-		}
-		var session = URLSession(configuration: config, delegate: delegat, delegateQueue: .main)
+		}()
+		let session = URLSession(configuration: config, delegate: delegat, delegateQueue: nil)
 
         return session
     }
@@ -126,7 +125,7 @@ extension APIDataTasksBuilder {
                     let newToken = try await refreshManager.makeRefreshToken()
                     var request = request
                     let newRequest = setTokensToRequest(&request, authTokens: newToken)
-                    return try await buildDataTask(newRequest, allowRetry: true)
+                    return try await buildDataTask(newRequest, allowRetry: false)
                 } catch {
                     do {
                         let newToken = try await refreshManager.makeRefreshAuthFormTG()
@@ -151,6 +150,7 @@ extension APIDataTasksBuilder {
                     }
                 }
             }
+            throw ResponseError.responseBase(response: apiError, statusCode: httpStatusCode)
         case 402:
             throw ResponseError.responseBase(response: apiError, statusCode: httpStatusCode)
         case 403:
@@ -165,7 +165,10 @@ extension APIDataTasksBuilder {
         if data.isEmpty {
             if isEmptyResponseAllowed {
                 // For case when backend send empty response (only http code)
-                return (EmptyResponse() as! T, httpResponse.allHeaderFields)
+                guard let emptyResponse = EmptyResponse() as? T else {
+                    throw APIError.responseObject
+                }
+                return (emptyResponse, httpResponse.allHeaderFields)
             } else {
                 //                let responseError = ResponseError.emptyData
                 //                debugErrorHandler.error = ResponseError.emptyData
@@ -176,9 +179,15 @@ extension APIDataTasksBuilder {
             }
         } else if isEmptyResponseAllowed {
             // For case when backend sent nonempty response and we don't care of it
-            return (EmptyResponse() as! T, httpResponse.allHeaderFields)
+            guard let emptyResponse = EmptyResponse() as? T else {
+                throw APIError.responseObject
+            }
+            return (emptyResponse, httpResponse.allHeaderFields)
         } else if isRawResponseAllowed {
-            return (data as! T, httpResponse.allHeaderFields)
+            guard let rawData = data as? T else {
+                throw APIError.responseObject
+            }
+            return (rawData, httpResponse.allHeaderFields)
         }
         
         let jsonString = String(data: data, encoding: .utf8) ?? "<не удалось сконвертировать в строку>"
