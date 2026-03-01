@@ -30,11 +30,16 @@ struct TextView: UIViewRepresentable {
     func makeUIView(context: Context) -> UITextView {
         let textView = UITextView()
         textView.isEditable = false
-        textView.isSelectable = true // Исправлено
+        textView.isSelectable = true
         textView.isUserInteractionEnabled = true
         textView.backgroundColor = .clear
         textView.textAlignment = .center
         textView.delegate = context.coordinator
+        textView.dataDetectorTypes = []
+        textView.linkTextAttributes = [
+            .underlineStyle: NSUnderlineStyle.single.rawValue,
+            .foregroundColor: UIColor.systemBlue
+        ]
 
         let attributedString = NSMutableAttributedString(string: text)
         let fullRange = NSRange(location: 0, length: text.utf16.count)
@@ -50,17 +55,13 @@ struct TextView: UIViewRepresentable {
             range: fullRange
         )
 
-        // Добавляем кастомные атрибуты
+        // Добавляем tappable-ссылки
         for (substring, linkType) in links {
             let linkRange = (text as NSString).range(of: substring)
+            guard linkRange.location != NSNotFound else { continue }
             attributedString.addAttribute(
-                .customLink, // Используем новый ключ
-                value: linkType.rawValue,
-                range: linkRange
-            )
-            attributedString.addAttribute(
-                .underlineStyle,
-                value: NSUnderlineStyle.single.rawValue,
+                .link,
+                value: "mmapp://\(linkType.rawValue)",
                 range: linkRange
             )
         }
@@ -85,33 +86,21 @@ struct TextView: UIViewRepresentable {
             self.links = links
         }
 
-        func textViewDidChangeSelection(_ textView: UITextView) {
-            guard let selectedRange = textView.selectedTextRange else { return }
+        func textView(
+            _ textView: UITextView,
+            shouldInteractWith URL: URL,
+            in characterRange: NSRange,
+            interaction: UITextItemInteraction
+        ) -> Bool {
+            guard URL.scheme == "mmapp" else { return true }
 
-            let location = textView.offset(from: textView.beginningOfDocument, to: selectedRange.start)
-
-            textView.attributedText.enumerateAttribute(
-                .customLink, // Используем тот же ключ
-                in: NSRange(location: 0, length: textView.attributedText.length)
-            ) { value, range, _ in
-                if let linkValue = value as? String,
-                   location >= range.location && location <= range.location + range.length {
-
-                    DispatchQueue.main.async {
-                        if let linkType = LinkedText.LinkType(rawValue: linkValue) {
-                            self.action(linkType)
-                        }
-                        textView.selectedTextRange = nil
-                    }
-                }
+            let actionKey = URL.host ?? URL.lastPathComponent
+            if let linkType = LinkedText.LinkType(rawValue: actionKey) {
+                action(linkType)
             }
+            return false
         }
     }
-}
-
-// Кастомный ключ для атрибутов
-extension NSAttributedString.Key {
-    static let customLink = NSAttributedString.Key("CustomLinkAttribute")
 }
 
 // Реализация RawRepresentable

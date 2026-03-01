@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import SwiftUICore
+import SwiftUI
 
 /// Модель результата для UserTargetDto
 struct UserTargetDtoModel: Codable, JSONRepresentable, Identifiable, Hashable {

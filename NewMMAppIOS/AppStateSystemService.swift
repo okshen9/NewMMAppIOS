@@ -10,7 +10,7 @@ import Foundation
 final class AppStateSystemService: ObservableObject {
 	static let shared = AppStateSystemService()
 	private init() {
-		guard let nameStand = UserRepository.snapshot.nameStend ?? UserDefaultsStorege.nameStend.getData(String.self),
+		guard let nameStand = UserRepository.snapshot.nameStend ?? UserRepository.UserDefaultsStorege.nameStend.getData(String.self),
 			  let stand = AppSystemTarget(rawValue: nameStand) else {
 			#if DEBUG
 			prodServ = .test

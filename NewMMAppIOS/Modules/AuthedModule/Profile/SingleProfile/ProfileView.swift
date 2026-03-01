@@ -82,7 +82,7 @@ struct ProfileView: View {
                     viewModel: .init(
                         nameCity: viewModel.profile?.location ?? "Москва",
                         nameUser: viewModel.profile?.fullName ?? "Пользователь без имени"
-                    }
+                    )
                 )
                 .frame(maxWidth: .infinity)
                 .frame(height: mapHeight)

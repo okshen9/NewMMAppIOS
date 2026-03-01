@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import SwiftUICore
+import SwiftUI
 
 /// Статус запрувлена ли цель
 enum TargetModerationStatus: String, UnknownCasedEnum, Codable, JSONRepresentable {

@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import SwiftUICore
+import SwiftUI
 
 struct FeedView: View {
     @StateObject private var viewModel = FeedViewModel()

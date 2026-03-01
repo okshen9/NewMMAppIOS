@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import SwiftUICore
+import SwiftUI
 
 enum TargetSubStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable, Equatable, Hashable {
     // Для целей и подцелей

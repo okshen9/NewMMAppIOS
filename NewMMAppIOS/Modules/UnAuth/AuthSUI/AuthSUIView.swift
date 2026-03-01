@@ -92,10 +92,25 @@ struct AuthSUIView: View {
             }
         }
         .sheet(isPresented: $showTerms, content: {
-            if let url = URL(string: "https://paymastermind.ru/privacy") {
-                WebView(url: url)
+            NavigationView {
+                if let url = URL(string: "https://paymastermind.ru/privacy") {
+                    WebView(url: url)
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                Button {
+                                    showTerms = false
+                                } label: {
+                                    Image(systemName: "xmark")
+                                }
+                                .accessibilityLabel("Закрыть")
+                            }
+                        }
+                }
             }
+
         })
+        
         .sheet(isPresented: $showPrivacy, content: {
             if let url = URL(string: "https://paymastermind.ru/privacy") {
                 WebView(url: url)
@@ -123,8 +138,12 @@ struct AuthSUIView: View {
                 ],
                 action: { linkType in
                     switch linkType {
-                    case .terms: showTerms = true
-                    case .privacy: showPrivacy = true
+                    case .terms:
+                        print("Neshko showTerms")
+                        showTerms = true
+                    case .privacy:
+                        print("Neshko privacy")
+                        showPrivacy = true
                     }
                 }
             )

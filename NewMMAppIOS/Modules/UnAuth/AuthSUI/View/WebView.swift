@@ -29,6 +29,7 @@ struct WebView: UIViewRepresentable {
         webView.navigationDelegate = navigationDelegate
         webView.uiDelegate = uiDelegate
         webView.scrollView.isScrollEnabled = isScrollEnabled
+        webView.scrollView.bounces = false
         return webView
     }
 
@@ -44,3 +45,19 @@ struct WebView: UIViewRepresentable {
 
     }
 }
+
+
+//struct WebViewWithClose: View {
+//    @State webViewModel 
+//    init(url: URL, isScrollEnabled: Bool = true, navigationDelegate: WKNavigationDelegate? = nil, uiDelegate: WKUIDelegate? = nil) {
+//        self.url = url
+//        self.navigationDelegate = navigationDelegate
+//        self.uiDelegate = uiDelegate
+//        self.isScrollEnabled = isScrollEnabled
+//    }
+//    
+//    var body: some View {
+//        WebView(url: <#T##URL#>, isScrollEnabled: <#T##Bool#>, navigationDelegate: <#T##(any WKNavigationDelegate)?#>, uiDelegate: <#T##(any WKUIDelegate)?#>))
+//    }
+//    
+//}

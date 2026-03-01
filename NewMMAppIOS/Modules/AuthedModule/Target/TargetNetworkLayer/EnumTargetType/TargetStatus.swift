@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import SwiftUICore
+import SwiftUI
 
 enum TargetStatus: String, UnknownCasedEnum, JSONRepresentable, CaseIterable, Equatable, Hashable {
 	/// Цель успешно завершена в срок.

@@ -7,7 +7,7 @@
 
 import Foundation
 import UIKit
-import SwiftUICore
+import SwiftUI
 
 struct CalendatItem: Identifiable, Equatable {
     static func == (lhs: CalendatItem, rhs: CalendatItem) -> Bool {

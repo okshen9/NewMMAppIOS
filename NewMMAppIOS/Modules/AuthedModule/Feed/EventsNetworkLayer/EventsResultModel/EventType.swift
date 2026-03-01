@@ -5,7 +5,7 @@
 //  Created by artem on 06.04.2025.
 //
 
-import SwiftUICore
+import SwiftUI
 
 
 enum EventType: String, Codable, JSONRepresentable, UnknownCasedEnum {
